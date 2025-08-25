@@ -1,0 +1,56 @@
+<!-- Agregar esto justo después de <div class="dj-elite-container"> -->
+<nav style="background: rgba(10, 10, 10, 0.95) !important; backdrop-filter: blur(10px) !important; padding: 15px 0 !important; position: fixed !important; top: 0 !important; width: 100% !important; z-index: 1000 !important; border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;">
+    <div style="max-width: 1100px !important; margin: 0 auto !important; padding: 0 20px !important; display: flex !important; justify-content: space-between !important; align-items: center !important;">
+        
+        <!-- Logo/Marca -->
+        <div style="color: #FFFFFF !important; font-weight: 700 !important; font-size: 1.5rem !important;">
+            DJ Elite
+        </div>
+        
+        <!-- Menú de navegación -->
+        <div style="display: flex !important; gap: 30px !important;">
+            <a href="#features" style="color: #B8B8CC !important; text-decoration: none !important; font-weight: 500 !important; transition: color 0.3s ease !important;">
+                Módulos
+            </a>
+            <a href="#testimonials" style="color: #B8B8CC !important; text-decoration: none !important; font-weight: 500 !important; transition: color 0.3s ease !important;">
+                Testimonios
+            </a>
+            <a href="#pricing" style="color: #B8B8CC !important; text-decoration: none !important; font-weight: 500 !important; transition: color 0.3s ease !important;">
+                Precios
+            </a>
+        </div>
+        
+        <!-- Botón CTA -->
+        <a href="#pricing" style="background: linear-gradient(135deg, #00C2B2 0%, #6C3B9F 100%) !important; color: #FFFFFF !important; padding: 10px 20px !important; border-radius: 25px !important; text-decoration: none !important; font-weight: 600 !important; font-size: 0.9rem !important;">
+            Empezar
+        </a>
+    </div>
+</nav>
+
+<style>
+/* Ajustar el hero para que no quede detrás de la navbar */
+.dj-elite-container .hero {
+    padding-top: 180px !important; /* Aumentado para compensar la navbar fija */
+}
+
+/* Efectos hover para la navbar */
+.dj-elite-container nav a:hover {
+    color: #00C2B2 !important;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+    .dj-elite-container nav > div {
+        flex-direction: column !important;
+        gap: 15px !important;
+    }
+    
+    .dj-elite-container nav > div > div:nth-child(2) {
+        order: 3 !important;
+    }
+    
+    .dj-elite-container .hero {
+        padding-top: 200px !important;
+    }
+}
+</style>
