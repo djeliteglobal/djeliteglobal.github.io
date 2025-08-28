@@ -22,7 +22,7 @@ function App() {
   return (
     <div className="App">
       <Header />
-      <main className="App-main">
+      <main className="main-content">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />

@@ -1,24 +1,23 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import '../App.css';
+import { NavLink } from 'react-router-dom';
 
 function Header() {
   return (
-    <header className="header">
-      <div className="container">
-        <div className="logo">
-          <Link to="/">DJ Elite</Link>
+    <header className="app-header">
+      <div className="header-container">
+        <div className="header-logo">
+          <NavLink to="/">DJ<span>Elite</span></NavLink>
         </div>
-        <nav className="nav">
+        <nav className="header-nav">
           <ul>
-            <li><Link to="/courses">Courses</Link></li>
-            <li><Link to="/shop">Shop</Link></li>
-            <li><Link to="/dashboard">My Dashboard</Link></li>
+            <li><NavLink to="/courses">Courses</NavLink></li>
+            <li><NavLink to="/shop">Shop</NavLink></li>
+            <li><NavLink to="/community">Community</NavLink></li>
           </ul>
         </nav>
-        <div className="user-actions">
-          <Link to="/login" className="login-btn">Login</Link>
-          <Link to="/register" className="signup-btn">Sign up</Link>
+        <div className="header-actions">
+          <NavLink to="/login" className="btn btn-secondary">Login</NavLink>
+          <NavLink to="/register" className="btn btn-primary">Sign Up</NavLink>
         </div>
       </div>
     </header>
