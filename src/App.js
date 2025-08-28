@@ -4,6 +4,7 @@ import './App.css';
 
 // Import components
 import Header from './components/Header';
+import Footer from './components/Footer';
 
 // Import page components
 import HomePage from './pages/HomePage';
@@ -37,6 +38,7 @@ function App() {
           <Route path="/checkout" element={<CheckoutPage />} />
         </Routes>
       </main>
+      <Footer />
     </div>
   );
 }
