@@ -13,9 +13,11 @@ export const handler: Handler = async (event, context) => {
   try {
     const stripeEvent = stripe.webhooks.constructEvent(event.body, sig, webhookSecret);
 
-    if (stripeEvent.type === 'checkout.session.completed') {
-      const session = stripeEvent.data.object as Stripe.Checkout.Session;
+    if (stripeEvent.type === 'payment_intent.succeeded') {
+      const paymentIntent = stripeEvent.data.object as Stripe.PaymentIntent;
+      const email = paymentIntent.receipt_email;
 
+      // Add to Systeme.io CRM
       await fetch('https://api.systeme.io/api/contacts', {
         method: 'POST',
         headers: {
@@ -23,7 +25,7 @@ export const handler: Handler = async (event, context) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: session.customer_details.email,
+          email: email,
           tags: ['paid-customer'],
         }),
       });
