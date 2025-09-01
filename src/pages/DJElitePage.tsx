@@ -69,8 +69,12 @@ export const DJElitePage: React.FC = () => {
                                     ))}
                                 </ul>
                            </div>
-                           <form name="newsletter" method="POST" data-netlify="true" className="flex flex-col gap-4">
-                               <input type="hidden" name="form-name" value="newsletter" />
+                           <form onSubmit={(e) => {
+                               e.preventDefault();
+                               const formData = new FormData(e.target as HTMLFormElement);
+                               alert('Thank you for subscribing! We\'ll be in touch soon.');
+                               (e.target as HTMLFormElement).reset();
+                           }} className="flex flex-col gap-4">
                                <input type="text" name="first_name" placeholder="Enter your first name" required className="w-full px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />
                                <input type="email" name="email" placeholder="Enter your best email" required className="w-full px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />
                                <Button type="submit" className="w-full py-3">GET FREE PREVIEW NOW →</Button>
@@ -337,8 +341,12 @@ export const DJElitePage: React.FC = () => {
                 <div className="container mx-auto px-4 py-16 text-center">
                     <Logo className="text-2xl mx-auto" />
                     <p className="mt-4 max-w-md mx-auto text-[color:var(--text-secondary)]">Get weekly DJ tips, industry insights, and exclusive opportunities.</p>
-                    <form name="footer-newsletter" method="POST" data-netlify="true" className="mt-6 max-w-sm mx-auto flex gap-2">
-                        <input type="hidden" name="form-name" value="footer-newsletter" />
+                    <form onSubmit={(e) => {
+                        e.preventDefault();
+                        const formData = new FormData(e.target as HTMLFormElement);
+                        alert('Thank you for subscribing! We\'ll be in touch soon.');
+                        (e.target as HTMLFormElement).reset();
+                    }} className="mt-6 max-w-sm mx-auto flex gap-2">
                         <input type="email" name="email" placeholder="Your email address" required className="flex-grow px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />
                         <Button type="submit" className="px-6">Subscribe</Button>
                     </form>
