@@ -70,7 +70,6 @@ export const DJElitePage: React.FC = () => {
                                 </ul>
                            </div>
                            <form action="/.netlify/functions/systeme-subscribe" method="POST" className="flex flex-col gap-4">
-                               <input type="hidden" name="workflow_id" value="426949" />
                                <input type="text" name="first_name" placeholder="Enter your first name" required className="w-full px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />
                                <input type="email" name="email" placeholder="Enter your best email" required className="w-full px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />
                                <Button type="submit" className="w-full py-3">GET FREE PREVIEW NOW →</Button>
@@ -338,7 +337,6 @@ export const DJElitePage: React.FC = () => {
                     <Logo className="text-2xl mx-auto" />
                     <p className="mt-4 max-w-md mx-auto text-[color:var(--text-secondary)]">Get weekly DJ tips, industry insights, and exclusive opportunities.</p>
                     <form action="/.netlify/functions/systeme-subscribe" method="POST" className="mt-6 max-w-sm mx-auto flex gap-2">
-                        <input type="hidden" name="workflow_id" value="426949" />
                         <input type="email" name="email" placeholder="Your email address" required className="flex-grow px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />
                         <Button type="submit" className="px-6">Subscribe</Button>
                     </form>

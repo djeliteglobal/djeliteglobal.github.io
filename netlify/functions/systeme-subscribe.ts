@@ -15,8 +15,16 @@ const handler: Handler = async (event) => {
   }
 
   try {
-    const { email, first_name } = JSON.parse(event.body || '{}');
+    // Parse form data instead of JSON
+    const params = new URLSearchParams(event.body || '');
+    const email = params.get('email');
+    const first_name = params.get('first_name') || '';
+    
     console.log('Adding contact:', { email, first_name });
+    
+    if (!email) {
+      throw new Error('Email is required');
+    }
 
     const response = await fetch('https://systeme.io/api/contacts', {
       method: 'POST',
