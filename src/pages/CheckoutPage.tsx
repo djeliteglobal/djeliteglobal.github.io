@@ -100,7 +100,12 @@ const CheckoutPage = () => {
         <main className="flex-grow container mx-auto px-4 py-12 flex items-center justify-center">
             <div className="w-full max-w-md bg-[color:var(--surface)] p-8 rounded-2xl border border-[color:var(--border)]">
                 <h1 className="text-3xl font-display font-bold text-center mb-2">Complete Your Enrollment</h1>
-                <p className="text-center text-[color:var(--text-secondary)] mb-8">You're one step away from becoming a DJ Elite.</p>
+                <p className="text-center text-[color:var(--text-secondary)] mb-4">You're one step away from becoming a DJ Elite.</p>
+                <div className="text-center mb-8 p-4 bg-[color:var(--surface-alt)] rounded-lg border border-[color:var(--accent)]/20">
+                    <p className="text-sm text-[color:var(--muted)]">DJ Elite Complete Course</p>
+                    <p className="text-3xl font-bold text-[color:var(--accent)]">$497</p>
+                    <p className="text-xs text-[color:var(--muted)]">One-time payment • 90-day guarantee</p>
+                </div>
                 {clientSecret && (
                     <Elements options={options} stripe={stripePromise}>
                         <CheckoutForm />

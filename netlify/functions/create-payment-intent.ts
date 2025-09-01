@@ -28,10 +28,11 @@ const handler: Handler = async (event) => {
       },
     };
   } catch (error) {
+    console.error('Error in create-payment-intent:', error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: error.message }),
-       headers: { 
+      headers: { 
         'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json'
       },

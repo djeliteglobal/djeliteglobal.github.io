@@ -59,7 +59,7 @@ export const DJElitePage: React.FC = () => {
                     <div className="mt-10 max-w-lg mx-auto">
                         <div className="bg-[color:var(--surface)]/50 backdrop-blur-md border border-[color:var(--border)] rounded-xl p-6">
                            <div className="text-left mb-4">
-                                <h3 className="font-bold text-lg text-[color:var(--accent)]">FREE ACCESS: WHAT YOU'LL LEARN</h3>
+                                <h3 className="font-bold text-lg text-[color:var(--accent)]">FREE TRAINING PREVIEW</h3>
                                 <ul className="mt-2 space-y-2 text-sm text-[color:var(--text-secondary)]">
                                     {leadMagnetPoints.map(point => (
                                         <li key={point} className="flex items-start">
@@ -69,10 +69,11 @@ export const DJElitePage: React.FC = () => {
                                     ))}
                                 </ul>
                            </div>
-                           <form className="flex flex-col gap-4">
-                               <input type="text" placeholder="Enter your first name" required className="w-full px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />
-                               <input type="email" placeholder="Enter your best email" required className="w-full px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />
-                               <Button className="w-full py-3">ACCESS FREE TRAINING NOW →</Button>
+                           <form action="https://systeme.io/api/forms/subscribe" method="POST" className="flex flex-col gap-4">
+                               <input type="hidden" name="form_id" value="YOUR_SYSTEME_FORM_ID" />
+                               <input type="text" name="first_name" placeholder="Enter your first name" required className="w-full px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />
+                               <input type="email" name="email" placeholder="Enter your best email" required className="w-full px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />
+                               <Button type="submit" className="w-full py-3">GET FREE PREVIEW NOW →</Button>
                            </form>
                         </div>
                         <p className="mt-4 text-xs text-[color:var(--muted)]">🔒 Your information is 100% secure. Unsubscribe anytime.</p>
@@ -157,7 +158,7 @@ export const DJElitePage: React.FC = () => {
                     <div className="max-w-4xl mx-auto grid md:grid-cols-[1fr_auto_1fr] items-center gap-8">
                         <div className="bg-[color:var(--surface)] border border-[color:var(--border)] rounded-xl p-6 text-center">
                             <h3 className="font-bold text-2xl text-[color:var(--danger)]">BEFORE</h3>
-                            <img src="https://images.unsplash.com/photo-1594635955369-0128a5065a78?q=80&w=1287" alt="Bedroom DJ" className="my-4 rounded-lg aspect-square object-cover"/>
+                            <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=400&fit=crop" alt="Bedroom DJ" className="my-4 rounded-lg aspect-square object-cover w-full h-48"/>
                             <ul className="text-left space-y-2 text-[color:var(--text-secondary)]">
                                 {["Playing for empty rooms", "No industry connections", "Frustrated and stuck", "No income from DJing"].map(item => <li key={item} className="flex items-start"><span className="mr-2 text-red-500">×</span> {item}</li>)}
                             </ul>
@@ -168,7 +169,7 @@ export const DJElitePage: React.FC = () => {
                         </div>
                         <div className="bg-[color:var(--surface)] border border-[color:var(--accent)] shadow-[0_0_40px_-10px_rgba(0,245,122,0.2)] rounded-xl p-6 text-center">
                              <h3 className="font-bold text-2xl text-[color:var(--accent)]">AFTER</h3>
-                             <img src="https://images.unsplash.com/photo-1542028682-f45eea5179b5?q=80&w=1335" alt="Professional DJ" className="my-4 rounded-lg aspect-square object-cover"/>
+                             <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop" alt="Professional DJ" className="my-4 rounded-lg aspect-square object-cover w-full h-48"/>
                              <ul className="text-left space-y-2 text-[color:var(--text-secondary)]">
                                 {["Regular club bookings", "Strong industry network", "Confident and skilled", "Consistent DJ income"].map(item => <li key={item} className="flex items-start"><span className="mr-2 text-green-500">✓</span> {item}</li>)}
                             </ul>
@@ -194,7 +195,7 @@ export const DJElitePage: React.FC = () => {
                 <Section id="instructor">
                     <SectionHeadline>Meet Your Mentor</SectionHeadline>
                     <div className="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
-                        <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAgACwcDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9/KKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAC... [truncated]" alt="DJ Elite Mentor" className="rounded-lg shadow-2xl"/>
+                        <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&h=600&fit=crop" alt="DJ Elite Mentor" className="rounded-lg shadow-2xl w-full"/>
                         <div>
                             <h3 className="font-display text-3xl font-bold">From Bedroom to Headliner</h3>
                             <p className="mt-4 text-[color:var(--text-secondary)]">Just 3 years ago, I was exactly where you are now. Mixing in my bedroom, dreaming of playing for real crowds, but having no idea how to make it happen.</p>
@@ -336,8 +337,9 @@ export const DJElitePage: React.FC = () => {
                 <div className="container mx-auto px-4 py-16 text-center">
                     <Logo className="text-2xl mx-auto" />
                     <p className="mt-4 max-w-md mx-auto text-[color:var(--text-secondary)]">Get weekly DJ tips, industry insights, and exclusive opportunities.</p>
-                    <form className="mt-6 max-w-sm mx-auto flex gap-2">
-                        <input type="email" placeholder="Your email address" required className="flex-grow px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />
+                    <form action="https://systeme.io/api/forms/subscribe" method="POST" className="mt-6 max-w-sm mx-auto flex gap-2">
+                        <input type="hidden" name="form_id" value="YOUR_SYSTEME_FORM_ID" />
+                        <input type="email" name="email" placeholder="Your email address" required className="flex-grow px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />
                         <Button type="submit" className="px-6">Subscribe</Button>
                     </form>
                     <div className="mt-8 flex justify-center gap-6 text-[color:var(--muted)]">
