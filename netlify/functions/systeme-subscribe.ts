@@ -26,21 +26,40 @@ const handler: Handler = async (event) => {
       throw new Error('Email is required');
     }
 
-    const response = await fetch('https://systeme.io/api/contacts', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.SYSTEMEIO_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        email,
-        first_name,
-        tags: ['Newsletter Subscriber']
-      })
-    });
+    // Try different API endpoints
+    const endpoints = [
+      'https://api.systeme.io/contacts',
+      'https://systeme.io/api/contacts',
+      'https://app.systeme.io/api/contacts'
+    ];
+    
+    let response;
+    let lastError;
+    
+    for (const endpoint of endpoints) {
+      try {
+        response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.SYSTEMEIO_API_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email,
+            first_name,
+            tags: ['Newsletter Subscriber']
+          })
+        });
+        
+        if (response.ok) break;
+        lastError = `${endpoint}: ${response.status}`;
+      } catch (err) {
+        lastError = `${endpoint}: ${err.message}`;
+      }
+    }
 
-    if (!response.ok) {
-      throw new Error(`Systeme.io API error: ${response.status}`);
+    if (!response || !response.ok) {
+      throw new Error(`All Systeme.io API endpoints failed. Last error: ${lastError}`);
     }
 
     const result = await response.json();
