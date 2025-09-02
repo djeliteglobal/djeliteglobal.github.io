@@ -3,6 +3,7 @@ import { loadStripe, StripeElementsOptions } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { Logo } from '../constants';
 import { Button } from '../components';
+import '../animations.css';
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
@@ -51,9 +52,14 @@ const CheckoutForm = () => {
             className="w-full px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all"
         />
         <PaymentElement id="payment-element" />
-        <Button variant="purchase" disabled={isLoading || !stripe || !elements} id="submit" className="w-full">
+        <Button variant="purchase" disabled={isLoading || !stripe || !elements} id="submit" className="w-full btn-animate">
             <span id="button-text">
-                {isLoading ? <div className="spinner" id="spinner"></div> : "Pay now"}
+                {isLoading ? (
+                    <div className="flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                        Processing...
+                    </div>
+                ) : "Pay $497 Now"}
             </span>
         </Button>
         {message && <div id="payment-message" className="text-red-500 text-center mt-2">{message}</div>}
@@ -106,10 +112,20 @@ const CheckoutPage = () => {
                     <p className="text-3xl font-bold text-[color:var(--accent)]">$497</p>
                     <p className="text-xs text-[color:var(--muted)]">One-time payment • 90-day guarantee</p>
                 </div>
-                {clientSecret && (
+                {clientSecret ? (
                     <Elements options={options} stripe={stripePromise}>
                         <CheckoutForm />
                     </Elements>
+                ) : (
+                    <div className="space-y-6">
+                        <div className="w-full h-12 bg-[color:var(--surface-alt)] rounded-lg animate-pulse"></div>
+                        <div className="w-full h-32 bg-[color:var(--surface-alt)] rounded-lg animate-pulse"></div>
+                        <div className="w-full h-12 bg-[color:var(--surface-alt)] rounded-lg animate-pulse"></div>
+                        <div className="text-center text-[color:var(--text-secondary)] flex items-center justify-center">
+                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[color:var(--accent)] mr-3"></div>
+                            Loading secure payment form...
+                        </div>
+                    </div>
                 )}
             </div>
         </main>

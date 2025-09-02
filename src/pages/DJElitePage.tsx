@@ -359,7 +359,7 @@ export const DJElitePage: React.FC = () => {
                         <a href="#" className="hover:text-[color:var(--text-primary)] transition-colors">Terms</a>
                         <a href="#" className="hover:text-[color:var(--text-primary)] transition-colors">Privacy</a>
                         <a href="#" className="hover:text-[color:var(--text-primary)] transition-colors">Contact</a>
-                        <a href={`https://www.buymeacoffee.com/${import.meta.env.VITE_BUY_ME_A_COFFEE_USERNAME}`} target="_blank" rel="noopener noreferrer" className="hover:text-[color:var(--text-primary)] transition-colors">Buy Me a Coffee</a>
+                        <a href="https://buymeacoffee.com/elitedjs" target="_blank" rel="noopener noreferrer" className="hover:text-[color:var(--text-primary)] transition-colors">Buy Me a Coffee</a>
                     </div>
                     <p className="mt-8 text-sm text-[color:var(--muted)]">&copy; {new Date().getFullYear()} DJ Elite. All rights reserved.</p>
                 </div>
