@@ -356,10 +356,12 @@ export const DJElitePage: React.FC = () => {
                 <Section id="faq" className="bg-[color:var(--surface-alt)]" animationType="animate-fade-in-left">
                     <SectionHeadline>Frequently Asked Questions</SectionHeadline>
                     <div className="max-w-3xl mx-auto space-y-4">
-                        {FAQS.map(faq => (
-                            <AccordionItem key={faq.question} title={faq.question}>
-                                <p>{faq.answer}</p>
-                            </AccordionItem>
+                        {FAQS.map((faq, index) => (
+                            <SelectableCard key={faq.question} id={`faq-${index}`} className="">
+                                <AccordionItem title={faq.question}>
+                                    <p>{faq.answer}</p>
+                                </AccordionItem>
+                            </SelectableCard>
                         ))}
                     </div>
                 </Section>
