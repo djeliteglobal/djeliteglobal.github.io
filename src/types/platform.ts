@@ -1,0 +1,73 @@
+export type Page = 'dashboard' | 'courses' | 'course_detail' | 'community' | 'opportunities' | 'settings' | 'landing';
+
+export interface AppState {
+  theme: 'light' | 'dark';
+  isLoggedIn: boolean;
+  page: Page;
+  courseId: number | null;
+  isSidebarOpen: boolean;
+}
+
+export type AppContextType = {
+  appState: AppState;
+  setAppState: React.Dispatch<React.SetStateAction<AppState>>;
+  navigate: (page: Page, courseId?: number | null) => void;
+};
+
+export interface User {
+  name: string;
+  email: string;
+  avatarUrl: string;
+  plan: 'Free' | 'Pro Annual' | 'Pro Monthly';
+}
+
+export interface Lesson {
+  id: number;
+  title: string;
+  duration: string;
+  type: 'video' | 'quiz' | 'resource';
+}
+
+export interface Module {
+  id: number;
+  title: string;
+  lessons: Lesson[];
+}
+
+export interface Course {
+  id: number;
+  title: string;
+  instructor: string;
+  duration: string;
+  level: 'Beginner' | 'Intermediate' | 'Advanced' | 'All Levels';
+  category: string;
+  imageUrl: string;
+  progress: number;
+  description: string;
+  modules: Module[];
+}
+
+export interface PricingPlan {
+  name: string;
+  price: string;
+  priceDetails: string;
+  features: string[];
+  isFeatured: boolean;
+  cta: string;
+}
+
+export interface FaqItem {
+    question: string;
+    answer: string;
+}
+
+export interface Opportunity {
+  id: number;
+  title:string;
+  venue: string;
+  location: string;
+  date: string;
+  genres: string[];
+  fee: string;
+  imageUrl: string;
+}
