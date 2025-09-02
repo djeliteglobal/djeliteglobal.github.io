@@ -24,9 +24,10 @@ const Section: React.FC<{id: string, className?: string, children: React.ReactNo
         <section 
             ref={ref} 
             id={id} 
-            className={`py-20 sm:py-28 ${className} opacity-0 transition-all duration-500 relative ${
+            className={`py-20 sm:py-28 ${className} transition-all duration-500 relative ${
                 isSelected ? 'bg-[color:var(--accent)]/3 shadow-[inset_4px_0_0_0_var(--accent)]' : ''
             }`} 
+            style={{opacity: 0}}
             onClick={() => onSelect?.(id)}
             {...props}
         >

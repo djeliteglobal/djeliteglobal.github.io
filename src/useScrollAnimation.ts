@@ -11,6 +11,7 @@ export const useScrollAnimation = (animationClass: string = 'animate-fade-in-up'
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
+            (entry.target as HTMLElement).style.opacity = '1';
             entry.target.classList.add(animationClass);
             observer.unobserve(entry.target);
           }
