@@ -14,6 +14,7 @@ import {
     BONUSES,
     FAQS,
 } from '../constants';
+import '../animations.css';
 
 const Section: React.FC<{id: string, className?: string, children: React.ReactNode} & React.HTMLAttributes<HTMLElement>> = ({ id, className, children, ...props}) => (
     <section id={id} className={`py-20 sm:py-28 ${className}`} {...props}>
@@ -42,21 +43,21 @@ export const DJElitePage: React.FC = () => {
     ];
 
     return (
-        <div className="bg-[color:var(--bg)] text-[color:var(--text-primary)] antialiased">
+        <div className="bg-[color:var(--bg)] text-[color:var(--text-primary)] antialiased animate-fade-in">
             
             {/* Hero Section */}
-            <header className="relative min-h-screen flex flex-col items-center justify-center text-center p-4 overflow-hidden">
+            <header className="relative min-h-screen flex flex-col items-center justify-center text-center p-4 overflow-hidden animate-fade-in-up">
                 <img src="https://images.unsplash.com/photo-1517814761483-6769dab4e9c0" alt="DJ performing at a club" className="absolute z-0 top-0 left-0 w-full h-full object-cover opacity-20"/>
                 <div className="absolute inset-0 bg-gradient-to-t from-[color:var(--bg)] via-transparent to-transparent"></div>
 
                 <div className="relative z-10">
-                    <h1 className="font-display text-4xl sm:text-6xl md:text-7xl font-bold tracking-tighter max-w-4xl mx-auto">
+                    <h1 className="font-display text-4xl sm:text-6xl md:text-7xl font-bold tracking-tighter max-w-4xl mx-auto animate-fade-in-up animate-delay-200">
                         The Exact System to Go From Bedroom DJ to <span className="text-[color:var(--accent)]">Playing best events</span> in 90 Days
                     </h1>
-                    <p className="mt-6 text-lg sm:text-xl text-[color:var(--text-secondary)] max-w-2xl mx-auto">
+                    <p className="mt-6 text-lg sm:text-xl text-[color:var(--text-secondary)] max-w-2xl mx-auto animate-fade-in-up animate-delay-300">
                         discover how hundreds of djs have landed their first professional gigs using this proven method.
                     </p>
-                    <div className="mt-10 max-w-lg mx-auto">
+                    <div className="mt-10 max-w-lg mx-auto animate-fade-in-up animate-delay-400">
                         <div className="bg-[color:var(--surface)]/50 backdrop-blur-md border border-[color:var(--border)] rounded-xl p-6">
                            <div className="text-left mb-4">
                                 <h3 className="font-bold text-lg text-[color:var(--accent)]">FREE TRAINING PREVIEW</h3>
@@ -77,7 +78,7 @@ export const DJElitePage: React.FC = () => {
                            }} className="flex flex-col gap-4">
                                <input type="text" name="first_name" placeholder="Enter your first name" required className="w-full px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />
                                <input type="email" name="email" placeholder="Enter your best email" required className="w-full px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />
-                               <Button type="submit" className="w-full py-3">GET FREE PREVIEW NOW →</Button>
+                               <Button type="submit" className="w-full py-3 btn-animate">GET FREE PREVIEW NOW →</Button>
                            </form>
                         </div>
                         <p className="mt-4 text-xs text-[color:var(--muted)]">🔒 Your information is 100% secure. Unsubscribe anytime.</p>
@@ -86,7 +87,7 @@ export const DJElitePage: React.FC = () => {
             </header>
 
             {/* Social Proof Band */}
-            <section className="bg-[color:var(--surface)] py-12">
+            <section className="bg-[color:var(--surface)] py-12 animate-fade-in-up">
                 <div className="container mx-auto px-4">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
                         {SOCIAL_PROOF_STATS.map(stat => (
@@ -116,7 +117,7 @@ export const DJElitePage: React.FC = () => {
                     
                     <div className="relative z-10">
                         <SectionHeadline>Does This Sound Familiar?</SectionHeadline>
-                        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto animate-fade-in-up animate-delay-200">
                             {PAIN_POINTS.map(point => (
                                 <div key={point.title} className="bg-[color:var(--surface)]/80 backdrop-blur-sm border border-[color:var(--border)] rounded-lg p-6 flex items-start gap-4">
                                     <span className="text-4xl mt-1">{point.icon}</span>
@@ -168,7 +169,7 @@ export const DJElitePage: React.FC = () => {
                             </ul>
                         </div>
                         <div className="text-center">
-                             <div className="text-5xl text-[color:var(--accent)] animate-pulse">→</div>
+                             <div className="text-5xl text-[color:var(--accent)] animate-pulse-slow">→</div>
                              <div className="mt-2 text-sm font-bold bg-[color:var(--accent)] text-black rounded-full px-3 py-1">90 DAYS</div>
                         </div>
                         <div className="bg-[color:var(--surface)] border border-[color:var(--accent)] shadow-[0_0_40px_-10px_rgba(0,245,122,0.2)] rounded-xl p-6 text-center">
@@ -324,8 +325,8 @@ export const DJElitePage: React.FC = () => {
                              <p className="font-display text-6xl font-bold text-[color:var(--accent)]">$497</p>
                              <p className="font-bold bg-[color:var(--accent)] text-black inline-block px-4 py-1 rounded-full mt-2">Save $2,867 Today!</p>
                         </div>
-                        <Link to="/checkout">
-                            <Button variant="purchase" className="w-full text-xl py-5">
+                        <Link to="/checkout" className="hover-lift">
+                            <Button variant="purchase" className="w-full text-xl py-5 btn-animate">
                                 <div className="flex flex-col">
                                     <span>🚀 ENROLL IN DJ ELITE NOW</span>
                                     <span className="text-xs font-normal mt-1 opacity-80">90-Day Money-Back Guarantee</span>
@@ -348,7 +349,7 @@ export const DJElitePage: React.FC = () => {
                         (e.target as HTMLFormElement).reset();
                     }} className="mt-6 max-w-sm mx-auto flex gap-2">
                         <input type="email" name="email" placeholder="Your email address" required className="flex-grow px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />
-                        <Button type="submit" className="px-6">Subscribe</Button>
+                        <Button type="submit" className="px-6 btn-animate">Subscribe</Button>
                     </form>
                     <div className="mt-8 flex justify-center gap-6 text-[color:var(--muted)]">
                         <a href="#" className="hover:text-[color:var(--text-primary)] transition-colors">Terms</a>
