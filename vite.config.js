@@ -5,5 +5,8 @@ export default defineConfig({
   plugins: [react()],
   build: {
     outDir: 'dist'
+  },
+  esbuild: {
+    target: 'es2015'
   }
 })
