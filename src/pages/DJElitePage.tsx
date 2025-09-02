@@ -24,15 +24,15 @@ const Section: React.FC<{id: string, className?: string, children: React.ReactNo
         <section 
             ref={ref} 
             id={id} 
-            className={`py-20 sm:py-28 ${className} opacity-0 cursor-pointer transition-all duration-300 relative ${
-                isSelected ? 'bg-[color:var(--accent)]/5 border-l-4 border-[color:var(--accent)]' : 'hover:bg-[color:var(--surface)]/30'
+            className={`py-20 sm:py-28 ${className} opacity-0 transition-all duration-500 relative ${
+                isSelected ? 'bg-[color:var(--accent)]/3 shadow-[inset_4px_0_0_0_var(--accent)]' : ''
             }`} 
             onClick={() => onSelect?.(id)}
             {...props}
         >
             {isSelected && (
-                <div className="absolute top-4 right-4 w-6 h-6 bg-[color:var(--accent)] rounded-full flex items-center justify-center animate-pulse-slow">
-                    <span className="text-black text-sm font-bold">✓</span>
+                <div className="absolute top-6 right-6 w-8 h-8 bg-[color:var(--accent)]/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-[color:var(--accent)]/50">
+                    <span className="text-[color:var(--accent)] text-sm font-bold">✓</span>
                 </div>
             )}
             <div className="container mx-auto px-4">
