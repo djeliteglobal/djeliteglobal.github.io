@@ -336,19 +336,19 @@ export const DJElitePage: React.FC = () => {
                 <Section id="urgency" animationType="animate-fade-in-up">
                     <SectionHeadline>⚠️ This Offer Won't Last Forever</SectionHeadline>
                     <div className="grid md:grid-cols-2 gap-8 items-center max-w-5xl mx-auto">
-                        <div className="bg-[color:var(--surface)] border border-[color:var(--border)] rounded-lg p-8 text-center">
+                        <SelectableCard id="countdown-card" className="bg-[color:var(--surface)] border border-[color:var(--border)] rounded-lg p-8 text-center">
                             <h3 className="text-xl font-bold">This special price expires in:</h3>
                             <div className="my-6">
                                 <CountdownTimer />
                             </div>
                             <p className="text-sm text-[color:var(--muted)]">The price will be increasing to $997 soon. Lock in your discount now.</p>
-                        </div>
-                        <div className="bg-[color:var(--surface)] border border-[color:var(--border)] rounded-lg p-8 text-center">
+                        </SelectableCard>
+                        <SelectableCard id="scarcity-card" className="bg-[color:var(--surface)] border border-[color:var(--border)] rounded-lg p-8 text-center">
                             <h3 className="text-xl font-bold">🔥 Only 50 spots available in this cohort</h3>
                             <p className="text-6xl font-display font-bold my-4 text-[color:var(--accent)]">23</p>
                             <p className="text-lg font-bold">spots remaining</p>
                             <p className="mt-2 text-sm text-[color:var(--muted)]">To ensure quality mentorship, I'm limiting this enrollment. Once these spots are filled, the doors close.</p>
-                        </div>
+                        </SelectableCard>
                     </div>
                 </Section>
                 
