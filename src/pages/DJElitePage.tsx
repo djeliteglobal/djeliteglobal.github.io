@@ -255,11 +255,11 @@ export const DJElitePage: React.FC = () => {
                             <h3 className="font-display text-3xl font-bold">From Bedroom to Headliner</h3>
                             <p className="mt-4 text-[color:var(--text-secondary)]">Just 3 years ago, I was exactly where you are now. Mixing in my bedroom, dreaming of playing for real crowds, but having no idea how to make it happen.</p>
                             <div className="mt-6 grid grid-cols-2 gap-6">
-                                {INSTRUCTOR_CREDENTIALS.map(cred => (
-                                    <div key={cred.title}>
+                                {INSTRUCTOR_CREDENTIALS.map((cred, index) => (
+                                    <SelectableCard key={cred.title} id={`credential-${index}`} className="p-4 bg-[color:var(--surface)] rounded-lg border border-[color:var(--border)]">
                                         <h4 className="font-bold">{cred.title}</h4>
                                         <p className="text-sm text-[color:var(--muted)]">{cred.description}</p>
-                                    </div>
+                                    </SelectableCard>
                                 ))}
                             </div>
                         </div>
