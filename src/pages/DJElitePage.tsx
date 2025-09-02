@@ -63,8 +63,8 @@ const SelectableCard: React.FC<{id: string, children: React.ReactNode, className
 
 const SectionHeadline: React.FC<{children: React.ReactNode, subheadline?: string}> = ({ children, subheadline }) => (
     <div className="max-w-4xl mx-auto text-center mb-12 md:mb-20">
-        <h2 className="font-display text-4xl sm:text-5xl font-bold tracking-tighter">{children}</h2>
-        {subheadline && <p className="mt-4 max-w-2xl mx-auto text-lg text-[color:var(--text-secondary)]">{subheadline}</p>}
+        <h2 className="font-display text-4xl sm:text-5xl font-bold tracking-tighter animate-fade-in-up">{children}</h2>
+        {subheadline && <p className="mt-4 max-w-2xl mx-auto text-lg text-[color:var(--text-secondary)] animate-fade-in-up animate-delay-200">{subheadline}</p>}
     </div>
 );
 
@@ -89,7 +89,7 @@ export const DJElitePage: React.FC = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-[color:var(--bg)] via-transparent to-transparent"></div>
 
                 <div className="relative z-10">
-                    <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tighter max-w-4xl mx-auto animate-fade-in-up animate-delay-200" style={{fontFamily: 'Inter, sans-serif'}}>
+                    <h1 className="font-display text-4xl sm:text-6xl md:text-7xl font-bold tracking-tighter max-w-4xl mx-auto animate-fade-in-up animate-delay-200">
                         The Exact System to Go From Bedroom DJ to <span className="text-[color:var(--accent)]">Playing at top events</span> in 90 Days
                     </h1>
                     <p className="mt-6 text-lg sm:text-xl text-[color:var(--text-secondary)] max-w-2xl mx-auto animate-fade-in-up animate-delay-300">
@@ -98,7 +98,7 @@ export const DJElitePage: React.FC = () => {
                     <div className="mt-10 max-w-lg mx-auto animate-fade-in-up animate-delay-400">
                         <div className="bg-[color:var(--surface)]/50 backdrop-blur-md border border-[color:var(--border)] rounded-xl p-6">
                            <div className="text-left mb-4">
-                                <h3 className="font-bold text-lg text-[color:var(--accent)]">FREE TRAINING PREVIEW</h3>
+                                <h3 className="font-bold text-lg text-[color:var(--accent)]">🎁 FREE TRAINING PREVIEW</h3>
                                 <ul className="mt-2 space-y-2 text-sm text-[color:var(--text-secondary)]">
                                     {leadMagnetPoints.map(point => (
                                         <li key={point} className="flex items-start">
