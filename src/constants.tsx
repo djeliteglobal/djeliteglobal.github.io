@@ -15,12 +15,16 @@ export const SOCIAL_PROOF_STATS = [
 ];
 
 export const VENUE_LOGOS = [
-    { name: 'Ultra Music Festival', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Ultra_Music_Festival_logo.svg/1280px-Ultra_Music_Festival_logo.svg.png' },
-    { name: 'Tomorrowland', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Tomorrowland_logo.svg/1280px-Tomorrowland_logo.svg.png' },
-    { name: 'Electric Daisy Carnival', src: 'https://upload.wikimedia.org/wikipedia/commons/2/25/EDC_Logo_New.png' },
-    { name: 'Privilege Ibiza', src: 'https://i.pinimg.com/originals/f5/01/a3/f501a35117f3089d81745749a5a3a2a4.png' },
-    { name: 'Fabric London', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Fabric_club_logo.svg/2560px-Fabric_club_logo.svg.png' },
-    { name: 'Berghain Berlin', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Berghain_logo.svg/1280px-Berghain_logo.svg.png' },
+    { name: 'Ultra Music Festival', src: 'https://logos-world.net/wp-content/uploads/2021/02/Ultra-Music-Festival-Logo.png' },
+    { name: 'Tomorrowland', src: 'https://logos-world.net/wp-content/uploads/2021/02/Tomorrowland-Logo.png' },
+    { name: 'Electric Daisy Carnival', src: 'https://logos-world.net/wp-content/uploads/2021/02/Electric-Daisy-Carnival-Logo.png' },
+    { name: 'Coachella', src: 'https://logos-world.net/wp-content/uploads/2020/12/Coachella-Logo.png' },
+    { name: 'Fabric London', src: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=200&h=80&fit=crop&crop=center' },
+    { name: 'Amnesia Ibiza', src: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&h=80&fit=crop&crop=center' },
+    { name: 'Pacha', src: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=200&h=80&fit=crop&crop=center' },
+    { name: 'Ministry of Sound', src: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&h=80&fit=crop&crop=center' },
+    { name: 'Burning Man', src: 'https://logos-world.net/wp-content/uploads/2021/02/Burning-Man-Logo.png' },
+    { name: 'Creamfields', src: 'https://logos-world.net/wp-content/uploads/2021/02/Creamfields-Logo.png' },
 ];
 
 export const PAIN_POINTS = [
