@@ -96,7 +96,9 @@ export const DJElitePage: React.FC = () => {
                         discover how hundreds of djs have landed their first professional gigs using this proven method.
                     </p>
                     <div className="mt-10 max-w-lg mx-auto animate-fade-in-up animate-delay-400">
-                        <div className="bg-white/10 border border-white/20 rounded-xl p-6" style={{backdropFilter: 'blur(20px) saturate(180%)', WebkitBackdropFilter: 'blur(20px) saturate(180%)', backgroundColor: 'rgba(17, 17, 17, 0.4)'}}>
+                        <div className="relative bg-[color:var(--surface)]/20 border border-white/30 rounded-xl p-6 overflow-hidden">
+                            <div className="absolute inset-0 bg-[color:var(--surface)]/60 backdrop-blur-md rounded-xl"></div>
+                            <div className="relative z-10">
                            <div className="text-left mb-4">
                                 <h3 className="font-bold text-lg text-[color:var(--accent)]">🎁 FREE TRAINING PREVIEW</h3>
                                 <ul className="mt-2 space-y-2 text-sm text-[color:var(--text-secondary)]">
@@ -118,6 +120,8 @@ export const DJElitePage: React.FC = () => {
                                <input type="email" name="email" placeholder="Enter your best email" required className="w-full px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />
                                <Button type="submit" className="w-full py-3 btn-animate">GET FREE PREVIEW NOW →</Button>
                            </form>
+                        </div>
+                            </div>
                         </div>
                         <p className="mt-4 text-xs text-[color:var(--muted)]">🔒 Your information is 100% secure. Unsubscribe anytime.</p>
                     </div>
@@ -156,14 +160,14 @@ export const DJElitePage: React.FC = () => {
                     <div className="relative z-10">
                         <SectionHeadline>Does This Sound Familiar?</SectionHeadline>
                         <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto animate-fade-in-up animate-delay-200">
-                            {PAIN_POINTS.map(point => (
-                                <div key={point.title} className="bg-[color:var(--surface)]/80 backdrop-blur-sm border border-[color:var(--border)] rounded-lg p-6 flex items-start gap-4">
+                            {PAIN_POINTS.map((point, index) => (
+                                <SelectableCard key={point.title} id={`pain-${index}`} className="bg-[color:var(--surface)]/80 backdrop-blur-sm border border-[color:var(--border)] rounded-lg p-6 flex items-start gap-4">
                                     <span className="text-4xl mt-1">{point.icon}</span>
                                     <div>
                                         <h3 className="font-bold text-lg">{point.title}</h3>
                                         <p className="text-[color:var(--text-secondary)] mt-1">{point.description}</p>
                                     </div>
-                                </div>
+                                </SelectableCard>
                             ))}
                         </div>
                     </div>
