@@ -108,11 +108,27 @@ export const DJElitePage: React.FC = () => {
                                     ))}
                                 </ul>
                            </div>
-                           <form onSubmit={(e) => {
+                           <form onSubmit={async (e) => {
                                e.preventDefault();
                                const formData = new FormData(e.target as HTMLFormElement);
-                               alert('Thank you for subscribing! We\'ll be in touch soon.');
-                               (e.target as HTMLFormElement).reset();
+                               const data = {
+                                   first_name: formData.get('first_name'),
+                                   email: formData.get('email')
+                               };
+                               try {
+                                   const response = await fetch('/.netlify/functions/subscribe', {
+                                       method: 'POST',
+                                       body: JSON.stringify(data)
+                                   });
+                                   if (response.ok) {
+                                       alert('🎉 Success! Check your email for the free training preview.');
+                                       (e.target as HTMLFormElement).reset();
+                                   } else {
+                                       alert('Something went wrong. Please try again.');
+                                   }
+                               } catch (error) {
+                                   alert('Network error. Please try again.');
+                               }
                            }} className="flex flex-col gap-4">
                                <input type="text" name="first_name" placeholder="Enter your first name" required className="w-full px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />
                                <input type="email" name="email" placeholder="Enter your best email" required className="w-full px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />
@@ -392,11 +408,27 @@ export const DJElitePage: React.FC = () => {
                 <div className="container mx-auto px-4 py-16 text-center">
                     <Logo className="text-2xl mx-auto" />
                     <p className="mt-4 max-w-md mx-auto text-[color:var(--text-secondary)]">Get weekly DJ tips, industry insights, and exclusive opportunities.</p>
-                    <form onSubmit={(e) => {
+                    <form onSubmit={async (e) => {
                         e.preventDefault();
                         const formData = new FormData(e.target as HTMLFormElement);
-                        alert('Thank you for subscribing! We\'ll be in touch soon.');
-                        (e.target as HTMLFormElement).reset();
+                        const data = {
+                            first_name: 'Newsletter Subscriber',
+                            email: formData.get('email')
+                        };
+                        try {
+                            const response = await fetch('/.netlify/functions/subscribe', {
+                                method: 'POST',
+                                body: JSON.stringify(data)
+                            });
+                            if (response.ok) {
+                                alert('📧 Subscribed! You\'ll get weekly DJ tips and insights.');
+                                (e.target as HTMLFormElement).reset();
+                            } else {
+                                alert('Something went wrong. Please try again.');
+                            }
+                        } catch (error) {
+                            alert('Network error. Please try again.');
+                        }
                     }} className="mt-6 max-w-sm mx-auto flex gap-2">
                         <input type="email" name="email" placeholder="Your email address" required className="flex-grow px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />
                         <Button type="submit" className="px-6 btn-animate">Subscribe</Button>
