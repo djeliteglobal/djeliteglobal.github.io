@@ -35,21 +35,25 @@ const Section: React.FC<{id: string, className?: string, children: React.ReactNo
     );
 };
 
-const SelectableCard: React.FC<{id: string, children: React.ReactNode, className?: string}> = ({ id, children, className = '' }) => {
+const SelectableCard: React.FC<{id: string, children: React.ReactNode, className?: string, isRedVariant?: boolean}> = ({ id, children, className = '', isRedVariant = false }) => {
     const { toggleSelection, isSelected } = useSelection();
     
     return (
         <div 
             className={`${className} cursor-pointer transition-all duration-500 relative ${
                 isSelected(id) 
-                    ? 'bg-[color:var(--surface)] border border-[color:var(--accent)] shadow-[0_0_60px_-15px_rgba(0,245,122,0.3)] scale-105' 
+                    ? isRedVariant
+                        ? 'bg-[color:var(--surface)] border border-red-500 shadow-[0_0_60px_-15px_rgba(239,68,68,0.3)] scale-105'
+                        : 'bg-[color:var(--surface)] border border-[color:var(--accent)] shadow-[0_0_60px_-15px_rgba(0,245,122,0.3)] scale-105'
                     : 'hover:scale-102 hover:shadow-lg'
             }`}
             onClick={() => toggleSelection(id)}
         >
             {isSelected(id) && (
-                <div className="absolute -top-2 -right-2 w-8 h-8 bg-[color:var(--accent)] rounded-full flex items-center justify-center z-10 animate-pulse-slow">
-                    <span className="text-black text-sm font-bold">✓</span>
+                <div className={`absolute top-1 right-1 w-4 h-4 rounded-sm flex items-center justify-center z-10 ${
+                    isRedVariant ? 'bg-red-500/90' : 'bg-[color:var(--accent)]/90'
+                }`}>
+                    <span className="text-white text-xs">✓</span>
                 </div>
             )}
             {children}
@@ -80,13 +84,13 @@ export const DJElitePage: React.FC = () => {
         <div className="bg-[color:var(--bg)] text-[color:var(--text-primary)] antialiased animate-fade-in">
             
             {/* Hero Section */}
-            <header className="relative min-h-screen flex flex-col items-center justify-center text-center p-4 overflow-hidden animate-fade-in-up">
+            <header className="relative min-h-screen flex flex-col items-center justify-center text-center p-4 overflow-hidden">
                 <img src="https://images.unsplash.com/photo-1517814761483-6769dab4e9c0" alt="DJ performing at a club" className="absolute z-0 top-0 left-0 w-full h-full object-cover opacity-20"/>
                 <div className="absolute inset-0 bg-gradient-to-t from-[color:var(--bg)] via-transparent to-transparent"></div>
 
                 <div className="relative z-10">
-                    <h1 className="font-display text-4xl sm:text-6xl md:text-7xl font-bold tracking-tighter max-w-4xl mx-auto animate-fade-in-up animate-delay-200">
-                        The Exact System to Go From Bedroom DJ to <span className="text-[color:var(--accent)]">Playing best events</span> in 90 Days
+                    <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tighter max-w-4xl mx-auto animate-fade-in-up animate-delay-200" style={{fontFamily: 'Inter, sans-serif'}}>
+                        The Exact System to Go From Bedroom DJ to <span className="text-[color:var(--accent)]">Playing at top events</span> in 90 Days
                     </h1>
                     <p className="mt-6 text-lg sm:text-xl text-[color:var(--text-secondary)] max-w-2xl mx-auto animate-fade-in-up animate-delay-300">
                         discover how hundreds of djs have landed their first professional gigs using this proven method.
@@ -195,24 +199,24 @@ export const DJElitePage: React.FC = () => {
                 <Section id="transformation" animationType="animate-fade-in-up">
                     <SectionHeadline>The Transformation is Real</SectionHeadline>
                     <div className="max-w-4xl mx-auto grid md:grid-cols-[1fr_auto_1fr] items-center gap-8">
-                        <div className="bg-[color:var(--surface)] border border-[color:var(--border)] rounded-xl p-6 text-center">
+                        <SelectableCard id="before-card" className="bg-[color:var(--surface)] border border-[color:var(--border)] rounded-xl p-6 text-center" isRedVariant={true}>
                             <h3 className="font-bold text-2xl text-[color:var(--danger)]">BEFORE</h3>
                             <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=400&fit=crop" alt="Bedroom DJ" className="my-4 rounded-lg aspect-square object-cover w-full h-48"/>
                             <ul className="text-left space-y-2 text-[color:var(--text-secondary)]">
                                 {["Playing for empty rooms", "No industry connections", "Frustrated and stuck", "No income from DJing"].map(item => <li key={item} className="flex items-start"><span className="mr-2 text-red-500">×</span> {item}</li>)}
                             </ul>
-                        </div>
+                        </SelectableCard>
                         <div className="text-center">
                              <div className="text-5xl text-[color:var(--accent)] animate-pulse-slow">→</div>
                              <div className="mt-2 text-sm font-bold bg-[color:var(--accent)] text-black rounded-full px-3 py-1">90 DAYS</div>
                         </div>
-                        <div className="bg-[color:var(--surface)] border border-[color:var(--accent)] shadow-[0_0_40px_-10px_rgba(0,245,122,0.2)] rounded-xl p-6 text-center">
+                        <SelectableCard id="after-card" className="bg-[color:var(--surface)] border border-[color:var(--accent)] shadow-[0_0_40px_-10px_rgba(0,245,122,0.2)] rounded-xl p-6 text-center">
                              <h3 className="font-bold text-2xl text-[color:var(--accent)]">AFTER</h3>
                              <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop" alt="Professional DJ" className="my-4 rounded-lg aspect-square object-cover w-full h-48"/>
                              <ul className="text-left space-y-2 text-[color:var(--text-secondary)]">
                                 {["Regular club bookings", "Strong industry network", "Confident and skilled", "Consistent DJ income"].map(item => <li key={item} className="flex items-start"><span className="mr-2 text-green-500">✓</span> {item}</li>)}
                             </ul>
-                        </div>
+                        </SelectableCard>
                     </div>
                 </Section>
 
