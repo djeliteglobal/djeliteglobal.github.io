@@ -233,8 +233,11 @@ export const DJElitePage: React.FC = () => {
                 <Section id="testimonials" className="bg-[color:var(--surface-alt)]" animationType="animate-fade-in-left">
                     <SectionHeadline>Real Students, Real Results</SectionHeadline>
                     <div className="max-w-5xl mx-auto text-center">
-                        <TestimonialCard testimonial={TESTIMONIALS[activeTestimonial]} />
+                        <SelectableCard id={`testimonial-${activeTestimonial}`} className="">
+                            <TestimonialCard testimonial={TESTIMONIALS[activeTestimonial]} />
+                        </SelectableCard>
 
+                        </SelectableCard>
                         <div className="mt-8 flex justify-center gap-3">
                             {TESTIMONIALS.map((_, index) => (
                                 <button key={index} onClick={() => setActiveTestimonial(index)} className={`w-3 h-3 rounded-full transition-colors ${activeTestimonial === index ? 'bg-[color:var(--accent)]' : 'bg-[color:var(--border)] hover:bg-[color:var(--muted)]'}`}></button>
