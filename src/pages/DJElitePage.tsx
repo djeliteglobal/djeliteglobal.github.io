@@ -35,24 +35,21 @@ const Section: React.FC<{id: string, className?: string, children: React.ReactNo
     );
 };
 
-const SelectableBlock: React.FC<{id: string, children: React.ReactNode, className?: string, onClick?: () => void}> = ({ id, children, className = '', onClick }) => {
+const SelectableCard: React.FC<{id: string, children: React.ReactNode, className?: string}> = ({ id, children, className = '' }) => {
     const { toggleSelection, isSelected } = useSelection();
-    
-    const handleClick = () => {
-        toggleSelection(id);
-        onClick?.();
-    };
     
     return (
         <div 
-            className={`${className} cursor-pointer transition-all duration-300 relative ${
-                isSelected(id) ? 'bg-[color:var(--accent)]/10 border-[color:var(--accent)] shadow-lg' : 'hover:shadow-md'
+            className={`${className} cursor-pointer transition-all duration-500 relative ${
+                isSelected(id) 
+                    ? 'bg-[color:var(--surface)] border border-[color:var(--accent)] shadow-[0_0_60px_-15px_rgba(0,245,122,0.3)] scale-105' 
+                    : 'hover:scale-102 hover:shadow-lg'
             }`}
-            onClick={handleClick}
+            onClick={() => toggleSelection(id)}
         >
             {isSelected(id) && (
-                <div className="absolute top-2 right-2 w-6 h-6 bg-[color:var(--accent)] rounded-full flex items-center justify-center z-10">
-                    <span className="text-black text-xs font-bold">✓</span>
+                <div className="absolute -top-2 -right-2 w-8 h-8 bg-[color:var(--accent)] rounded-full flex items-center justify-center z-10 animate-pulse-slow">
+                    <span className="text-black text-sm font-bold">✓</span>
                 </div>
             )}
             {children}
@@ -274,14 +271,14 @@ export const DJElitePage: React.FC = () => {
                             <SectionHeadline>Everything You Get Today</SectionHeadline>
                             <div className="space-y-4">
                                 {VALUE_STACK_ITEMS.map((item, index) => (
-                                    <SelectableBlock key={item.title} id={`value-${index}`} className="flex items-start gap-4 bg-[color:var(--surface)] p-4 rounded-lg border border-[color:var(--border)]">
+                                    <SelectableCard key={item.title} id={`value-${index}`} className="flex items-start gap-4 bg-[color:var(--surface)] p-4 rounded-lg border border-[color:var(--border)]">
                                         <div className="text-4xl">{item.icon}</div>
                                         <div className="flex-grow">
                                             <h3 className="font-bold">{item.title}</h3>
                                             <p className="text-sm text-[color:var(--text-secondary)]">{item.description}</p>
                                         </div>
                                         <div className="font-bold text-[color:var(--text-secondary)]">{item.value}</div>
-                                    </SelectableBlock>
+                                    </SelectableCard>
                                 ))}
                             </div>
                             <div className="mt-8 bg-[color:var(--surface)] border border-[color:var(--accent)] rounded-lg p-6 text-center">
@@ -293,11 +290,11 @@ export const DJElitePage: React.FC = () => {
                              <SectionHeadline>Plus, These Exclusive Bonuses</SectionHeadline>
                              <div className="space-y-4">
                                 {BONUSES.map((bonus, index) => (
-                                    <SelectableBlock key={bonus.title} id={`bonus-${index}`} className="bg-gradient-to-br from-[color:var(--surface-alt)] to-transparent border border-[color:var(--border)] p-6 rounded-lg">
+                                    <SelectableCard key={bonus.title} id={`bonus-${index}`} className="bg-gradient-to-br from-[color:var(--surface-alt)] to-transparent border border-[color:var(--border)] p-6 rounded-lg">
                                         <h3 className="font-bold text-lg text-[color:var(--accent)]">{bonus.title}</h3>
                                         <p className="mt-2 text-[color:var(--text-secondary)]">{bonus.description}</p>
                                         <div className="mt-4 text-sm font-bold bg-[color:var(--surface)] text-[color:var(--accent)] inline-block px-3 py-1 rounded-full">{bonus.value}</div>
-                                    </SelectableBlock>
+                                    </SelectableCard>
                                 ))}
                             </div>
                         </div>
