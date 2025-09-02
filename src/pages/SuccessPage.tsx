@@ -49,4 +49,5 @@ const SuccessPage: React.FC = () => {
   );
 };
 
+export { SuccessPage };
 export default SuccessPage;
