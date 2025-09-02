@@ -15,14 +15,18 @@ import {
     FAQS,
 } from '../constants';
 import '../animations.css';
+import { useScrollAnimation } from '../useScrollAnimation';
 
-const Section: React.FC<{id: string, className?: string, children: React.ReactNode} & React.HTMLAttributes<HTMLElement>> = ({ id, className, children, ...props}) => (
-    <section id={id} className={`py-20 sm:py-28 ${className}`} {...props}>
-        <div className="container mx-auto px-4">
-            {children}
-        </div>
-    </section>
-);
+const Section: React.FC<{id: string, className?: string, children: React.ReactNode, animationType?: string} & React.HTMLAttributes<HTMLElement>> = ({ id, className, children, animationType = 'animate-fade-in-up', ...props}) => {
+    const ref = useScrollAnimation(animationType);
+    return (
+        <section ref={ref} id={id} className={`py-20 sm:py-28 ${className} opacity-0`} {...props}>
+            <div className="container mx-auto px-4">
+                {children}
+            </div>
+        </section>
+    );
+};
 
 const SectionHeadline: React.FC<{children: React.ReactNode, subheadline?: string}> = ({ children, subheadline }) => (
     <div className="max-w-4xl mx-auto text-center mb-12 md:mb-20">
@@ -111,7 +115,7 @@ export const DJElitePage: React.FC = () => {
 
             <main>
                 {/* Problem/Agitation Section */}
-                <Section id="problem" className="relative overflow-hidden">
+                <Section id="problem" className="relative overflow-hidden" animationType="animate-fade-in-left">
                     <img src="https://images.unsplash.com/photo-1641573481523-3e0447d7ba86" alt="DJ looking thoughtful in a club setting" className="absolute z-0 top-0 left-0 w-full h-full object-cover opacity-10"/>
                     <div className="absolute inset-0 bg-gradient-to-b from-[color:var(--bg)]/50 via-[color:var(--bg)]/90 to-[color:var(--bg)]"></div>
                     
@@ -132,7 +136,7 @@ export const DJElitePage: React.FC = () => {
                 </Section>
 
                 {/* Solution/Method Section */}
-                <Section id="solution" className="bg-[color:var(--surface-alt)]">
+                <Section id="solution" className="bg-[color:var(--surface-alt)]" animationType="animate-fade-in-right">
                     <SectionHeadline subheadline="The exact framework that took me from bedroom mixing to headlining festivals">The DJ Elite 7-Step System</SectionHeadline>
                     <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
                         {METHOD_STEPS.slice(0, 3).map(step => (
@@ -158,7 +162,7 @@ export const DJElitePage: React.FC = () => {
                 </Section>
                 
                  {/* Transformation Section */}
-                <Section id="transformation">
+                <Section id="transformation" animationType="animate-fade-in-up">
                     <SectionHeadline>The Transformation is Real</SectionHeadline>
                     <div className="max-w-4xl mx-auto grid md:grid-cols-[1fr_auto_1fr] items-center gap-8">
                         <div className="bg-[color:var(--surface)] border border-[color:var(--border)] rounded-xl p-6 text-center">
@@ -183,7 +187,7 @@ export const DJElitePage: React.FC = () => {
                 </Section>
 
                 {/* Testimonials Showcase */}
-                <Section id="testimonials" className="bg-[color:var(--surface-alt)]">
+                <Section id="testimonials" className="bg-[color:var(--surface-alt)]" animationType="animate-fade-in-left">
                     <SectionHeadline>Real Students, Real Results</SectionHeadline>
                     <div className="max-w-5xl mx-auto text-center">
                         <TestimonialCard testimonial={TESTIMONIALS[activeTestimonial]} />
@@ -197,7 +201,7 @@ export const DJElitePage: React.FC = () => {
                 </Section>
 
                 {/* Instructor Section */}
-                <Section id="instructor">
+                <Section id="instructor" animationType="animate-fade-in-right">
                     <SectionHeadline>Meet Your Mentor</SectionHeadline>
                     <div className="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
                         <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&h=600&fit=crop" alt="DJ Elite Mentor" className="rounded-lg shadow-2xl w-full"/>
@@ -217,7 +221,7 @@ export const DJElitePage: React.FC = () => {
                 </Section>
                 
                 {/* Curriculum Breakdown */}
-                <Section id="curriculum" className="bg-[color:var(--surface-alt)]">
+                <Section id="curriculum" className="bg-[color:var(--surface-alt)]" animationType="animate-fade-in-up">
                     <SectionHeadline>What You'll Master Inside DJ Elite</SectionHeadline>
                     <div className="max-w-3xl mx-auto space-y-4">
                         {CURRICULUM_MODULES.map((module, i) => (
@@ -231,7 +235,7 @@ export const DJElitePage: React.FC = () => {
                 </Section>
 
                 {/* Value Stack & Bonuses Section */}
-                <Section id="value-stack">
+                <Section id="value-stack" animationType="animate-fade-in-left">
                     <div className="grid lg:grid-cols-2 gap-16 items-start">
                         <div>
                             <SectionHeadline>Everything You Get Today</SectionHeadline>
@@ -268,7 +272,7 @@ export const DJElitePage: React.FC = () => {
                 </Section>
                 
                 {/* Guarantee Section */}
-                <Section id="guarantee" className="bg-[color:var(--surface-alt)]">
+                <Section id="guarantee" className="bg-[color:var(--surface-alt)]" animationType="animate-fade-in-right">
                     <div className="max-w-4xl mx-auto bg-[color:var(--surface)] border border-[color:var(--border)] rounded-xl shadow-2xl overflow-hidden md:flex">
                         <div className="p-8 flex-shrink-0 flex items-center justify-center bg-gradient-to-br from-gray-800 to-black md:w-64">
                              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/100_percent_satisfaction_guaranteed_logo.svg/1024px-100_percent_satisfaction_guaranteed_logo.svg.png" alt="100% Guarantee Seal" className="w-40 h-40 filter invert" />
@@ -283,7 +287,7 @@ export const DJElitePage: React.FC = () => {
                 </Section>
                 
                  {/* Urgency/Scarcity Section */}
-                <Section id="urgency">
+                <Section id="urgency" animationType="animate-fade-in-up">
                     <SectionHeadline>⚠️ This Offer Won't Last Forever</SectionHeadline>
                     <div className="grid md:grid-cols-2 gap-8 items-center max-w-5xl mx-auto">
                         <div className="bg-[color:var(--surface)] border border-[color:var(--border)] rounded-lg p-8 text-center">
@@ -303,7 +307,7 @@ export const DJElitePage: React.FC = () => {
                 </Section>
                 
                 {/* FAQ Section */}
-                <Section id="faq" className="bg-[color:var(--surface-alt)]">
+                <Section id="faq" className="bg-[color:var(--surface-alt)]" animationType="animate-fade-in-left">
                     <SectionHeadline>Frequently Asked Questions</SectionHeadline>
                     <div className="max-w-3xl mx-auto space-y-4">
                         {FAQS.map(faq => (
@@ -315,7 +319,7 @@ export const DJElitePage: React.FC = () => {
                 </Section>
                 
                 {/* Final CTA Section */}
-                <Section id="final-cta" className="text-center">
+                <Section id="final-cta" className="text-center" animationType="animate-fade-in-up">
                     <h2 className="font-display text-5xl font-bold">Your Moment is NOW</h2>
                     <p className="mt-4 max-w-2xl mx-auto text-lg text-[color:var(--text-secondary)]">Every day you wait is another day someone else takes the gig you deserve. The DJ industry is waiting for you - but only if you take action today.</p>
                     <div className="mt-12 max-w-2xl mx-auto bg-[color:var(--surface)] border border-[color:var(--accent)] rounded-2xl p-8 shadow-[0_0_60px_-15px_rgba(0,245,122,0.3)]">
