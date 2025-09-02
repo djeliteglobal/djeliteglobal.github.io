@@ -174,23 +174,32 @@ export const DJElitePage: React.FC = () => {
                     <SectionHeadline subheadline="The exact framework that took me from bedroom mixing to headlining festivals">The DJ Elite 7-Step System</SectionHeadline>
                     <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
                         {METHOD_STEPS.slice(0, 3).map(step => (
-                            <div key={step.number} className="bg-[color:var(--surface)] border border-[color:var(--border)] rounded-lg p-6">
-                                <span className="text-sm font-bold text-[color:var(--accent)]">STEP {step.number}</span>
+                            <SelectableCard key={step.number} id={`method-${step.number}`} className="bg-[color:var(--surface)] border border-[color:var(--border)] rounded-lg p-6">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-lg">{step.icon}</span>
+                                    <span className="text-sm font-bold text-[color:var(--accent)]">STEP {step.number}</span>
+                                </div>
                                 <h3 className="font-bold text-xl mt-2">{step.title}</h3>
                                 <p className="text-[color:var(--text-secondary)] mt-2">{step.description}</p>
-                            </div>
+                            </SelectableCard>
                         ))}
-                         <div className="bg-gradient-to-br from-[color:var(--accent-muted)]/20 to-transparent border border-[color:var(--accent-muted)]/50 rounded-lg p-6 sm:col-span-2 lg:col-span-1">
-                                <span className="text-sm font-bold text-white">STEP 4</span>
-                                <h3 className="font-bold text-xl mt-2 text-white">⚡ Performance Psychology</h3>
+                         <SelectableCard id="method-4" className="bg-gradient-to-br from-[color:var(--accent-muted)]/20 to-transparent border border-[color:var(--accent-muted)]/50 rounded-lg p-6 sm:col-span-2 lg:col-span-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-lg">⚡</span>
+                                    <span className="text-sm font-bold text-white">STEP 4</span>
+                                </div>
+                                <h3 className="font-bold text-xl mt-2 text-white">Performance Psychology</h3>
                                 <p className="text-green-200/80 mt-2">Develop stage presence, crowd control techniques, and energy management skills.</p>
-                            </div>
+                            </SelectableCard>
                         {METHOD_STEPS.slice(4).map(step => (
-                            <div key={step.number} className="bg-[color:var(--surface)] border border-[color:var(--border)] rounded-lg p-6">
-                                <span className="text-sm font-bold text-[color:var(--accent)]">STEP {step.number}</span>
+                            <SelectableCard key={step.number} id={`method-${step.number}`} className="bg-[color:var(--surface)] border border-[color:var(--border)] rounded-lg p-6">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-lg">{step.icon}</span>
+                                    <span className="text-sm font-bold text-[color:var(--accent)]">STEP {step.number}</span>
+                                </div>
                                 <h3 className="font-bold text-xl mt-2">{step.title}</h3>
                                 <p className="text-[color:var(--text-secondary)] mt-2">{step.description}</p>
-                            </div>
+                            </SelectableCard>
                         ))}
                     </div>
                 </Section>
