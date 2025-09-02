@@ -96,9 +96,7 @@ export const DJElitePage: React.FC = () => {
                         discover how hundreds of djs have landed their first professional gigs using this proven method.
                     </p>
                     <div className="mt-10 max-w-lg mx-auto animate-fade-in-up animate-delay-400">
-                        <div className="relative bg-[color:var(--surface)]/20 border border-white/30 rounded-xl p-6 overflow-hidden">
-                            <div className="absolute inset-0 bg-[color:var(--surface)]/60 backdrop-blur-md rounded-xl"></div>
-                            <div className="relative z-10">
+                        <div className="bg-[color:var(--surface)]/50 backdrop-blur-md border border-[color:var(--border)] rounded-xl p-6">
                            <div className="text-left mb-4">
                                 <h3 className="font-bold text-lg text-[color:var(--accent)]">🎁 FREE TRAINING PREVIEW</h3>
                                 <ul className="mt-2 space-y-2 text-sm text-[color:var(--text-secondary)]">
@@ -120,7 +118,6 @@ export const DJElitePage: React.FC = () => {
                                <input type="email" name="email" placeholder="Enter your best email" required className="w-full px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />
                                <Button type="submit" className="w-full py-3 btn-animate">GET FREE PREVIEW NOW →</Button>
                            </form>
-                            </div>
                         </div>
                         <p className="mt-4 text-xs text-[color:var(--muted)]">🔒 Your information is 100% secure. Unsubscribe anytime.</p>
                     </div>
