@@ -18,28 +18,45 @@ import '../animations.css';
 import { useScrollAnimation } from '../useScrollAnimation';
 import { useSelection } from '../useSelection';
 
-const Section: React.FC<{id: string, className?: string, children: React.ReactNode, animationType?: string, onSelect?: (id: string) => void, isSelected?: boolean} & React.HTMLAttributes<HTMLElement>> = ({ id, className, children, animationType = 'animate-fade-in-up', onSelect, isSelected, ...props}) => {
+const Section: React.FC<{id: string, className?: string, children: React.ReactNode, animationType?: string} & React.HTMLAttributes<HTMLElement>> = ({ id, className, children, animationType = 'animate-fade-in-up', ...props}) => {
     const ref = useScrollAnimation(animationType);
     return (
         <section 
             ref={ref} 
             id={id} 
-            className={`py-20 sm:py-28 ${className} transition-all duration-500 relative ${
-                isSelected ? 'bg-[color:var(--accent)]/3 shadow-[inset_4px_0_0_0_var(--accent)]' : ''
-            }`} 
+            className={`py-20 sm:py-28 ${className}`} 
             style={{opacity: 0}}
-            onClick={() => onSelect?.(id)}
             {...props}
         >
-            {isSelected && (
-                <div className="absolute top-6 right-6 w-8 h-8 bg-[color:var(--accent)]/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-[color:var(--accent)]/50">
-                    <span className="text-[color:var(--accent)] text-sm font-bold">✓</span>
-                </div>
-            )}
             <div className="container mx-auto px-4">
                 {children}
             </div>
         </section>
+    );
+};
+
+const SelectableBlock: React.FC<{id: string, children: React.ReactNode, className?: string, onClick?: () => void}> = ({ id, children, className = '', onClick }) => {
+    const { toggleSelection, isSelected } = useSelection();
+    
+    const handleClick = () => {
+        toggleSelection(id);
+        onClick?.();
+    };
+    
+    return (
+        <div 
+            className={`${className} cursor-pointer transition-all duration-300 relative ${
+                isSelected(id) ? 'bg-[color:var(--accent)]/10 border-[color:var(--accent)] shadow-lg' : 'hover:shadow-md'
+            }`}
+            onClick={handleClick}
+        >
+            {isSelected(id) && (
+                <div className="absolute top-2 right-2 w-6 h-6 bg-[color:var(--accent)] rounded-full flex items-center justify-center z-10">
+                    <span className="text-black text-xs font-bold">✓</span>
+                </div>
+            )}
+            {children}
+        </div>
     );
 };
 
@@ -131,7 +148,7 @@ export const DJElitePage: React.FC = () => {
 
             <main>
                 {/* Problem/Agitation Section */}
-                <Section id="problem" className="relative overflow-hidden" animationType="animate-fade-in-left" onSelect={toggleSelection} isSelected={isSelected('problem')}>
+                <Section id="problem" className="relative overflow-hidden" animationType="animate-fade-in-left">
                     <img src="https://images.unsplash.com/photo-1641573481523-3e0447d7ba86" alt="DJ looking thoughtful in a club setting" className="absolute z-0 top-0 left-0 w-full h-full object-cover opacity-10"/>
                     <div className="absolute inset-0 bg-gradient-to-b from-[color:var(--bg)]/50 via-[color:var(--bg)]/90 to-[color:var(--bg)]"></div>
                     
@@ -152,7 +169,7 @@ export const DJElitePage: React.FC = () => {
                 </Section>
 
                 {/* Solution/Method Section */}
-                <Section id="solution" className="bg-[color:var(--surface-alt)]" animationType="animate-fade-in-right" onSelect={toggleSelection} isSelected={isSelected('solution')}>
+                <Section id="solution" className="bg-[color:var(--surface-alt)]" animationType="animate-fade-in-right">
                     <SectionHeadline subheadline="The exact framework that took me from bedroom mixing to headlining festivals">The DJ Elite 7-Step System</SectionHeadline>
                     <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
                         {METHOD_STEPS.slice(0, 3).map(step => (
@@ -178,7 +195,7 @@ export const DJElitePage: React.FC = () => {
                 </Section>
                 
                  {/* Transformation Section */}
-                <Section id="transformation" animationType="animate-fade-in-up" onSelect={toggleSelection} isSelected={isSelected('transformation')}>
+                <Section id="transformation" animationType="animate-fade-in-up">
                     <SectionHeadline>The Transformation is Real</SectionHeadline>
                     <div className="max-w-4xl mx-auto grid md:grid-cols-[1fr_auto_1fr] items-center gap-8">
                         <div className="bg-[color:var(--surface)] border border-[color:var(--border)] rounded-xl p-6 text-center">
@@ -203,7 +220,7 @@ export const DJElitePage: React.FC = () => {
                 </Section>
 
                 {/* Testimonials Showcase */}
-                <Section id="testimonials" className="bg-[color:var(--surface-alt)]" animationType="animate-fade-in-left" onSelect={toggleSelection} isSelected={isSelected('testimonials')}>
+                <Section id="testimonials" className="bg-[color:var(--surface-alt)]" animationType="animate-fade-in-left">
                     <SectionHeadline>Real Students, Real Results</SectionHeadline>
                     <div className="max-w-5xl mx-auto text-center">
                         <TestimonialCard testimonial={TESTIMONIALS[activeTestimonial]} />
@@ -217,7 +234,7 @@ export const DJElitePage: React.FC = () => {
                 </Section>
 
                 {/* Instructor Section */}
-                <Section id="instructor" animationType="animate-fade-in-right" onSelect={toggleSelection} isSelected={isSelected('instructor')}>
+                <Section id="instructor" animationType="animate-fade-in-right">
                     <SectionHeadline>Meet Your Mentor</SectionHeadline>
                     <div className="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
                         <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&h=600&fit=crop" alt="DJ Elite Mentor" className="rounded-lg shadow-2xl w-full"/>
@@ -237,7 +254,7 @@ export const DJElitePage: React.FC = () => {
                 </Section>
                 
                 {/* Curriculum Breakdown */}
-                <Section id="curriculum" className="bg-[color:var(--surface-alt)]" animationType="animate-fade-in-up" onSelect={toggleSelection} isSelected={isSelected('curriculum')}>
+                <Section id="curriculum" className="bg-[color:var(--surface-alt)]" animationType="animate-fade-in-up">
                     <SectionHeadline>What You'll Master Inside DJ Elite</SectionHeadline>
                     <div className="max-w-3xl mx-auto space-y-4">
                         {CURRICULUM_MODULES.map((module, i) => (
@@ -251,20 +268,20 @@ export const DJElitePage: React.FC = () => {
                 </Section>
 
                 {/* Value Stack & Bonuses Section */}
-                <Section id="value-stack" animationType="animate-fade-in-left" onSelect={toggleSelection} isSelected={isSelected('value-stack')}>
+                <Section id="value-stack" animationType="animate-fade-in-left">
                     <div className="grid lg:grid-cols-2 gap-16 items-start">
                         <div>
                             <SectionHeadline>Everything You Get Today</SectionHeadline>
                             <div className="space-y-4">
-                                {VALUE_STACK_ITEMS.map(item => (
-                                    <div key={item.title} className="flex items-start gap-4 bg-[color:var(--surface)] p-4 rounded-lg border border-[color:var(--border)]">
+                                {VALUE_STACK_ITEMS.map((item, index) => (
+                                    <SelectableBlock key={item.title} id={`value-${index}`} className="flex items-start gap-4 bg-[color:var(--surface)] p-4 rounded-lg border border-[color:var(--border)]">
                                         <div className="text-4xl">{item.icon}</div>
                                         <div className="flex-grow">
                                             <h3 className="font-bold">{item.title}</h3>
                                             <p className="text-sm text-[color:var(--text-secondary)]">{item.description}</p>
                                         </div>
                                         <div className="font-bold text-[color:var(--text-secondary)]">{item.value}</div>
-                                    </div>
+                                    </SelectableBlock>
                                 ))}
                             </div>
                             <div className="mt-8 bg-[color:var(--surface)] border border-[color:var(--accent)] rounded-lg p-6 text-center">
@@ -275,12 +292,12 @@ export const DJElitePage: React.FC = () => {
                         <div className="mt-20 lg:mt-0">
                              <SectionHeadline>Plus, These Exclusive Bonuses</SectionHeadline>
                              <div className="space-y-4">
-                                {BONUSES.map(bonus => (
-                                    <div key={bonus.title} className="bg-gradient-to-br from-[color:var(--surface-alt)] to-transparent border border-[color:var(--border)] p-6 rounded-lg">
+                                {BONUSES.map((bonus, index) => (
+                                    <SelectableBlock key={bonus.title} id={`bonus-${index}`} className="bg-gradient-to-br from-[color:var(--surface-alt)] to-transparent border border-[color:var(--border)] p-6 rounded-lg">
                                         <h3 className="font-bold text-lg text-[color:var(--accent)]">{bonus.title}</h3>
                                         <p className="mt-2 text-[color:var(--text-secondary)]">{bonus.description}</p>
                                         <div className="mt-4 text-sm font-bold bg-[color:var(--surface)] text-[color:var(--accent)] inline-block px-3 py-1 rounded-full">{bonus.value}</div>
-                                    </div>
+                                    </SelectableBlock>
                                 ))}
                             </div>
                         </div>
@@ -288,7 +305,7 @@ export const DJElitePage: React.FC = () => {
                 </Section>
                 
                 {/* Guarantee Section */}
-                <Section id="guarantee" className="bg-[color:var(--surface-alt)]" animationType="animate-fade-in-right" onSelect={toggleSelection} isSelected={isSelected('guarantee')}>
+                <Section id="guarantee" className="bg-[color:var(--surface-alt)]" animationType="animate-fade-in-right">
                     <div className="max-w-4xl mx-auto bg-[color:var(--surface)] border border-[color:var(--border)] rounded-xl shadow-2xl overflow-hidden md:flex">
                         <div className="p-8 flex-shrink-0 flex items-center justify-center bg-gradient-to-br from-gray-800 to-black md:w-64">
                              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/100_percent_satisfaction_guaranteed_logo.svg/1024px-100_percent_satisfaction_guaranteed_logo.svg.png" alt="100% Guarantee Seal" className="w-40 h-40 filter invert" />
@@ -303,7 +320,7 @@ export const DJElitePage: React.FC = () => {
                 </Section>
                 
                  {/* Urgency/Scarcity Section */}
-                <Section id="urgency" animationType="animate-fade-in-up" onSelect={toggleSelection} isSelected={isSelected('urgency')}>
+                <Section id="urgency" animationType="animate-fade-in-up">
                     <SectionHeadline>⚠️ This Offer Won't Last Forever</SectionHeadline>
                     <div className="grid md:grid-cols-2 gap-8 items-center max-w-5xl mx-auto">
                         <div className="bg-[color:var(--surface)] border border-[color:var(--border)] rounded-lg p-8 text-center">
@@ -323,7 +340,7 @@ export const DJElitePage: React.FC = () => {
                 </Section>
                 
                 {/* FAQ Section */}
-                <Section id="faq" className="bg-[color:var(--surface-alt)]" animationType="animate-fade-in-left" onSelect={toggleSelection} isSelected={isSelected('faq')}>
+                <Section id="faq" className="bg-[color:var(--surface-alt)]" animationType="animate-fade-in-left">
                     <SectionHeadline>Frequently Asked Questions</SectionHeadline>
                     <div className="max-w-3xl mx-auto space-y-4">
                         {FAQS.map(faq => (
@@ -335,7 +352,7 @@ export const DJElitePage: React.FC = () => {
                 </Section>
                 
                 {/* Final CTA Section */}
-                <Section id="final-cta" className="text-center" animationType="animate-fade-in-up" onSelect={toggleSelection} isSelected={isSelected('final-cta')}>
+                <Section id="final-cta" className="text-center" animationType="animate-fade-in-up">
                     <h2 className="font-display text-5xl font-bold">Your Moment is NOW</h2>
                     <p className="mt-4 max-w-2xl mx-auto text-lg text-[color:var(--text-secondary)]">Every day you wait is another day someone else takes the gig you deserve. The DJ industry is waiting for you - but only if you take action today.</p>
                     <div className="mt-12 max-w-2xl mx-auto bg-[color:var(--surface)] border border-[color:var(--accent)] rounded-2xl p-8 shadow-[0_0_60px_-15px_rgba(0,245,122,0.3)]">
