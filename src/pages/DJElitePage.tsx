@@ -96,7 +96,7 @@ export const DJElitePage: React.FC = () => {
                         discover how hundreds of djs have landed their first professional gigs using this proven method.
                     </p>
                     <div className="mt-10 max-w-lg mx-auto animate-fade-in-up animate-delay-400">
-                        <div className="bg-[color:var(--surface)]/50 backdrop-blur-md border border-[color:var(--border)] rounded-xl p-6" style={{backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)'}}>
+                        <div className="bg-white/10 border border-white/20 rounded-xl p-6" style={{backdropFilter: 'blur(20px) saturate(180%)', WebkitBackdropFilter: 'blur(20px) saturate(180%)', backgroundColor: 'rgba(17, 17, 17, 0.4)'}}>
                            <div className="text-left mb-4">
                                 <h3 className="font-bold text-lg text-[color:var(--accent)]">🎁 FREE TRAINING PREVIEW</h3>
                                 <ul className="mt-2 space-y-2 text-sm text-[color:var(--text-secondary)]">
