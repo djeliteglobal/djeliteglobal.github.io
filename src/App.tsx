@@ -1,28 +1,22 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { DJElitePage } from './pages/DJElitePage';
-import CheckoutPage from './pages/CheckoutPage';
-import ThankYouPage from './pages/ThankYouPage';
-import SuccessPage from './pages/SuccessPage';
+import { HomePage } from './pages/HomePage';
+import { CheckoutPage } from './pages/CheckoutPage';
+import { SuccessPage } from './pages/SuccessPage';
+import './index.css';
 
-const App: React.FC = () => {
-    useEffect(() => {
-        const root = window.document.documentElement;
-        if (!root.classList.contains('dark')) {
-            root.classList.add('dark');
-        }
-    }, []);
-    
-    return (
-        <Router>
-            <Routes>
-                <Route path="/" element={<DJElitePage />} />
-                <Route path="/checkout" element={<CheckoutPage />} />
-                <Route path="/thank-you" element={<ThankYouPage />} />
-                <Route path="/success" element={<SuccessPage />} />
-            </Routes>
-        </Router>
-    );
-};
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/funnel" element={<DJElitePage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/success" element={<SuccessPage />} />
+      </Routes>
+    </Router>
+  );
+}
 
 export default App;
