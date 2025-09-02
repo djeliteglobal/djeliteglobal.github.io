@@ -120,7 +120,6 @@ export const DJElitePage: React.FC = () => {
                                <input type="email" name="email" placeholder="Enter your best email" required className="w-full px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />
                                <Button type="submit" className="w-full py-3 btn-animate">GET FREE PREVIEW NOW →</Button>
                            </form>
-                        </div>
                             </div>
                         </div>
                         <p className="mt-4 text-xs text-[color:var(--muted)]">🔒 Your information is 100% secure. Unsubscribe anytime.</p>
