@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Button, AccordionItem, TestimonialCard, CountdownTimer } from '../components';
 import { 
     Logo, 
@@ -391,14 +390,12 @@ export const DJElitePage: React.FC = () => {
                              <p className="font-display text-6xl font-bold text-[color:var(--accent)]">$497</p>
                              <p className="font-bold bg-[color:var(--accent)] text-black inline-block px-4 py-1 rounded-full mt-2">Save $2,867 Today!</p>
                         </div>
-                        <Link to="/checkout" className="hover-lift">
-                            <Button variant="purchase" className="w-full text-xl py-5 btn-animate">
-                                <div className="flex flex-col">
-                                    <span>🚀 ENROLL IN DJ ELITE NOW</span>
-                                    <span className="text-xs font-normal mt-1 opacity-80">90-Day Money-Back Guarantee</span>
-                                </div>
-                            </Button>
-                        </Link>
+                        <Button variant="purchase" className="w-full text-xl py-5 btn-animate hover-lift" onClick={() => window.location.href = '/checkout'}>
+                            <div className="flex flex-col">
+                                <span>🚀 ENROLL IN DJ ELITE NOW</span>
+                                <span className="text-xs font-normal mt-1 opacity-80">90-Day Money-Back Guarantee</span>
+                            </div>
+                        </Button>
                         <p className="text-xs text-[color:var(--muted)] mt-4">This is a one-time payment. Prices will go up after the timer hits zero.</p>
                     </div>
                 </Section>
