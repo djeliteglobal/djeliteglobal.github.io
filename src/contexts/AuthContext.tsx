@@ -52,6 +52,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
+    // If no Supabase config, skip auth and set loading false
+    if (!import.meta.env.VITE_SUPABASE_URL) {
+      setLoading(false);
+      return;
+    }
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (session?.user) {
