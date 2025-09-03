@@ -5,6 +5,7 @@ import { DJElitePage } from './pages/DJElitePage';
 import { CheckoutPage } from './pages/CheckoutPage';
 import { SuccessPage } from './pages/SuccessPage';
 import './index.css';
+import './debug.css';
 
 function App() {
   useEffect(() => {

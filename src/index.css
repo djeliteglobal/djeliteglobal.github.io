@@ -52,20 +52,21 @@
 }
 
 html {
-  background-color: #0B0D10;
+  background-color: #0B0D10 !important;
 }
 
 body {
   font-family: 'Inter', sans-serif;
-  background-color: var(--bg);
-  color: var(--text-primary);
+  background-color: #0B0D10 !important;
+  color: #FFFFFF !important;
   line-height: 1.6;
   min-height: 100vh;
 }
 
 #root {
   min-height: 100vh;
-  background-color: var(--bg);
+  background-color: #0B0D10 !important;
+  color: #FFFFFF !important;
 }
 
 .font-display {

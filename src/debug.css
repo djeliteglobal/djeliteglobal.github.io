@@ -1,0 +1,23 @@
+/* Emergency CSS Reset */
+* {
+  background-color: #0B0D10 !important;
+  color: #FFFFFF !important;
+}
+
+html, body, #root {
+  background-color: #0B0D10 !important;
+  color: #FFFFFF !important;
+  min-height: 100vh !important;
+}
+
+/* Test if this loads */
+body::before {
+  content: "CSS LOADED";
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  background: red !important;
+  color: white !important;
+  padding: 10px !important;
+  z-index: 9999 !important;
+}
