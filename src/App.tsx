@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { HomePage } from './pages/HomePage';
 import { DJElitePage } from './pages/DJElitePage';
@@ -7,6 +7,11 @@ import { SuccessPage } from './pages/SuccessPage';
 import './index.css';
 
 function App() {
+  useEffect(() => {
+    // Set default theme on app load
+    document.documentElement.classList.add('dark');
+  }, []);
+
   return (
     <Router>
       <Routes>
