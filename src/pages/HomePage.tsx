@@ -88,7 +88,7 @@ const HomePageContent: React.FC = () => {
                     <LandingPage />
                     <div className="fixed bottom-4 right-4 z-50">
                         <Link to="/funnel" className="bg-[color:var(--accent)] text-black px-6 py-3 rounded-full font-bold hover:bg-[color:var(--accent-muted)] transition-all shadow-lg">
-                            🚀 DJ Elite Funnel
+                            🚀 DJ Career Accelerator
                         </Link>
                     </div>
                 </>

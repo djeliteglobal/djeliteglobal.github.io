@@ -18,11 +18,7 @@ export const LandingPage: React.FC = () => {
                 <div className="container mx-auto flex h-20 items-center justify-between px-4">
                     <div className="text-2xl font-bold font-display">DJ Elite</div>
                     <div>
-                        <Button variant="secondary" className="mr-2" onClick={() => navigate('dashboard')}>Log In</Button>
                         <Button onClick={() => navigate('dashboard')}>Get Started</Button>
-                        <Link to="/funnel" className="ml-2 px-4 py-2 rounded bg-[color:var(--accent)] text-black hover:bg-[color:var(--accent-muted)]">
-                            Sales Funnel
-                        </Link>
                     </div>
                 </div>
             </header>
@@ -39,12 +35,8 @@ export const LandingPage: React.FC = () => {
                         <p className="mt-6 max-w-2xl mx-auto text-lg text-[color:var(--text-secondary)]">
                             Learn, build your brand, and connect with real promoters. All in one place.
                         </p>
-                        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                            <Button className="w-full sm:w-auto" onClick={() => navigate('dashboard')}>Start Your Journey</Button>
-                            <Button variant="ghost" className="w-full sm:w-auto text-white hover:bg-white/10">
-                                <PlayCircleIcon className="inline-block mr-2 h-5 w-5" />
-                                Watch Trailer
-                            </Button>
+                        <div className="mt-10 flex justify-center">
+                            <Button className="px-8 py-4 text-lg" onClick={() => navigate('dashboard')}>Get Started</Button>
                         </div>
                     </div>
                 </section>
