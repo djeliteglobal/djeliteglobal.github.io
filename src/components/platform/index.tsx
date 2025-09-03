@@ -1,6 +1,7 @@
 import React, { useState, useContext, useRef, useEffect } from 'react';
 import { AppContext } from '../../pages/HomePage';
-import { MOCK_USER, NAV_ITEMS, SunIcon, MoonIcon, SearchIcon, MenuIcon, CheckCircleIcon, ChevronDownIcon, Logo } from '../../constants/platform';
+import { useAuth } from '../../contexts/AuthContext';
+import { NAV_ITEMS, SunIcon, MoonIcon, SearchIcon, MenuIcon, CheckCircleIcon, ChevronDownIcon, Logo } from '../../constants/platform';
 import type { Course, FaqItem, PricingPlan, Opportunity } from '../../types/platform';
 
 // Button Component
@@ -25,6 +26,7 @@ export const Button: React.FC<ButtonProps> = ({ variant = 'primary', children, c
 
 export const TopBar: React.FC = () => {
     const { appState, setAppState } = useContext(AppContext)!;
+    const { currentUser } = useAuth();
     
     const toggleTheme = () => {
         setAppState(prev => ({...prev, theme: prev.theme === 'dark' ? 'light' : 'dark' }));
@@ -57,7 +59,7 @@ export const TopBar: React.FC = () => {
                     {appState.theme === 'dark' ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
                 </button>
                 <div className="h-10 w-10 rounded-full">
-                    <img src={MOCK_USER.avatarUrl} alt={MOCK_USER.name} className="h-full w-full rounded-full object-cover" />
+                    <img src={currentUser?.avatarUrl} alt={currentUser?.name} className="h-full w-full rounded-full object-cover" />
                 </div>
             </div>
         </header>
@@ -66,6 +68,7 @@ export const TopBar: React.FC = () => {
 
 export const SideNav: React.FC = () => {
     const { appState, navigate } = useContext(AppContext)!;
+    const { currentUser, logout } = useAuth();
     
     return (
         <nav className={`fixed z-40 md:z-auto md:relative inset-y-0 left-0 w-64 border-r border-[color:var(--border)] bg-[color:var(--surface)] transition-transform duration-300 ease-in-out ${appState.isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
@@ -88,7 +91,7 @@ export const SideNav: React.FC = () => {
                     </button>
                 ))}
             </div>
-             <div className="absolute bottom-0 left-0 w-full p-4">
+             <div className="absolute bottom-0 left-0 w-full p-4 space-y-2">
                 <button 
                   onClick={() => navigate('settings')}
                   className={`flex w-full items-center gap-3 rounded-md px-4 py-3 text-sm font-medium transition-colors ${
@@ -96,11 +99,16 @@ export const SideNav: React.FC = () => {
                         ? 'bg-[color:var(--surface-alt)] text-[color:var(--text-primary)]' 
                         : 'text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-alt)] hover:text-[color:var(--text-primary)]'
                   }`}>
-                    <img src={MOCK_USER.avatarUrl} alt={MOCK_USER.name} className="h-8 w-8 rounded-full object-cover" />
+                    <img src={currentUser?.avatarUrl} alt={currentUser?.name} className="h-8 w-8 rounded-full object-cover" />
                     <div className="text-left">
-                        <p className="font-semibold text-[color:var(--text-primary)]">{MOCK_USER.name}</p>
-                        <p className="text-xs text-[color:var(--muted)]">{MOCK_USER.plan}</p>
+                        <p className="font-semibold text-[color:var(--text-primary)]">{currentUser?.name}</p>
+                        <p className="text-xs text-[color:var(--muted)]">{currentUser?.plan}</p>
                     </div>
+                </button>
+                <button 
+                  onClick={logout}
+                  className="w-full text-left px-4 py-2 text-sm text-[color:var(--text-secondary)] hover:text-red-500 transition-colors">
+                    Sign Out
                 </button>
              </div>
         </nav>

@@ -1,9 +1,11 @@
 import React, { useContext, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AppContext } from '../../pages/HomePage';
+import { useAuth } from '../../contexts/AuthContext';
 import { Button, CourseCard, FaqItemComponent, PricingCard, OpportunitySwipeCard } from '../platform';
-import { COURSES, FAQ_ITEMS, PRICING_PLANS, MOCK_USER, PlayCircleIcon, VideoIcon, FileTextIcon, HelpCircleIcon, XIcon, HeartIcon, MOCK_OPPORTUNITIES } from '../../constants/platform';
+import { COURSES, FAQ_ITEMS, PRICING_PLANS, PlayCircleIcon, VideoIcon, FileTextIcon, HelpCircleIcon, XIcon, HeartIcon, MOCK_OPPORTUNITIES } from '../../constants/platform';
 import type { Course, Opportunity } from '../../types/platform';
+import { DJMatchingPage } from './DJMatchingPage';
 
 // Landing Page
 export const LandingPage: React.FC = () => {
@@ -80,10 +82,11 @@ export const LandingPage: React.FC = () => {
 
 // Dashboard Page
 export const Dashboard: React.FC = () => {
+    const { currentUser } = useAuth();
     const inProgressCourse = COURSES.find(c => c.progress > 0 && c.progress < 100);
     return (
         <div className="p-4 sm:p-6 md:p-8">
-            <h1 className="font-display text-3xl font-bold">Welcome back, {MOCK_USER.name.split(' ')[0]}!</h1>
+            <h1 className="font-display text-3xl font-bold">Welcome back, {currentUser?.name.split(' ')[0]}!</h1>
             <p className="mt-1 text-[color:var(--text-secondary)]">Let's make some noise today.</p>
 
             <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -380,6 +383,7 @@ export const OpportunitiesPage: React.FC = () => {
 
 // Settings Page
 export const SettingsPage: React.FC = () => {
+    const { currentUser } = useAuth();
     return (
         <div className="p-4 sm:p-6 md:p-8">
             <h1 className="font-display text-3xl font-bold">Settings</h1>
@@ -391,11 +395,11 @@ export const SettingsPage: React.FC = () => {
                     <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
                         <div>
                             <label className="text-sm font-medium text-[color:var(--text-secondary)]">Full Name</label>
-                            <input type="text" defaultValue={MOCK_USER.name} className="mt-1 block w-full rounded-md border-[color:var(--border)] bg-[color:var(--surface-alt)] p-2 focus:border-[color:var(--accent)] focus:ring-[color:var(--accent)]" />
+                            <input type="text" defaultValue={currentUser?.name} className="mt-1 block w-full rounded-md border-[color:var(--border)] bg-[color:var(--surface-alt)] p-2 focus:border-[color:var(--accent)] focus:ring-[color:var(--accent)]" />
                         </div>
                          <div>
                             <label className="text-sm font-medium text-[color:var(--text-secondary)]">Email Address</label>
-                            <input type="email" defaultValue={MOCK_USER.email} className="mt-1 block w-full rounded-md border-[color:var(--border)] bg-[color:var(--surface-alt)] p-2 focus:border-[color:var(--accent)] focus:ring-[color:var(--accent)]" />
+                            <input type="email" defaultValue={currentUser?.email} className="mt-1 block w-full rounded-md border-[color:var(--border)] bg-[color:var(--surface-alt)] p-2 focus:border-[color:var(--accent)] focus:ring-[color:var(--accent)]" />
                         </div>
                     </div>
                      <div className="mt-6">
@@ -405,7 +409,7 @@ export const SettingsPage: React.FC = () => {
 
                 <div className="rounded-xl bg-[color:var(--surface)] p-6 shadow-soft border border-[color:var(--border)]">
                     <h2 className="font-display text-xl font-bold">Subscription</h2>
-                     <p className="mt-4 text-[color:var(--text-secondary)]">You are currently on the <span className="font-semibold text-[color:var(--text-primary)]">{MOCK_USER.plan}</span> plan.</p>
+                     <p className="mt-4 text-[color:var(--text-secondary)]">You are currently on the <span className="font-semibold text-[color:var(--text-primary)]">{currentUser?.plan}</span> plan.</p>
                      <div className="mt-6 flex gap-4">
                          <Button>Manage Subscription</Button>
                          <Button variant="secondary">View Billing History</Button>
@@ -415,3 +419,6 @@ export const SettingsPage: React.FC = () => {
         </div>
     );
 };
+
+// DJ Matching Page Export
+export { DJMatchingPage };

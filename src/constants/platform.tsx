@@ -70,6 +70,7 @@ export const NAV_ITEMS = [
     { name: 'Courses', icon: BookOpenIcon, page: 'courses' },
     { name: 'Community', icon: UsersIcon, page: 'community' },
     { name: 'Opportunities', icon: ZapIcon, page: 'opportunities' },
+    { name: 'DJ Connect', icon: HeartIcon, page: 'dj_matching' },
 ];
 
 export const MOCK_USER: User = {
