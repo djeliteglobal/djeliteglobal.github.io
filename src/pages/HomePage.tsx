@@ -100,8 +100,10 @@ const HomePageContent: React.FC = () => {
 
 export const HomePage: React.FC = () => {
     return (
-        <AuthProvider>
-            <HomePageContent />
-        </AuthProvider>
+        <div style={{ backgroundColor: '#0B0D10', color: '#FFFFFF', minHeight: '100vh' }}>
+            <AuthProvider>
+                <HomePageContent />
+            </AuthProvider>
+        </div>
     );
 };
