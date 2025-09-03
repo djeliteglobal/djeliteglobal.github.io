@@ -1,23 +1,43 @@
-/* Emergency CSS Reset */
-* {
-  background-color: #0B0D10 !important;
-  color: #FFFFFF !important;
+/* VITALIK MODE: NUCLEAR CSS OVERRIDE */
+html {
+  background: #0B0D10 !important;
 }
 
-html, body, #root {
-  background-color: #0B0D10 !important;
+body {
+  background: #0B0D10 !important;
+  color: #FFFFFF !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+#root {
+  background: #0B0D10 !important;
   color: #FFFFFF !important;
   min-height: 100vh !important;
 }
 
-/* Test if this loads */
-body::before {
-  content: "CSS LOADED";
-  position: fixed;
-  top: 10px;
-  left: 10px;
-  background: red !important;
-  color: white !important;
-  padding: 10px !important;
-  z-index: 9999 !important;
+/* Override ALL elements */
+div, section, main, header, nav, button, p, h1, h2, h3, h4, h5, h6 {
+  color: #FFFFFF !important;
+}
+
+/* Specific overrides for common classes */
+.bg-\[color\:var\(--bg\)\] {
+  background-color: #0B0D10 !important;
+}
+
+.text-\[color\:var\(--text-primary\)\] {
+  color: #FFFFFF !important;
+}
+
+.text-\[color\:var\(--text-secondary\)\] {
+  color: #B8BCC8 !important;
+}
+
+.bg-\[color\:var\(--surface\)\] {
+  background-color: #1A1D23 !important;
+}
+
+.bg-\[color\:var\(--accent\)\] {
+  background-color: #00F57A !important;
+  color: #000000 !important;
 }
