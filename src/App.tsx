@@ -4,6 +4,8 @@ import { HomePage } from './pages/HomePage';
 import { DJElitePage } from './pages/DJElitePage';
 import { CheckoutPage } from './pages/CheckoutPage';
 import { SuccessPage } from './pages/SuccessPage';
+import { TermsPage } from './pages/TermsPage';
+import { PrivacyPage } from './pages/PrivacyPage';
 import './index.css';
 import './debug.css';
 
@@ -20,6 +22,8 @@ function App() {
         <Route path="/funnel" element={<DJElitePage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/success" element={<SuccessPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
       </Routes>
     </Router>
   );
