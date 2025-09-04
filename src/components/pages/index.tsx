@@ -51,11 +51,14 @@ export const LandingPage: React.FC = () => {
                     <div className="relative z-10 text-center text-white p-4 -mt-48 md:-mt-32">
                         {/* Swipe Right Logo */}
                         <div className="mb-6 flex justify-center">
-                            <div className="text-6xl text-white" style={{
-                                animation: 'swipeRight 2s ease-in-out infinite'
-                            }}>
-                                ✋
-                            </div>
+                            <img 
+                                src="/swipe right.png" 
+                                alt="Swipe Right" 
+                                className="w-20 h-20"
+                                style={{
+                                    animation: 'swipeRight 2s ease-in-out infinite'
+                                }}
+                            />
                         </div>
                         <h1 className="font-display text-4xl font-bold md:text-7xl">One World Stage.</h1>
                         <h1 className="font-display text-4xl font-bold md:text-7xl text-[color:var(--accent)]">Swipe Right to DJ!</h1>
