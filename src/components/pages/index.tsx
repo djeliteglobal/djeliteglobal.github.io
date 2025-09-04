@@ -52,7 +52,7 @@ export const LandingPage: React.FC = () => {
                         {/* Swipe Right Logo */}
                         <div className="mb-6 flex justify-center">
                             <img 
-                                src="/swipe right.png" 
+                                src="/Swipe Right.png" 
                                 alt="Swipe Right" 
                                 className="w-20 h-20"
                                 style={{
