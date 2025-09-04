@@ -107,7 +107,7 @@ export const SideNav: React.FC = () => {
                 </button>
                 <button 
                   onClick={logout}
-                  className="w-full text-left px-4 py-2 text-sm text-[color:var(--text-secondary)] hover:text-red-500 transition-colors">
+                  className="w-full text-left px-4 py-2 text-sm text-[color:var(--text-secondary)] hover:text-red-500 transition-all duration-200 active:scale-95 active:bg-red-500/10 rounded-md">
                     Sign Out
                 </button>
              </div>
