@@ -32,17 +32,45 @@ export const LandingPage: React.FC = () => {
                     <div className="relative z-10 text-center text-white p-4 -mt-48 md:-mt-32">
                         {/* Swipe Right Logo */}
                         <div className="mb-6 flex justify-center">
-                            <svg width="80" height="80" viewBox="0 0 100 100" className="animate-pulse">
-                                {/* Hand */}
-                                <path d="M25 60 Q30 50 35 55 L40 50 Q45 45 50 50 L55 45 Q60 40 65 45 L70 40 Q75 35 80 40 L85 45 Q85 55 80 65 L75 70 Q70 75 60 75 L40 75 Q30 70 25 60 Z" fill="#00F57A" stroke="#00F57A" strokeWidth="2"/>
-                                {/* Motion lines */}
-                                <path d="M15 30 L25 35 M10 40 L20 45 M15 50 L25 55" stroke="#00F57A" strokeWidth="3" strokeLinecap="round" opacity="0.7">
-                                    <animate attributeName="opacity" values="0.3;0.8;0.3" dur="1.5s" repeatCount="indefinite"/>
-                                </path>
-                                {/* Arrow */}
-                                <path d="M70 25 L85 30 L70 35 M70 30 L85 30" stroke="#00F57A" strokeWidth="3" strokeLinecap="round">
-                                    <animateTransform attributeName="transform" type="translate" values="0,0;10,0;0,0" dur="2s" repeatCount="indefinite"/>
-                                </path>
+                            <svg width="100" height="60" viewBox="0 0 120 60" className="">
+                                {/* Hand Palm */}
+                                <ellipse cx="35" cy="35" rx="12" ry="18" fill="#00F57A"/>
+                                
+                                {/* Thumb */}
+                                <ellipse cx="25" cy="25" rx="4" ry="8" fill="#00F57A" transform="rotate(-30 25 25)"/>
+                                
+                                {/* Index Finger */}
+                                <rect x="42" y="15" width="5" height="15" rx="2.5" fill="#00F57A"/>
+                                
+                                {/* Middle Finger */}
+                                <rect x="49" y="12" width="5" height="18" rx="2.5" fill="#00F57A"/>
+                                
+                                {/* Ring Finger */}
+                                <rect x="56" y="15" width="5" height="15" rx="2.5" fill="#00F57A"/>
+                                
+                                {/* Pinky */}
+                                <rect x="63" y="18" width="4" height="12" rx="2" fill="#00F57A"/>
+                                
+                                {/* Motion Arrow */}
+                                <g>
+                                    <path d="M75 30 L95 30 M90 25 L95 30 L90 35" stroke="#00F57A" strokeWidth="3" strokeLinecap="round" fill="none">
+                                        <animateTransform attributeName="transform" type="translateX" values="0;15;0" dur="2s" repeatCount="indefinite"/>
+                                        <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
+                                    </path>
+                                </g>
+                                
+                                {/* Swipe motion lines */}
+                                <g opacity="0.6">
+                                    <line x1="70" y1="20" x2="80" y2="20" stroke="#00F57A" strokeWidth="2" strokeLinecap="round">
+                                        <animate attributeName="opacity" values="0;1;0" dur="1.5s" repeatCount="indefinite" begin="0s"/>
+                                    </line>
+                                    <line x1="72" y1="30" x2="82" y2="30" stroke="#00F57A" strokeWidth="2" strokeLinecap="round">
+                                        <animate attributeName="opacity" values="0;1;0" dur="1.5s" repeatCount="indefinite" begin="0.3s"/>
+                                    </line>
+                                    <line x1="70" y1="40" x2="80" y2="40" stroke="#00F57A" strokeWidth="2" strokeLinecap="round">
+                                        <animate attributeName="opacity" values="0;1;0" dur="1.5s" repeatCount="indefinite" begin="0.6s"/>
+                                    </line>
+                                </g>
                             </svg>
                         </div>
                         <h1 className="font-display text-4xl font-bold md:text-7xl">One World Stage.</h1>
