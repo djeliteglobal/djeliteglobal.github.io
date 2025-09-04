@@ -32,7 +32,7 @@ export const LandingPage: React.FC = () => {
                     <div className="relative z-10 text-center text-white p-4 -mt-48 md:-mt-32">
                         {/* Swipe Right Logo */}
                         <div className="mb-6 flex justify-center">
-                            <div className="text-6xl animate-bounce">
+                            <div className="text-6xl animate-bounce transform rotate-90">
                                 👉
                             </div>
                         </div>
