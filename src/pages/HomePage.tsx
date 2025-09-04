@@ -6,6 +6,34 @@ import { LandingPage, Dashboard, CoursesPage, CourseDetailPage, CommunityPage, O
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { AuthModal } from '../components/auth/AuthModal';
 
+// Add bounce animation styles for sticky button
+const bounceInStyles = `
+  @keyframes bounceIn {
+    0% {
+      opacity: 0;
+      transform: translateY(100px) scale(0.3);
+    }
+    50% {
+      opacity: 1;
+      transform: translateY(-30px) scale(1.05);
+    }
+    70% {
+      transform: translateY(10px) scale(0.95);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+`;
+
+// Inject styles
+if (typeof document !== 'undefined') {
+  const styleSheet = document.createElement('style');
+  styleSheet.textContent = bounceInStyles;
+  document.head.appendChild(styleSheet);
+}
+
 export const AppContext = createContext<AppContextType | null>(null);
 
 const HomePageContent: React.FC = () => {
@@ -87,7 +115,13 @@ const HomePageContent: React.FC = () => {
                 <>
                     <LandingPage />
                     <div className="fixed bottom-4 right-4 z-50">
-                        <Link to="/funnel" className="bg-[color:var(--accent)] text-black px-6 py-3 rounded-full font-bold hover:bg-[color:var(--accent-muted)] transition-all shadow-lg">
+                        <Link 
+                            to="/funnel" 
+                            className="bg-[color:var(--accent)] text-black px-6 py-3 rounded-full font-bold hover:bg-[color:var(--accent-muted)] transition-all shadow-lg"
+                            style={{
+                                animation: 'bounceIn 0.8s ease-out 1s both'
+                            }}
+                        >
                             🚀 DJ Career Accelerator
                         </Link>
                     </div>

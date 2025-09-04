@@ -18,7 +18,7 @@ export const LandingPage: React.FC = () => {
                 <div className="container mx-auto flex h-20 items-center justify-between px-4">
                     <div className="text-2xl font-bold font-display">DJ Elite</div>
                     <div>
-                        <Button onClick={() => navigate('dashboard')}>Get Started</Button>
+                        <Button onClick={() => navigate('dashboard')}>Log In</Button>
                     </div>
                 </div>
             </header>
@@ -36,7 +36,7 @@ export const LandingPage: React.FC = () => {
                             Connect with DJs worldwide, find your perfect gig match, and build your music community.
                         </p>
                         <div className="mt-10 flex justify-center">
-                            <Button className="px-8 py-4 text-lg" onClick={() => navigate('dashboard')}>Create Account</Button>
+                            <Button className="px-8 py-4 text-lg" onClick={() => navigate('dashboard')}>Get Started</Button>
                         </div>
                     </div>
                 </section>
