@@ -41,106 +41,110 @@ export const LandingPage: React.FC = () => {
                     </div>
                 </section>
                 
-                {/* StoryBrand Section - Enhanced UX */}
-                <section className="py-20 sm:py-32 bg-gradient-to-b from-[color:var(--surface)] to-[color:var(--bg)] relative overflow-hidden">
-                    {/* Subtle background pattern */}
-                    <div className="absolute inset-0 opacity-5">
-                        <div className="absolute inset-0" style={{backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)', backgroundSize: '20px 20px'}}></div>
-                    </div>
-                    
-                    <div className="container mx-auto px-4 text-center relative z-10">
-                        {/* Problem Statement - Enhanced */}
-                        <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-6 mb-12 max-w-4xl mx-auto backdrop-blur-sm">
-                            <p className="text-xl md:text-2xl text-red-400 font-bold mb-2">
-                                🎧 The Problem Every DJ Faces
-                            </p>
-                            <p className="text-lg md:text-xl text-red-300">
-                                Tired of playing empty rooms while other DJs get the best gigs?
+                {/* How It Works Section - Masterfully Designed */}
+                <section className="py-16 sm:py-24 bg-[color:var(--surface)]">
+                    <div className="container mx-auto px-4 max-w-6xl">
+                        
+                        {/* Problem (Social Proof + Loss Aversion) */}
+                        <div className="text-center mb-12">
+                            <p className="text-red-500 font-medium mb-2">Join 10,000+ DJs who were stuck</p>
+                            <h2 className="text-2xl md:text-3xl font-bold text-[color:var(--text-primary)] mb-4">
+                                Playing empty rooms while others get paid gigs?
+                            </h2>
+                        </div>
+
+                        {/* Solution (Clear Value Prop) */}
+                        <div className="text-center mb-16">
+                            <h3 className="text-3xl md:text-4xl font-bold text-[color:var(--text-primary)] mb-4">
+                                You're one connection away from $500+ weekends
+                            </h3>
+                            <p className="text-lg text-[color:var(--text-secondary)] max-w-2xl mx-auto">
+                                We've helped DJs like you get booked at premium venues
                             </p>
                         </div>
-                        
-                        {/* Solution - Enhanced Hierarchy */}
-                        <h2 className="font-display text-4xl font-black sm:text-6xl mb-6 bg-gradient-to-r from-[color:var(--text-primary)] to-[color:var(--accent)] bg-clip-text text-transparent leading-tight">
-                            You're One Gig Away From Going Pro
-                        </h2>
-                        
-                        {/* Authority - Enhanced */}
-                        <div className="bg-[color:var(--accent)]/10 border border-[color:var(--accent)]/20 rounded-xl p-4 mb-8 inline-block">
-                            <p className="text-lg text-[color:var(--accent)] font-bold">
-                                ✨ We've helped 10,000+ DJs get booked at premium venues
-                            </p>
-                        </div>
-                        
-                        {/* Success Vision - Enhanced */}
-                        <div className="max-w-4xl mx-auto mb-16">
-                            <p className="text-2xl md:text-3xl text-[color:var(--text-primary)] font-semibold mb-4 leading-relaxed">
-                                Imagine getting paid $500+ every weekend doing what you love.
-                            </p>
-                            <p className="text-lg text-[color:var(--text-secondary)] leading-relaxed">
-                                Connect with promoters, match with venues, and build your music career.
-                            </p>
-                        </div>
-                        
-                        {/* 3-Step Plan - Enhanced Visual Design */}
-                        <div className="bg-[color:var(--elevated)] rounded-3xl p-8 md:p-12 mb-16 shadow-2xl border border-[color:var(--border)]">
-                            <h3 className="text-2xl font-bold mb-12 text-[color:var(--text-primary)]">How It Works</h3>
-                            <div className="flex flex-col lg:flex-row items-center justify-center gap-12">
-                                <div className="flex flex-col items-center gap-4 group">
-                                    <div className="bg-gradient-to-br from-[color:var(--accent)] to-[color:var(--accent)]/80 text-black rounded-2xl w-16 h-16 flex items-center justify-center font-black text-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+
+                        {/* 3-Step Process (Progressive Disclosure + Natural Mapping) */}
+                        <div className="mb-16">
+                            <h4 className="text-xl font-semibold text-center mb-12 text-[color:var(--text-primary)]">
+                                How it works (takes 2 minutes)
+                            </h4>
+                            
+                            <div className="grid md:grid-cols-3 gap-8 md:gap-4">
+                                {/* Step 1 */}
+                                <div className="text-center group">
+                                    <div className="w-12 h-12 bg-[color:var(--accent)] text-black rounded-full flex items-center justify-center font-bold text-lg mx-auto mb-4 group-hover:scale-110 transition-transform">
                                         1
                                     </div>
-                                    <h4 className="font-bold text-xl text-[color:var(--text-primary)]">Create Profile</h4>
-                                    <p className="text-[color:var(--text-secondary)] text-center max-w-xs leading-relaxed">
-                                        Build your DJ portfolio with photos, mixes, and experience
+                                    <h5 className="font-semibold text-lg mb-2 text-[color:var(--text-primary)]">Create Profile</h5>
+                                    <p className="text-[color:var(--text-secondary)] text-sm leading-relaxed">
+                                        Upload 3 photos, add your music style, set your rate
                                     </p>
                                 </div>
-                                
-                                <div className="hidden lg:block text-[color:var(--accent)] text-4xl font-bold animate-pulse">
-                                    →
+
+                                {/* Arrow */}
+                                <div className="hidden md:flex items-center justify-center">
+                                    <div className="text-[color:var(--accent)] text-2xl">→</div>
                                 </div>
-                                
-                                <div className="flex flex-col items-center gap-4 group">
-                                    <div className="bg-gradient-to-br from-[color:var(--accent)] to-[color:var(--accent)]/80 text-black rounded-2xl w-16 h-16 flex items-center justify-center font-black text-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+
+                                {/* Step 2 */}
+                                <div className="text-center group">
+                                    <div className="w-12 h-12 bg-[color:var(--accent)] text-black rounded-full flex items-center justify-center font-bold text-lg mx-auto mb-4 group-hover:scale-110 transition-transform">
                                         2
                                     </div>
-                                    <h4 className="font-bold text-xl text-[color:var(--text-primary)]">Match with Promoters</h4>
-                                    <p className="text-[color:var(--text-secondary)] text-center max-w-xs leading-relaxed">
-                                        Swipe through gig opportunities and connect with venues
+                                    <h5 className="font-semibold text-lg mb-2 text-[color:var(--text-primary)]">Swipe & Match</h5>
+                                    <p className="text-[color:var(--text-secondary)] text-sm leading-relaxed">
+                                        Browse gigs, swipe right on ones you want
                                     </p>
                                 </div>
-                                
-                                <div className="hidden lg:block text-[color:var(--accent)] text-4xl font-bold animate-pulse">
-                                    →
+
+                                {/* Arrow */}
+                                <div className="hidden md:flex items-center justify-center">
+                                    <div className="text-[color:var(--accent)] text-2xl">→</div>
                                 </div>
-                                
-                                <div className="flex flex-col items-center gap-4 group">
-                                    <div className="bg-gradient-to-br from-[color:var(--accent)] to-[color:var(--accent)]/80 text-black rounded-2xl w-16 h-16 flex items-center justify-center font-black text-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+
+                                {/* Step 3 */}
+                                <div className="text-center group">
+                                    <div className="w-12 h-12 bg-[color:var(--accent)] text-black rounded-full flex items-center justify-center font-bold text-lg mx-auto mb-4 group-hover:scale-110 transition-transform">
                                         3
                                     </div>
-                                    <h4 className="font-bold text-xl text-[color:var(--text-primary)]">Get Booked</h4>
-                                    <p className="text-[color:var(--text-secondary)] text-center max-w-xs leading-relaxed">
-                                        Land paid gigs and build your professional DJ career
+                                    <h5 className="font-semibold text-lg mb-2 text-[color:var(--text-primary)]">Get Booked</h5>
+                                    <p className="text-[color:var(--text-secondary)] text-sm leading-relaxed">
+                                        Promoters contact you directly, negotiate, get paid
                                     </p>
                                 </div>
                             </div>
                         </div>
-                        
-                        {/* Enhanced CTAs */}
-                        <div className="flex flex-col sm:flex-row justify-center gap-6 mb-12">
-                            <Button className="px-10 py-5 text-xl font-bold bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent)]/90 hover:from-[color:var(--accent)]/90 hover:to-[color:var(--accent)] transform hover:scale-105 transition-all duration-200 shadow-xl hover:shadow-2xl" onClick={() => navigate('dashboard')}>
-                                🚀 Create Account
-                            </Button>
-                            <Button variant="secondary" className="px-8 py-5 text-lg font-semibold border-2 border-[color:var(--border)] hover:border-[color:var(--accent)] hover:bg-[color:var(--accent)]/10 transition-all duration-200">
-                                👀 See How It Works
-                            </Button>
-                        </div>
-                        
-                        {/* Stakes - Enhanced */}
-                        <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 max-w-2xl mx-auto">
-                            <p className="text-red-400 font-semibold text-lg">
-                                ⏰ Don't let another weekend pass playing to empty rooms
+
+                        {/* Success Vision (Intrinsic Motivation) */}
+                        <div className="bg-[color:var(--elevated)] rounded-xl p-8 mb-12 text-center">
+                            <p className="text-xl md:text-2xl font-semibold text-[color:var(--text-primary)] mb-2">
+                                Imagine: $500+ every weekend doing what you love
+                            </p>
+                            <p className="text-[color:var(--text-secondary)]">
+                                Build your reputation, grow your fanbase, live the DJ life
                             </p>
                         </div>
+
+                        {/* Clear CTAs (Fitts's Law + Recognition over Recall) */}
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+                            <Button 
+                                className="px-8 py-4 text-lg font-semibold bg-[color:var(--accent)] hover:bg-[color:var(--accent)]/90 transition-colors" 
+                                onClick={() => navigate('dashboard')}
+                            >
+                                Start Matching (Free)
+                            </Button>
+                            <Button 
+                                variant="secondary" 
+                                className="px-6 py-4 text-lg border border-[color:var(--border)] hover:border-[color:var(--accent)] transition-colors"
+                            >
+                                See Success Stories
+                            </Button>
+                        </div>
+
+                        {/* Stakes (Loss Aversion) */}
+                        <p className="text-center text-red-500 font-medium">
+                            Don't spend another weekend playing to empty rooms
+                        </p>
                     </div>
                 </section>
                 
