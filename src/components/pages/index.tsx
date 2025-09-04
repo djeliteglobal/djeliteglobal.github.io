@@ -32,46 +32,9 @@ export const LandingPage: React.FC = () => {
                     <div className="relative z-10 text-center text-white p-4 -mt-48 md:-mt-32">
                         {/* Swipe Right Logo */}
                         <div className="mb-6 flex justify-center">
-                            <svg width="100" height="60" viewBox="0 0 120 60" className="">
-                                {/* Hand Palm */}
-                                <ellipse cx="35" cy="35" rx="12" ry="18" fill="#00F57A"/>
-                                
-                                {/* Thumb */}
-                                <ellipse cx="25" cy="25" rx="4" ry="8" fill="#00F57A" transform="rotate(-30 25 25)"/>
-                                
-                                {/* Index Finger */}
-                                <rect x="42" y="15" width="5" height="15" rx="2.5" fill="#00F57A"/>
-                                
-                                {/* Middle Finger */}
-                                <rect x="49" y="12" width="5" height="18" rx="2.5" fill="#00F57A"/>
-                                
-                                {/* Ring Finger */}
-                                <rect x="56" y="15" width="5" height="15" rx="2.5" fill="#00F57A"/>
-                                
-                                {/* Pinky */}
-                                <rect x="63" y="18" width="4" height="12" rx="2" fill="#00F57A"/>
-                                
-                                {/* Motion Arrow */}
-                                <g>
-                                    <path d="M75 30 L95 30 M90 25 L95 30 L90 35" stroke="#00F57A" strokeWidth="3" strokeLinecap="round" fill="none">
-                                        <animateTransform attributeName="transform" type="translateX" values="0;15;0" dur="2s" repeatCount="indefinite"/>
-                                        <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
-                                    </path>
-                                </g>
-                                
-                                {/* Swipe motion lines */}
-                                <g opacity="0.6">
-                                    <line x1="70" y1="20" x2="80" y2="20" stroke="#00F57A" strokeWidth="2" strokeLinecap="round">
-                                        <animate attributeName="opacity" values="0;1;0" dur="1.5s" repeatCount="indefinite" begin="0s"/>
-                                    </line>
-                                    <line x1="72" y1="30" x2="82" y2="30" stroke="#00F57A" strokeWidth="2" strokeLinecap="round">
-                                        <animate attributeName="opacity" values="0;1;0" dur="1.5s" repeatCount="indefinite" begin="0.3s"/>
-                                    </line>
-                                    <line x1="70" y1="40" x2="80" y2="40" stroke="#00F57A" strokeWidth="2" strokeLinecap="round">
-                                        <animate attributeName="opacity" values="0;1;0" dur="1.5s" repeatCount="indefinite" begin="0.6s"/>
-                                    </line>
-                                </g>
-                            </svg>
+                            <div className="text-6xl animate-bounce">
+                                👉
+                            </div>
                         </div>
                         <h1 className="font-display text-4xl font-bold md:text-7xl">One World Stage.</h1>
                         <h1 className="font-display text-4xl font-bold md:text-7xl text-[color:var(--accent)]">Swipe Right to DJ!</h1>
