@@ -25,19 +25,58 @@ export const LandingPage: React.FC = () => {
             
             <main>
                 {/* Hero Section */}
-                <section className="relative flex min-h-screen items-center justify-center pt-20">
+                <section className="relative flex min-h-screen items-center justify-center pt-8 md:pt-20">
                     <div className="absolute inset-0 bg-black/50">
                         <img src="https://images.unsplash.com/photo-1517814761483-6769dab4e9c0" alt="DJ performing" className="h-full w-full object-cover opacity-30"/>
                     </div>
-                    <div className="relative z-10 text-center text-white p-4">
-                        <h1 className="font-display text-4xl font-bold md:text-7xl">One World Stage.</h1>
-                        <h1 className="font-display text-4xl font-bold md:text-7xl text-[color:var(--accent)]">Swipe Right to DJ!</h1>
-                        <p className="mt-6 max-w-2xl mx-auto text-lg text-[color:var(--text-secondary)]">
-                            Connect with DJs worldwide, find your perfect gig match, and build your music community.
+                    <div className="relative z-10 text-center text-white p-4 -mt-16 md:mt-0">
+                        {/* Problem Statement */}
+                        <p className="text-lg md:text-xl text-red-400 font-semibold mb-4">
+                            Tired of playing empty rooms while other DJs get the best gigs?
                         </p>
-                        <div className="mt-10 flex justify-center">
-                            <Button className="px-8 py-4 text-lg" onClick={() => navigate('dashboard')}>Get Started</Button>
+                        
+                        <h1 className="font-display text-4xl font-bold md:text-7xl">You're One Gig Away</h1>
+                        <h1 className="font-display text-4xl font-bold md:text-7xl text-[color:var(--accent)]">From Going Pro</h1>
+                        
+                        {/* Authority Statement */}
+                        <p className="mt-4 text-sm md:text-base text-white/80 font-medium">
+                            We've helped 10,000+ DJs get booked at premium venues
+                        </p>
+                        
+                        {/* Success Vision */}
+                        <p className="mt-6 max-w-2xl mx-auto text-lg text-[color:var(--text-secondary)]">
+                            Imagine getting paid $500+ every weekend doing what you love. Connect with promoters, match with venues, and build your music career.
+                        </p>
+                        
+                        {/* Clear Plan */}
+                        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 text-sm md:text-base">
+                            <div className="flex items-center gap-2 text-white/90">
+                                <span className="bg-[color:var(--accent)] text-black rounded-full w-6 h-6 flex items-center justify-center font-bold text-xs">1</span>
+                                Create Profile
+                            </div>
+                            <span className="hidden sm:block text-white/50">→</span>
+                            <div className="flex items-center gap-2 text-white/90">
+                                <span className="bg-[color:var(--accent)] text-black rounded-full w-6 h-6 flex items-center justify-center font-bold text-xs">2</span>
+                                Match with Promoters
+                            </div>
+                            <span className="hidden sm:block text-white/50">→</span>
+                            <div className="flex items-center gap-2 text-white/90">
+                                <span className="bg-[color:var(--accent)] text-black rounded-full w-6 h-6 flex items-center justify-center font-bold text-xs">3</span>
+                                Get Booked
+                            </div>
                         </div>
+                        
+                        <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
+                            <Button className="px-8 py-4 text-lg font-bold" onClick={() => navigate('dashboard')}>Find Your Next Gig</Button>
+                            <Button variant="ghost" className="px-6 py-4 text-white border border-white/30 hover:bg-white/10">
+                                See How It Works
+                            </Button>
+                        </div>
+                        
+                        {/* Stakes */}
+                        <p className="mt-6 text-sm text-red-300 font-medium">
+                            Don't let another weekend pass playing to empty rooms
+                        </p>
                     </div>
                 </section>
                 
