@@ -99,44 +99,48 @@ export const MOCK_OPPORTUNITIES: Opportunity[] = [
 
 export const PRICING_PLANS: PricingPlan[] = [
     {
-        name: 'Monthly',
+        name: 'Free',
+        price: '$0',
+        priceDetails: '/forever',
+        features: [
+            'DJ Profile & Portfolio',
+            'Swipe & Match with DJs',
+            'Basic Community Access',
+            'Limited Gig Opportunities',
+            'Connect with 10 DJs/month',
+        ],
+        isFeatured: false,
+        cta: 'Start Free'
+    },
+    {
+        name: 'Pro',
+        price: '$19',
+        priceDetails: '/month',
+        features: [
+            'Everything in Free',
+            'Unlimited DJ Connections',
+            'Priority Gig Matching',
+            'Advanced Profile Features',
+            'Direct Promoter Contact',
+            'Community Events Access',
+        ],
+        isFeatured: true,
+        cta: 'Go Pro'
+    },
+    {
+        name: 'Elite',
         price: '$49',
         priceDetails: '/month',
         features: [
-            'Access to all courses',
-            'Private Community',
-            'Weekly Charts & Contests',
-            'Demo Submission Portal',
+            'Everything in Pro',
+            'Exclusive High-Paying Gigs',
+            'Personal Brand Manager',
+            'Industry Mentor Sessions',
+            'Featured Profile Placement',
+            'Early Access to New Features',
         ],
         isFeatured: false,
-        cta: 'Start Monthly'
-    },
-    {
-        name: 'Annual',
-        price: '$497',
-        priceDetails: '/year',
-        features: [
-            'All Monthly features',
-            'Path Dashboard & Time-Tracking',
-            'Downloadable Templates',
-            'Shareable Artist Profile',
-            '2 months free',
-        ],
-        isFeatured: true,
-        cta: 'Go Pro Annual'
-    },
-    {
-        name: 'Lifetime',
-        price: '$997',
-        priceDetails: 'one-time',
-        features: [
-            'All Annual features',
-            'Lifetime access, no renewals',
-            'Exclusive Mentor Sessions',
-            'Early access to new features',
-        ],
-        isFeatured: false,
-        cta: 'Get Lifetime Access'
+        cta: 'Join Elite'
     }
 ];
 

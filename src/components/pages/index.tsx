@@ -30,10 +30,10 @@ export const LandingPage: React.FC = () => {
                         <img src="https://images.unsplash.com/photo-1517814761483-6769dab4e9c0" alt="DJ performing" className="h-full w-full object-cover opacity-30"/>
                     </div>
                     <div className="relative z-10 text-center text-white p-4">
-                        <h1 className="font-display text-4xl font-bold md:text-7xl">Book More Gigs.</h1>
-                        <h1 className="font-display text-4xl font-bold md:text-7xl text-[color:var(--accent)]">Get Paid Like a Pro.</h1>
+                        <h1 className="font-display text-4xl font-bold md:text-7xl">One World Stage.</h1>
+                        <h1 className="font-display text-4xl font-bold md:text-7xl text-[color:var(--accent)]">Swipe Right to DJ!</h1>
                         <p className="mt-6 max-w-2xl mx-auto text-lg text-[color:var(--text-secondary)]">
-                            Learn, build your brand, and connect with real promoters. All in one place.
+                            Connect with DJs worldwide, find your perfect gig match, and build your music community.
                         </p>
                         <div className="mt-10 flex justify-center">
                             <Button className="px-8 py-4 text-lg" onClick={() => navigate('dashboard')}>Get Started</Button>
@@ -44,9 +44,9 @@ export const LandingPage: React.FC = () => {
                 {/* Pricing Section */}
                 <section id="pricing" className="py-20 sm:py-32">
                     <div className="container mx-auto px-4">
-                        <h2 className="text-center font-display text-3xl font-bold sm:text-5xl">Choose Your Path to Success</h2>
+                        <h2 className="text-center font-display text-3xl font-bold sm:text-5xl">Find Your Perfect Match</h2>
                         <p className="mx-auto mt-4 max-w-2xl text-center text-lg text-[color:var(--text-secondary)]">
-                            One simple price, cancel anytime. Get everything you need to become a professional DJ.
+                            Connect with DJs worldwide, discover gig opportunities, and build your music community. Start free!
                         </p>
                         <div className="mx-auto mt-16 grid max-w-md grid-cols-1 gap-8 lg:max-w-5xl lg:grid-cols-3">
                             {PRICING_PLANS.map((plan) => (
