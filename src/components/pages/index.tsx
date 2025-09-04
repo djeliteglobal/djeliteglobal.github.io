@@ -29,7 +29,7 @@ export const LandingPage: React.FC = () => {
                     <div className="absolute inset-0 bg-black/50">
                         <img src="https://images.unsplash.com/photo-1517814761483-6769dab4e9c0" alt="DJ performing" className="h-full w-full object-cover opacity-30"/>
                     </div>
-                    <div className="relative z-10 text-center text-white p-4 -mt-32 md:-mt-16">
+                    <div className="relative z-10 text-center text-white p-4 -mt-48 md:-mt-32">
                         <h1 className="font-display text-4xl font-bold md:text-7xl">One World Stage.</h1>
                         <h1 className="font-display text-4xl font-bold md:text-7xl text-[color:var(--accent)]">Swipe Right to DJ!</h1>
                         <p className="mt-6 max-w-2xl mx-auto text-lg text-[color:var(--text-secondary)]">
@@ -41,54 +41,106 @@ export const LandingPage: React.FC = () => {
                     </div>
                 </section>
                 
-                {/* StoryBrand Section */}
-                <section className="py-20 sm:py-32 bg-[color:var(--surface)]">
-                    <div className="container mx-auto px-4 text-center">
-                        <p className="text-xl md:text-2xl text-red-500 font-semibold mb-6">
-                            Tired of playing empty rooms while other DJs get the best gigs?
-                        </p>
+                {/* StoryBrand Section - Enhanced UX */}
+                <section className="py-20 sm:py-32 bg-gradient-to-b from-[color:var(--surface)] to-[color:var(--bg)] relative overflow-hidden">
+                    {/* Subtle background pattern */}
+                    <div className="absolute inset-0 opacity-5">
+                        <div className="absolute inset-0" style={{backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)', backgroundSize: '20px 20px'}}></div>
+                    </div>
+                    
+                    <div className="container mx-auto px-4 text-center relative z-10">
+                        {/* Problem Statement - Enhanced */}
+                        <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-6 mb-12 max-w-4xl mx-auto backdrop-blur-sm">
+                            <p className="text-xl md:text-2xl text-red-400 font-bold mb-2">
+                                🎧 The Problem Every DJ Faces
+                            </p>
+                            <p className="text-lg md:text-xl text-red-300">
+                                Tired of playing empty rooms while other DJs get the best gigs?
+                            </p>
+                        </div>
                         
-                        <h2 className="font-display text-3xl font-bold sm:text-5xl mb-4">You're One Gig Away From Going Pro</h2>
+                        {/* Solution - Enhanced Hierarchy */}
+                        <h2 className="font-display text-4xl font-black sm:text-6xl mb-6 bg-gradient-to-r from-[color:var(--text-primary)] to-[color:var(--accent)] bg-clip-text text-transparent leading-tight">
+                            You're One Gig Away From Going Pro
+                        </h2>
                         
-                        <p className="text-lg text-[color:var(--text-secondary)] mb-8">
-                            We've helped 10,000+ DJs get booked at premium venues
-                        </p>
+                        {/* Authority - Enhanced */}
+                        <div className="bg-[color:var(--accent)]/10 border border-[color:var(--accent)]/20 rounded-xl p-4 mb-8 inline-block">
+                            <p className="text-lg text-[color:var(--accent)] font-bold">
+                                ✨ We've helped 10,000+ DJs get booked at premium venues
+                            </p>
+                        </div>
                         
-                        <p className="max-w-3xl mx-auto text-xl text-[color:var(--text-primary)] mb-12">
-                            Imagine getting paid $500+ every weekend doing what you love. Connect with promoters, match with venues, and build your music career.
-                        </p>
+                        {/* Success Vision - Enhanced */}
+                        <div className="max-w-4xl mx-auto mb-16">
+                            <p className="text-2xl md:text-3xl text-[color:var(--text-primary)] font-semibold mb-4 leading-relaxed">
+                                Imagine getting paid $500+ every weekend doing what you love.
+                            </p>
+                            <p className="text-lg text-[color:var(--text-secondary)] leading-relaxed">
+                                Connect with promoters, match with venues, and build your music career.
+                            </p>
+                        </div>
                         
-                        {/* 3-Step Plan */}
-                        <div className="flex flex-col md:flex-row items-center justify-center gap-8 mb-12">
-                            <div className="flex flex-col items-center gap-3">
-                                <div className="bg-[color:var(--accent)] text-black rounded-full w-12 h-12 flex items-center justify-center font-bold text-xl">1</div>
-                                <h3 className="font-semibold text-lg">Create Profile</h3>
-                                <p className="text-[color:var(--text-secondary)] text-center max-w-xs">Build your DJ portfolio with photos, mixes, and experience</p>
-                            </div>
-                            <div className="hidden md:block text-[color:var(--accent)] text-3xl">→</div>
-                            <div className="flex flex-col items-center gap-3">
-                                <div className="bg-[color:var(--accent)] text-black rounded-full w-12 h-12 flex items-center justify-center font-bold text-xl">2</div>
-                                <h3 className="font-semibold text-lg">Match with Promoters</h3>
-                                <p className="text-[color:var(--text-secondary)] text-center max-w-xs">Swipe through gig opportunities and connect with venues</p>
-                            </div>
-                            <div className="hidden md:block text-[color:var(--accent)] text-3xl">→</div>
-                            <div className="flex flex-col items-center gap-3">
-                                <div className="bg-[color:var(--accent)] text-black rounded-full w-12 h-12 flex items-center justify-center font-bold text-xl">3</div>
-                                <h3 className="font-semibold text-lg">Get Booked</h3>
-                                <p className="text-[color:var(--text-secondary)] text-center max-w-xs">Land paid gigs and build your professional DJ career</p>
+                        {/* 3-Step Plan - Enhanced Visual Design */}
+                        <div className="bg-[color:var(--elevated)] rounded-3xl p-8 md:p-12 mb-16 shadow-2xl border border-[color:var(--border)]">
+                            <h3 className="text-2xl font-bold mb-12 text-[color:var(--text-primary)]">How It Works</h3>
+                            <div className="flex flex-col lg:flex-row items-center justify-center gap-12">
+                                <div className="flex flex-col items-center gap-4 group">
+                                    <div className="bg-gradient-to-br from-[color:var(--accent)] to-[color:var(--accent)]/80 text-black rounded-2xl w-16 h-16 flex items-center justify-center font-black text-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                                        1
+                                    </div>
+                                    <h4 className="font-bold text-xl text-[color:var(--text-primary)]">Create Profile</h4>
+                                    <p className="text-[color:var(--text-secondary)] text-center max-w-xs leading-relaxed">
+                                        Build your DJ portfolio with photos, mixes, and experience
+                                    </p>
+                                </div>
+                                
+                                <div className="hidden lg:block text-[color:var(--accent)] text-4xl font-bold animate-pulse">
+                                    →
+                                </div>
+                                
+                                <div className="flex flex-col items-center gap-4 group">
+                                    <div className="bg-gradient-to-br from-[color:var(--accent)] to-[color:var(--accent)]/80 text-black rounded-2xl w-16 h-16 flex items-center justify-center font-black text-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                                        2
+                                    </div>
+                                    <h4 className="font-bold text-xl text-[color:var(--text-primary)]">Match with Promoters</h4>
+                                    <p className="text-[color:var(--text-secondary)] text-center max-w-xs leading-relaxed">
+                                        Swipe through gig opportunities and connect with venues
+                                    </p>
+                                </div>
+                                
+                                <div className="hidden lg:block text-[color:var(--accent)] text-4xl font-bold animate-pulse">
+                                    →
+                                </div>
+                                
+                                <div className="flex flex-col items-center gap-4 group">
+                                    <div className="bg-gradient-to-br from-[color:var(--accent)] to-[color:var(--accent)]/80 text-black rounded-2xl w-16 h-16 flex items-center justify-center font-black text-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                                        3
+                                    </div>
+                                    <h4 className="font-bold text-xl text-[color:var(--text-primary)]">Get Booked</h4>
+                                    <p className="text-[color:var(--text-secondary)] text-center max-w-xs leading-relaxed">
+                                        Land paid gigs and build your professional DJ career
+                                    </p>
+                                </div>
                             </div>
                         </div>
                         
-                        <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
-                            <Button className="px-8 py-4 text-lg font-bold" onClick={() => navigate('dashboard')}>Create Account</Button>
-                            <Button variant="secondary" className="px-6 py-4">
-                                See How It Works
+                        {/* Enhanced CTAs */}
+                        <div className="flex flex-col sm:flex-row justify-center gap-6 mb-12">
+                            <Button className="px-10 py-5 text-xl font-bold bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent)]/90 hover:from-[color:var(--accent)]/90 hover:to-[color:var(--accent)] transform hover:scale-105 transition-all duration-200 shadow-xl hover:shadow-2xl" onClick={() => navigate('dashboard')}>
+                                🚀 Create Account
+                            </Button>
+                            <Button variant="secondary" className="px-8 py-5 text-lg font-semibold border-2 border-[color:var(--border)] hover:border-[color:var(--accent)] hover:bg-[color:var(--accent)]/10 transition-all duration-200">
+                                👀 See How It Works
                             </Button>
                         </div>
                         
-                        <p className="text-red-500 font-medium">
-                            Don't let another weekend pass playing to empty rooms
-                        </p>
+                        {/* Stakes - Enhanced */}
+                        <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 max-w-2xl mx-auto">
+                            <p className="text-red-400 font-semibold text-lg">
+                                ⏰ Don't let another weekend pass playing to empty rooms
+                            </p>
+                        </div>
                     </div>
                 </section>
                 
