@@ -7,6 +7,7 @@ interface AuthContextType {
   currentUser: User | null;
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string, name: string) => Promise<void>;
+  loginWithOAuth: (provider: 'google' | 'instagram') => Promise<void>;
   logout: () => Promise<void>;
   loading: boolean;
 }
@@ -42,6 +43,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
+    });
+    if (error) throw error;
+  };
+
+  const loginWithOAuth = async (provider: 'google' | 'instagram') => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `${window.location.origin}/`
+      }
     });
     if (error) throw error;
   };
@@ -82,6 +93,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     currentUser,
     login,
     signup,
+    loginWithOAuth,
     logout,
     loading
   };
