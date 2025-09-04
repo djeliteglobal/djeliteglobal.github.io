@@ -308,8 +308,8 @@ export const Dashboard: React.FC = () => {
                     <div className="rounded-xl bg-[color:var(--surface)] p-6 shadow-soft border border-[color:var(--border)]">
                         <h3 className="font-display text-xl font-bold">New Opportunities</h3>
                         <ul className="mt-4 space-y-3">
-                            <li className="flex justify-between items-center text-sm"><span>Club Night @ Berlin</span><span className="px-2 py-0.5 text-xs rounded-full bg-green-500/20 text-green-400">Open</span></li>
-                            <li className="flex justify-between items-center text-sm"><span>Festival Opener @ Ibiza</span><span className="px-2 py-0.5 text-xs rounded-full bg-green-500/20 text-green-400">Open</span></li>
+                            <li className="flex justify-between items-center text-sm"><span>Club Night @ Berlin</span><span className="px-2 py-0.5 text-xs rounded-full bg-[color:var(--accent)]/20 text-[color:var(--accent)]">Open</span></li>
+                            <li className="flex justify-between items-center text-sm"><span>Festival Opener @ Ibiza</span><span className="px-2 py-0.5 text-xs rounded-full bg-[color:var(--accent)]/20 text-[color:var(--accent)]">Open</span></li>
                             <li className="flex justify-between items-center text-sm"><span>Radio Mix Guest</span><span className="px-2 py-0.5 text-xs rounded-full bg-yellow-500/20 text-yellow-400">Applied</span></li>
                         </ul>
                         <Button variant="secondary" className="mt-4 w-full">View All</Button>
