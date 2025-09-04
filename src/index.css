@@ -9,10 +9,19 @@
   --text-primary: #FFFFFF;
   --text-secondary: #B8BCC8;
   --muted: #6B7280;
-  --accent: #40E0D0;
-  --accent-muted: #20B2AA;
-  --danger: #EF4444;
-  --success: #10B981;
+  
+  /* 🎨 THEME COLORS - Import from theme/colors.ts */
+  --accent: var(--theme-primary, #40E0D0);
+  --accent-muted: var(--theme-primary-muted, #20B2AA);
+  --danger: var(--theme-danger, #EF4444);
+  --success: var(--theme-success, #10B981);
+  
+  /* Theme color variables */
+  --theme-primary: #40E0D0;
+  --theme-primary-muted: #20B2AA;
+  --theme-success: #10B981;
+  --theme-warning: #F59E0B;
+  --theme-danger: #EF4444;
 }
 
 .light {
@@ -24,10 +33,12 @@
   --text-primary: #0F172A;
   --text-secondary: #475569;
   --muted: #64748B;
-  --accent: #40E0D0;
-  --accent-muted: #20B2AA;
-  --danger: #EF4444;
-  --success: #10B981;
+  
+  /* Theme colors inherit from root */
+  --accent: var(--theme-primary);
+  --accent-muted: var(--theme-primary-muted);
+  --danger: var(--theme-danger);
+  --success: var(--theme-success);
 }
 
 .dark {
@@ -39,10 +50,12 @@
   --text-primary: #FFFFFF;
   --text-secondary: #B8BCC8;
   --muted: #6B7280;
-  --accent: #40E0D0;
-  --accent-muted: #20B2AA;
-  --danger: #EF4444;
-  --success: #10B981;
+  
+  /* Theme colors inherit from root */
+  --accent: var(--theme-primary);
+  --accent-muted: var(--theme-primary-muted);
+  --danger: var(--theme-danger);
+  --success: var(--theme-success);
 }
 
 * {
