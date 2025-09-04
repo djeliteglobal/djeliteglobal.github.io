@@ -36,7 +36,7 @@ export const LandingPage: React.FC = () => {
                             Connect with DJs worldwide, find your perfect gig match, and build your music community.
                         </p>
                         <div className="mt-10 flex justify-center">
-                            <Button className="px-8 py-4 text-lg" onClick={() => navigate('dashboard')}>Get Started</Button>
+                            <Button className="px-8 py-4 text-lg" onClick={() => navigate('dashboard')}>Create Account</Button>
                         </div>
                     </div>
                 </section>
