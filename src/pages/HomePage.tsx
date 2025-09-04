@@ -11,19 +11,41 @@ const bounceInStyles = `
   @keyframes bounceIn {
     0% {
       opacity: 0;
-      transform: translateY(100px) scale(0.3);
+      transform: translateY(200px) scale(0.5);
     }
-    50% {
+    40% {
       opacity: 1;
-      transform: translateY(-30px) scale(1.05);
+      transform: translateY(-50px) scale(1.1);
     }
-    70% {
-      transform: translateY(10px) scale(0.95);
+    60% {
+      transform: translateY(20px) scale(0.9);
+    }
+    80% {
+      transform: translateY(-10px) scale(1.05);
     }
     100% {
       opacity: 1;
       transform: translateY(0) scale(1);
     }
+  }
+  
+  @keyframes shake {
+    0%, 100% {
+      transform: translateX(0) translateY(0) scale(1);
+    }
+    25% {
+      transform: translateX(-3px) translateY(-2px) scale(1.02);
+    }
+    50% {
+      transform: translateX(3px) translateY(2px) scale(0.98);
+    }
+    75% {
+      transform: translateX(-2px) translateY(1px) scale(1.01);
+    }
+  }
+  
+  .dj-button-animated {
+    animation: bounceIn 1.2s ease-out 4s both, shake 0.6s ease-in-out 9s infinite;
   }
 `;
 
@@ -117,10 +139,7 @@ const HomePageContent: React.FC = () => {
                     <div className="fixed bottom-4 right-4 z-50">
                         <Link 
                             to="/funnel" 
-                            className="bg-[color:var(--accent)] text-black px-6 py-3 rounded-full font-bold hover:bg-[color:var(--accent-muted)] transition-all shadow-lg"
-                            style={{
-                                animation: 'bounceIn 0.8s ease-out 1s both'
-                            }}
+                            className="bg-[color:var(--accent)] text-black px-6 py-3 rounded-full font-bold hover:bg-[color:var(--accent-muted)] transition-all shadow-lg dj-button-animated"
                         >
                             🚀 DJ Career Accelerator
                         </Link>
