@@ -29,7 +29,7 @@ export const LandingPage: React.FC = () => {
                     <div className="absolute inset-0 bg-black/50">
                         <img src="https://images.unsplash.com/photo-1517814761483-6769dab4e9c0" alt="DJ performing" className="h-full w-full object-cover opacity-30"/>
                     </div>
-                    <div className="relative z-10 text-center text-white p-4 -mt-16 md:mt-0">
+                    <div className="relative z-10 text-center text-white p-4 -mt-32 md:-mt-16">
                         <h1 className="font-display text-4xl font-bold md:text-7xl">One World Stage.</h1>
                         <h1 className="font-display text-4xl font-bold md:text-7xl text-[color:var(--accent)]">Swipe Right to DJ!</h1>
                         <p className="mt-6 max-w-2xl mx-auto text-lg text-[color:var(--text-secondary)]">
@@ -80,7 +80,7 @@ export const LandingPage: React.FC = () => {
                         </div>
                         
                         <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
-                            <Button className="px-8 py-4 text-lg font-bold" onClick={() => navigate('dashboard')}>Find Your Next Gig</Button>
+                            <Button className="px-8 py-4 text-lg font-bold" onClick={() => navigate('dashboard')}>Create Account</Button>
                             <Button variant="secondary" className="px-6 py-4">
                                 See How It Works
                             </Button>
