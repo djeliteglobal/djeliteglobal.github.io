@@ -30,6 +30,21 @@ export const LandingPage: React.FC = () => {
                         <img src="https://images.unsplash.com/photo-1517814761483-6769dab4e9c0" alt="DJ performing" className="h-full w-full object-cover opacity-30"/>
                     </div>
                     <div className="relative z-10 text-center text-white p-4 -mt-48 md:-mt-32">
+                        {/* Swipe Right Logo */}
+                        <div className="mb-6 flex justify-center">
+                            <svg width="80" height="80" viewBox="0 0 100 100" className="animate-pulse">
+                                {/* Hand */}
+                                <path d="M25 60 Q30 50 35 55 L40 50 Q45 45 50 50 L55 45 Q60 40 65 45 L70 40 Q75 35 80 40 L85 45 Q85 55 80 65 L75 70 Q70 75 60 75 L40 75 Q30 70 25 60 Z" fill="#00F57A" stroke="#00F57A" strokeWidth="2"/>
+                                {/* Motion lines */}
+                                <path d="M15 30 L25 35 M10 40 L20 45 M15 50 L25 55" stroke="#00F57A" strokeWidth="3" strokeLinecap="round" opacity="0.7">
+                                    <animate attributeName="opacity" values="0.3;0.8;0.3" dur="1.5s" repeatCount="indefinite"/>
+                                </path>
+                                {/* Arrow */}
+                                <path d="M70 25 L85 30 L70 35 M70 30 L85 30" stroke="#00F57A" strokeWidth="3" strokeLinecap="round">
+                                    <animateTransform attributeName="transform" type="translate" values="0,0;10,0;0,0" dur="2s" repeatCount="indefinite"/>
+                                </path>
+                            </svg>
+                        </div>
                         <h1 className="font-display text-4xl font-bold md:text-7xl">One World Stage.</h1>
                         <h1 className="font-display text-4xl font-bold md:text-7xl text-[color:var(--accent)]">Swipe Right to DJ!</h1>
                         <p className="mt-6 max-w-2xl mx-auto text-lg text-[color:var(--text-secondary)]">
