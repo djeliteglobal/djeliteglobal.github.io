@@ -175,6 +175,46 @@ export const LandingPage: React.FC = () => {
                     </div>
                 </section>
             </main>
+            
+            {/* Footer */}
+            <footer className="bg-[color:var(--surface)] border-t border-[color:var(--border)] mt-20">
+                <div className="container mx-auto px-4 py-16 text-center">
+                    <div className="text-2xl font-bold font-display mb-4">DJ Elite</div>
+                    <p className="mt-4 max-w-md mx-auto text-[color:var(--text-secondary)]">Connect with DJs worldwide, find your perfect gig match, and build your music community.</p>
+                    <form onSubmit={async (e) => {
+                        e.preventDefault();
+                        const formData = new FormData(e.target as HTMLFormElement);
+                        const data = {
+                            first_name: 'Newsletter Subscriber',
+                            email: formData.get('email')
+                        };
+                        try {
+                            const response = await fetch('/.netlify/functions/subscribe', {
+                                method: 'POST',
+                                body: JSON.stringify(data)
+                            });
+                            if (response.ok) {
+                                alert('📧 Subscribed! You\'ll get weekly DJ tips and insights.');
+                                (e.target as HTMLFormElement).reset();
+                            } else {
+                                alert('Something went wrong. Please try again.');
+                            }
+                        } catch (error) {
+                            alert('Network error. Please try again.');
+                        }
+                    }} className="mt-6 max-w-sm mx-auto flex gap-2">
+                        <input type="email" name="email" placeholder="Your email address" required className="flex-grow px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />
+                        <Button type="submit" className="px-6">Subscribe</Button>
+                    </form>
+                    <div className="mt-8 flex justify-center gap-6 text-[color:var(--muted)]">
+                        <a href="/terms" className="hover:text-[color:var(--text-primary)] transition-colors">Terms</a>
+                        <a href="/privacy" className="hover:text-[color:var(--text-primary)] transition-colors">Privacy</a>
+                        <a href="#" className="hover:text-[color:var(--text-primary)] transition-colors">Contact</a>
+                        <a href="https://buymeacoffee.com/elitedjs" target="_blank" rel="noopener noreferrer" className="hover:text-[color:var(--text-primary)] transition-colors">Buy Me a Coffee</a>
+                    </div>
+                    <p className="mt-8 text-sm text-[color:var(--muted)]">&copy; {new Date().getFullYear()} DJ Elite. All rights reserved.</p>
+                </div>
+            </footer>
         </div>
     );
 };

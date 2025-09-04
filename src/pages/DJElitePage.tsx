@@ -89,7 +89,7 @@ export const DJElitePage: React.FC = () => {
 
                 <div className="relative z-10">
                     <h1 className="font-display text-4xl sm:text-6xl md:text-7xl font-bold tracking-tighter max-w-4xl mx-auto animate-fade-in-up animate-delay-200">
-                        The Exact System to Go From Bedroom DJ to <span className="text-[color:var(--accent)]">Playing at top events</span> in 90 Days
+                        DJ Career Accelerator: <span className="text-[color:var(--accent)]">From Bedroom to Main Stage</span> in 90 Days
                     </h1>
                     <p className="mt-6 text-lg sm:text-xl text-[color:var(--text-secondary)] max-w-2xl mx-auto animate-fade-in-up animate-delay-300">
                         discover how hundreds of djs have landed their first professional gigs using this proven method.
