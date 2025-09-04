@@ -128,7 +128,7 @@ body {
 
 .btn-animate:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(64, 224, 208, 0.4);
+  box-shadow: 0 10px 25px -5px color-mix(in srgb, var(--accent) 40%, transparent);
 }
 
 .hover-lift:hover {

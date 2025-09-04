@@ -31,10 +31,12 @@ const CheckoutForm = () => {
       },
     });
 
-    if (error.type === "card_error" || error.type === "validation_error") {
-      setMessage(error.message);
-    } else {
-      setMessage("An unexpected error occurred.");
+    if (error) {
+      if (error.type === "card_error" || error.type === "validation_error") {
+        setMessage(error.message);
+      } else {
+        setMessage("Payment failed. Please try again.");
+      }
     }
 
     setIsLoading(false);
@@ -69,15 +71,36 @@ const CheckoutForm = () => {
 
 const CheckoutPage = () => {
   const [clientSecret, setClientSecret] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/.netlify/functions/create-payment-intent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount: 497 }), // Amount for the course
-    })
-      .then((res) => res.json())
-      .then((data) => setClientSecret(data.clientSecret));
+    const createPaymentIntent = async () => {
+      try {
+        const response = await fetch("/.netlify/functions/create-payment-intent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ amount: 497 }),
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Payment setup failed: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        if (data.clientSecret) {
+          setClientSecret(data.clientSecret);
+        } else {
+          throw new Error('Invalid response from payment service');
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to initialize payment');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    createPaymentIntent();
   }, []);
 
   const options: StripeElementsOptions = {
@@ -112,11 +135,18 @@ const CheckoutPage = () => {
                     <p className="text-3xl font-bold text-[color:var(--accent)]">$497</p>
                     <p className="text-xs text-[color:var(--muted)]">One-time payment • 90-day guarantee</p>
                 </div>
-                {clientSecret ? (
+                {error ? (
+                    <div className="text-center">
+                        <div className="text-red-500 mb-4">{error}</div>
+                        <Button onClick={() => window.location.reload()} variant="secondary">
+                            Try Again
+                        </Button>
+                    </div>
+                ) : clientSecret ? (
                     <Elements options={options} stripe={stripePromise}>
                         <CheckoutForm />
                     </Elements>
-                ) : (
+                ) : loading ? (
                     <div className="space-y-6">
                         <div className="w-full h-12 bg-[color:var(--surface-alt)] rounded-lg animate-pulse"></div>
                         <div className="w-full h-32 bg-[color:var(--surface-alt)] rounded-lg animate-pulse"></div>
@@ -126,7 +156,7 @@ const CheckoutPage = () => {
                             Loading secure payment form...
                         </div>
                     </div>
-                )}
+                ) : null}
             </div>
         </main>
     </div>

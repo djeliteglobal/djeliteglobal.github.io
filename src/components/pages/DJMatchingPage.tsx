@@ -46,8 +46,16 @@ export const DJMatchingPage: React.FC = () => {
   const [profiles, setProfiles] = useState(MOCK_DJ_PROFILES);
 
   const handleSwipe = (profileId: string, direction: 'like' | 'pass') => {
-    console.log(`${direction} on ${profileId}`);
+    const sanitizedId = profileId.replace(/[\r\n\t]/g, '');
+    console.log(`${direction} on ${sanitizedId}`);
     setProfiles(prev => prev.filter(p => p.id !== profileId));
+  };
+
+  const getTabButtonClass = (isActive: boolean) => {
+    const baseClass = 'px-4 py-2 rounded-lg transition-colors';
+    const activeClass = 'bg-[color:var(--accent)] text-black';
+    const inactiveClass = 'bg-[color:var(--surface-alt)] text-[color:var(--text-secondary)]';
+    return `${baseClass} ${isActive ? activeClass : inactiveClass}`;
   };
 
   return (
@@ -61,21 +69,13 @@ export const DJMatchingPage: React.FC = () => {
         <div className="flex gap-2">
           <button
             onClick={() => setView('swipe')}
-            className={`px-4 py-2 rounded-lg transition-colors ${
-              view === 'swipe' 
-                ? 'bg-[color:var(--accent)] text-black' 
-                : 'bg-[color:var(--surface-alt)] text-[color:var(--text-secondary)]'
-            }`}
+            className={getTabButtonClass(view === 'swipe')}
           >
             Discover
           </button>
           <button
             onClick={() => setView('profile')}
-            className={`px-4 py-2 rounded-lg transition-colors ${
-              view === 'profile' 
-                ? 'bg-[color:var(--accent)] text-black' 
-                : 'bg-[color:var(--surface-alt)] text-[color:var(--text-secondary)]'
-            }`}
+            className={getTabButtonClass(view === 'profile')}
           >
             My Profile
           </button>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import type { Testimonial } from './types';
 
 // Button Component
@@ -11,9 +11,9 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 export const Button: React.FC<ButtonProps> = ({ variant = 'primary', children, className = '', ...props }) => {
   const baseClasses = 'px-8 py-4 rounded-lg font-bold text-base transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4';
   const variantClasses = {
-    primary: 'bg-[color:var(--accent)] text-black focus:ring-[color:var(--accent-muted)]/50 shadow-[0_5px_20px_-5px_rgba(64,224,208,0.4)]',
+    primary: 'bg-[color:var(--accent)] text-black focus:ring-[color:var(--accent-muted)]/50',
     secondary: 'bg-transparent text-[color:var(--text-primary)] border-2 border-[color:var(--border)] hover:bg-[color:var(--surface-alt)] hover:border-[color:var(--muted)] focus:ring-[color:var(--muted)]/50',
-    purchase: 'bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-muted)] text-black focus:ring-[color:var(--accent)]/50 shadow-[0_5px_20px_-5px_rgba(64,224,208,0.4)] text-lg',
+    purchase: 'bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-muted)] text-black focus:ring-[color:var(--accent)]/50 text-lg',
   };
   return (
     <button className={`${baseClasses} ${variantClasses[variant]} ${className}`} {...props}>
@@ -82,31 +82,27 @@ export const CountdownTimer: React.FC = () => {
         return date;
     });
 
-    const calculateTimeLeft = () => {
+    const calculateTimeLeft = useCallback(() => {
         const difference = +targetDate - +new Date();
-        let timeLeft = {
-            days: 0, hours: 0, minutes: 0, seconds: 0,
-        };
-
-        if (difference > 0) {
-            timeLeft = {
-                days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-                hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-                minutes: Math.floor((difference / 1000 / 60) % 60),
-                seconds: Math.floor((difference / 1000) % 60),
-            };
+        if (difference <= 0) {
+            return { days: 0, hours: 0, minutes: 0, seconds: 0 };
         }
-        return timeLeft;
-    };
+        return {
+            days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+            hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+            minutes: Math.floor((difference / 1000 / 60) % 60),
+            seconds: Math.floor((difference / 1000) % 60),
+        };
+    }, [targetDate]);
 
-    const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+    const [timeLeft, setTimeLeft] = useState(calculateTimeLeft);
 
     useEffect(() => {
-        const timer = setTimeout(() => {
+        const timer = setInterval(() => {
             setTimeLeft(calculateTimeLeft());
         }, 1000);
-        return () => clearTimeout(timer);
-    });
+        return () => clearInterval(timer);
+    }, [calculateTimeLeft]);
 
     const formatTime = (time: number) => time.toString().padStart(2, '0');
 
@@ -124,14 +120,21 @@ export const CountdownTimer: React.FC = () => {
 
 export const CheckoutButton: React.FC<{ amount: number; productName: string; }> = ({ amount, productName }) => {
   const handleCheckout = async () => {
+    const sanitizedProductName = productName.replace(/[<>"'&]/g, '');
     const response = await fetch('/.netlify/functions/create-checkout-session', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount, productName })
+      body: JSON.stringify({ amount, productName: sanitizedProductName })
     });
     
     const { url } = await response.json();
-    window.location.href = url;
+    
+    // Validate URL to prevent XSS
+    if (url && (url.startsWith('https://') || url.startsWith('http://'))) {
+      window.location.href = url;
+    } else {
+      console.error('Invalid redirect URL received');
+    }
   };
 
   return (

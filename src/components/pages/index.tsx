@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { AppContext } from '../../pages/HomePage';
 import { useAuth } from '../../contexts/AuthContext';
@@ -158,7 +158,7 @@ export const LandingPage: React.FC = () => {
                         {/* Clear CTAs (Fitts's Law + Recognition over Recall) */}
                         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
                             <Button 
-                                className="px-8 py-4 text-lg font-semibold bg-[color:var(--accent)] hover:bg-[color:var(--accent)]/90 transition-colors" 
+                                className="px-8 py-4 text-lg font-semibold" 
                                 onClick={() => navigate('dashboard')}
                             >
                                 Start Matching (Free)
@@ -460,14 +460,14 @@ export const OpportunitiesPage: React.FC = () => {
         setOpportunities(prev => prev.slice(1));
     };
     
-    const triggerSwipe = (direction: 'left' | 'right') => {
+    const triggerSwipe = useCallback((direction: 'left' | 'right') => {
         const topCard = document.querySelector<HTMLElement>('[data-swipe-card="true"]');
         if (topCard) {
             topCard.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
             topCard.classList.add(direction === 'right' ? 'swipe-out-right' : 'swipe-out-left');
             topCard.addEventListener('animationend', handleSwipe, { once: true });
         }
-    };
+    }, [handleSwipe]);
 
     return (
         <div className="flex flex-col h-full p-4 sm:p-6 md:p-8">
@@ -495,18 +495,22 @@ export const OpportunitiesPage: React.FC = () => {
                     <div className="flex flex-col items-center w-full max-w-sm mx-auto">
                         <div className="relative h-[500px] w-full">
                             {opportunities.length > 0 ? (
-                                opportunities.map((op, index) => (
-                                    <OpportunitySwipeCard
-                                        key={op.id}
-                                        opportunity={op}
-                                        onSwipe={handleSwipe}
-                                        isTop={index === 0}
-                                        style={{ 
-                                            zIndex: opportunities.length - index,
-                                            transform: `scale(${1 - (Math.min(index, 2) * 0.05)}) translateY(-${Math.min(index, 2) * 10}px)`,
-                                        }}
-                                    />
-                                )).reverse()
+                                [...opportunities].reverse().map((op, index) => {
+                                    const reverseIndex = opportunities.length - 1 - index;
+                                    const clampedIndex = Math.min(reverseIndex, 2);
+                                    return (
+                                        <OpportunitySwipeCard
+                                            key={op.id}
+                                            opportunity={op}
+                                            onSwipe={handleSwipe}
+                                            isTop={reverseIndex === 0}
+                                            style={{ 
+                                                zIndex: reverseIndex + 1,
+                                                transform: `scale(${1 - (clampedIndex * 0.05)}) translateY(-${clampedIndex * 10}px)`,
+                                            }}
+                                        />
+                                    );
+                                })
                             ) : (
                                 <div className="flex flex-col items-center justify-center h-full w-full rounded-xl bg-[color:var(--surface)] border-2 border-dashed border-[color:var(--border)]">
                                     <p className="text-lg font-semibold text-[color:var(--text-secondary)]">No more gigs for now!</p>

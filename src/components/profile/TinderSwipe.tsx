@@ -19,15 +19,17 @@ interface TinderSwipeProps {
 export const TinderSwipe: React.FC<TinderSwipeProps> = ({ profiles, onSwipe }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [photoIndex, setPhotoIndex] = useState(0);
+  const [imageError, setImageError] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const currentProfile = profiles[currentIndex];
-  if (!currentProfile) return <div className="text-center text-[color:var(--text-secondary)]">No more profiles</div>;
+  if (!currentProfile || !currentProfile.photos?.length) return <div className="text-center text-[color:var(--text-secondary)]">No more profiles</div>;
 
   const handleSwipe = (direction: 'like' | 'pass') => {
     onSwipe(currentProfile.id, direction);
     setCurrentIndex(prev => prev + 1);
     setPhotoIndex(0);
+    setImageError(false);
   };
 
   const nextPhoto = () => {
@@ -42,17 +44,53 @@ export const TinderSwipe: React.FC<TinderSwipeProps> = ({ profiles, onSwipe }) =
     <div className="max-w-sm mx-auto">
       <div ref={cardRef} className="relative h-[600px] bg-[color:var(--surface)] rounded-xl overflow-hidden shadow-lg">
         <div className="relative h-2/3">
-          <img 
-            src={currentProfile.photos[photoIndex]} 
-            alt={currentProfile.name}
-            className="w-full h-full object-cover"
-          />
+          {imageError ? (
+            <div className="w-full h-full bg-[color:var(--surface-alt)] flex items-center justify-center text-[color:var(--text-secondary)]">
+              Image unavailable
+            </div>
+          ) : (
+            <img 
+              src={currentProfile.photos[photoIndex]} 
+              alt={currentProfile.name}
+              className="w-full h-full object-cover"
+              onError={() => setImageError(true)}
+              onLoad={() => setImageError(false)}
+            />
+          )}
           
           {/* Photo navigation */}
           <div className="absolute inset-0 flex">
-            <button onClick={prevPhoto} className="flex-1" />
-            <button onClick={nextPhoto} className="flex-1" />
+            <button 
+              onClick={prevPhoto} 
+              className="flex-1 hover:bg-black/10 transition-colors"
+              aria-label="Previous photo"
+            />
+            <button 
+              onClick={nextPhoto} 
+              className="flex-1 hover:bg-black/10 transition-colors"
+              aria-label="Next photo"
+            />
           </div>
+          
+          {/* Navigation arrows */}
+          {currentProfile.photos.length > 1 && (
+            <>
+              <button 
+                onClick={prevPhoto}
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black/70 transition-colors"
+                aria-label="Previous photo"
+              >
+                ←
+              </button>
+              <button 
+                onClick={nextPhoto}
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black/70 transition-colors"
+                aria-label="Next photo"
+              >
+                →
+              </button>
+            </>
+          )}
           
           {/* Photo indicators */}
           <div className="absolute top-4 left-4 right-4 flex gap-1">
