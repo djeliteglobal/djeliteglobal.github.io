@@ -47,26 +47,26 @@ export const LandingPage: React.FC = () => {
                         
                         {/* Problem (Social Proof + Loss Aversion) */}
                         <div className="text-center mb-12">
-                            <p className="text-red-500 font-medium mb-2">Join 10,000+ DJs who were stuck</p>
+                            <p className="text-red-500 font-medium mb-2">Join 10,000+ DJs building connections</p>
                             <h2 className="text-2xl md:text-3xl font-bold text-[color:var(--text-primary)] mb-4">
-                                Playing empty rooms while others get paid gigs?
+                                Tired of DJing alone with no network to grow?
                             </h2>
                         </div>
 
                         {/* Solution (Clear Value Prop) */}
                         <div className="text-center mb-16">
                             <h3 className="text-3xl md:text-4xl font-bold text-[color:var(--text-primary)] mb-4">
-                                You're one connection away from $500+ weekends
+                                Connect with DJs who help each other succeed
                             </h3>
                             <p className="text-lg text-[color:var(--text-secondary)] max-w-2xl mx-auto">
-                                We've helped DJs like you get booked at premium venues
+                                Build relationships with DJs who have connections, exchange gigs, and grow together
                             </p>
                         </div>
 
                         {/* 3-Step Process (Progressive Disclosure + Natural Mapping) */}
                         <div className="mb-16">
                             <h4 className="text-xl font-semibold text-center mb-12 text-[color:var(--text-primary)]">
-                                How it works (takes 2 minutes)
+                                How the community works
                             </h4>
                             
                             <div className="grid md:grid-cols-3 gap-8 md:gap-4">
@@ -77,7 +77,7 @@ export const LandingPage: React.FC = () => {
                                     </div>
                                     <h5 className="font-semibold text-lg mb-2 text-[color:var(--text-primary)]">Create Profile</h5>
                                     <p className="text-[color:var(--text-secondary)] text-sm leading-relaxed">
-                                        Upload 3 photos, add your music style, set your rate
+                                        Share your style, experience, and what you can help other DJs with
                                     </p>
                                 </div>
 
@@ -91,9 +91,9 @@ export const LandingPage: React.FC = () => {
                                     <div className="w-12 h-12 bg-[color:var(--accent)] text-black rounded-full flex items-center justify-center font-bold text-lg mx-auto mb-4 group-hover:scale-110 transition-transform">
                                         2
                                     </div>
-                                    <h5 className="font-semibold text-lg mb-2 text-[color:var(--text-primary)]">Swipe & Match</h5>
+                                    <h5 className="font-semibold text-lg mb-2 text-[color:var(--text-primary)]">Connect & Collaborate</h5>
                                     <p className="text-[color:var(--text-secondary)] text-sm leading-relaxed">
-                                        Browse gigs, swipe right on ones you want
+                                        Match with DJs who complement your skills and share opportunities
                                     </p>
                                 </div>
 
@@ -107,9 +107,9 @@ export const LandingPage: React.FC = () => {
                                     <div className="w-12 h-12 bg-[color:var(--accent)] text-black rounded-full flex items-center justify-center font-bold text-lg mx-auto mb-4 group-hover:scale-110 transition-transform">
                                         3
                                     </div>
-                                    <h5 className="font-semibold text-lg mb-2 text-[color:var(--text-primary)]">Get Booked</h5>
+                                    <h5 className="font-semibold text-lg mb-2 text-[color:var(--text-primary)]">Grow Together</h5>
                                     <p className="text-[color:var(--text-secondary)] text-sm leading-relaxed">
-                                        Promoters contact you directly, negotiate, get paid
+                                        Exchange gigs, get referrals, and expand your network through collaboration
                                     </p>
                                 </div>
                             </div>
@@ -118,10 +118,10 @@ export const LandingPage: React.FC = () => {
                         {/* Success Vision (Intrinsic Motivation) */}
                         <div className="bg-[color:var(--elevated)] rounded-xl p-8 mb-12 text-center">
                             <p className="text-xl md:text-2xl font-semibold text-[color:var(--text-primary)] mb-2">
-                                Imagine: $500+ every weekend doing what you love
+                                Build a network that opens doors to new opportunities
                             </p>
                             <p className="text-[color:var(--text-secondary)]">
-                                Build your reputation, grow your fanbase, live the DJ life
+                                Connect with DJs who have club connections, share gigs, and grow your reach together
                             </p>
                         </div>
 
@@ -143,7 +143,7 @@ export const LandingPage: React.FC = () => {
 
                         {/* Stakes (Loss Aversion) */}
                         <p className="text-center text-red-500 font-medium">
-                            Don't spend another weekend playing to empty rooms
+                            Don't miss out on the connections that could change your DJ career
                         </p>
                     </div>
                 </section>
