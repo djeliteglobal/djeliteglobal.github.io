@@ -69,7 +69,7 @@ export const LandingPage: React.FC = () => {
                                 How the community works
                             </h4>
                             
-                            <div className="grid md:grid-cols-3 gap-8 md:gap-4">
+                            <div className="grid md:grid-cols-5 gap-8 md:gap-4 items-center">
                                 {/* Step 1 */}
                                 <div className="text-center group">
                                     <div className="w-12 h-12 bg-[color:var(--accent)] text-black rounded-full flex items-center justify-center font-bold text-lg mx-auto mb-4 group-hover:scale-110 transition-transform">
