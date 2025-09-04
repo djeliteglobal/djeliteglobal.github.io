@@ -7,6 +7,25 @@ import { COURSES, FAQ_ITEMS, PRICING_PLANS, PlayCircleIcon, VideoIcon, FileTextI
 import type { Course, Opportunity } from '../../types/platform';
 import { DJMatchingPage } from './DJMatchingPage';
 
+// Add swipe animation styles
+const swipeStyles = `
+  @keyframes swipeRight {
+    0%, 100% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(20px);
+    }
+  }
+`;
+
+// Inject styles
+if (typeof document !== 'undefined') {
+  const styleSheet = document.createElement('style');
+  styleSheet.textContent = swipeStyles;
+  document.head.appendChild(styleSheet);
+}
+
 // Landing Page
 export const LandingPage: React.FC = () => {
     const { navigate } = useContext(AppContext)!;
@@ -32,8 +51,10 @@ export const LandingPage: React.FC = () => {
                     <div className="relative z-10 text-center text-white p-4 -mt-48 md:-mt-32">
                         {/* Swipe Right Logo */}
                         <div className="mb-6 flex justify-center">
-                            <div className="text-6xl animate-bounce transform rotate-90">
-                                👉
+                            <div className="text-6xl text-white" style={{
+                                animation: 'swipeRight 2s ease-in-out infinite'
+                            }}>
+                                ✋
                             </div>
                         </div>
                         <h1 className="font-display text-4xl font-bold md:text-7xl">One World Stage.</h1>
