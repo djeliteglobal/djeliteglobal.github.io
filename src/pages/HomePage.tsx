@@ -2,6 +2,7 @@ import React, { useState, useEffect, createContext, useCallback, useMemo } from 
 import { Link } from 'react-router-dom';
 import type { AppState, AppContextType, Page } from '../types/platform';
 import { TopBar, SideNav } from '../components/platform';
+import { ProfileEditor } from '../components/profile/ProfileEditor';
 import { LandingPage, Dashboard, CoursesPage, CourseDetailPage, CommunityPage, OpportunitiesPage, SettingsPage, EventsPage } from '../components/pages';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { AuthModal } from '../components/auth/AuthModal';
@@ -62,6 +63,7 @@ export const AppContext = createContext<AppContextType | null>(null);
 const HomePageContent: React.FC = () => {
     const { currentUser } = useAuth();
     const { t } = useTranslation();
+    const [showProfileEditor, setShowProfileEditor] = useState(false);
     const [appState, setAppState] = useState<AppState>({
         theme: 'dark',
         isLoggedIn: !!currentUser,
@@ -138,6 +140,7 @@ const HomePageContent: React.FC = () => {
                     {appState.isSidebarOpen && (
                         <div onClick={() => setAppState(prev => ({...prev, isSidebarOpen: false}))} className="fixed inset-0 z-30 bg-black/50 md:hidden"></div>
                     )}
+                    <ProfileEditor isOpen={showProfileEditor} onClose={() => setShowProfileEditor(false)} />
                 </div>
             ) : (
                 <>
