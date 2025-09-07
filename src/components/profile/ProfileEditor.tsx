@@ -38,7 +38,12 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
         dj_name: profile.dj_name,
         age: profile.age,
         location: profile.location,
-        bio: profile.bio
+        bio: profile.bio,
+        profile_image_url: profile.profile_image_url,
+        genres: profile.genres || [],
+        skills: profile.skills || [],
+        venues: profile.venues || [],
+        fee: profile.fee
       };
       
       await updateProfile(updateData);
@@ -53,6 +58,28 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
   };
 
 
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      alert('File size must be less than 2MB');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const imageUrl = await uploadProfileImage(file);
+      setProfile({...profile, profile_image_url: imageUrl});
+      alert('Profile picture uploaded successfully!');
+    } catch (error: any) {
+      console.error('Failed to upload image:', error);
+      alert(`Failed to upload image: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const addImageUrl = () => {
     setImageUrls([...imageUrls, '']);
@@ -129,21 +156,82 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
 
 
 
-          {/* Note: Advanced fields will be added once database schema is updated */}
-          <div className="bg-[color:var(--surface-alt)] p-4 rounded-lg">
-            <p className="text-sm text-[color:var(--text-secondary)] mb-2">
-              <strong>Coming Soon:</strong>
-            </p>
-            <ul className="text-xs text-[color:var(--muted)] space-y-1">
-              <li>• Profile picture upload</li>
-              <li>• Music genres</li>
-              <li>• Skills & specialties</li>
-              <li>• Venues you play at</li>
-              <li>• Fee information</li>
-            </ul>
-            <p className="text-xs text-[color:var(--muted)] mt-2 italic">
-              Database schema update required
-            </p>
+          {/* Profile Picture Upload */}
+          <div>
+            <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Profile Picture</label>
+            <div className="space-y-4">
+              {profile.profile_image_url && (
+                <div className="flex items-center gap-4">
+                  <img 
+                    src={profile.profile_image_url} 
+                    alt="Current profile" 
+                    className="w-16 h-16 rounded-full object-cover"
+                  />
+                  <span className="text-sm text-[color:var(--text-secondary)]">Current profile picture</span>
+                </div>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="block w-full text-sm text-[color:var(--text-secondary)] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[color:var(--accent)] file:text-black hover:file:bg-[color:var(--accent-muted)]"
+              />
+              <p className="text-xs text-[color:var(--muted)]">
+                Upload a new profile picture (JPG, PNG, GIF up to 2MB)
+              </p>
+            </div>
+          </div>
+
+          {/* Genres */}
+          <div>
+            <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Music Genres</label>
+            <input
+              type="text"
+              value={profile.genres?.join(', ') || ''}
+              onChange={(e) => setProfile({...profile, genres: e.target.value.split(',').map(g => g.trim()).filter(g => g)})}
+              className="w-full px-3 py-2 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-lg focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
+              placeholder="House, Techno, Deep House, Trance"
+            />
+            <p className="text-xs text-[color:var(--muted)] mt-1">Separate genres with commas</p>
+          </div>
+
+          {/* Skills */}
+          <div>
+            <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Skills & Specialties</label>
+            <input
+              type="text"
+              value={profile.skills?.join(', ') || ''}
+              onChange={(e) => setProfile({...profile, skills: e.target.value.split(',').map(s => s.trim()).filter(s => s)})}
+              className="w-full px-3 py-2 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-lg focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
+              placeholder="Mixing, Production, Scratching, Live Performance"
+            />
+            <p className="text-xs text-[color:var(--muted)] mt-1">What can you help other DJs with?</p>
+          </div>
+
+          {/* Venues */}
+          <div>
+            <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Venues You Play At</label>
+            <input
+              type="text"
+              value={profile.venues?.join(', ') || ''}
+              onChange={(e) => setProfile({...profile, venues: e.target.value.split(',').map(v => v.trim()).filter(v => v)})}
+              className="w-full px-3 py-2 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-lg focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
+              placeholder="Club XYZ, Festival ABC, Private Events"
+            />
+            <p className="text-xs text-[color:var(--muted)] mt-1">Where do you perform?</p>
+          </div>
+
+          {/* Fee */}
+          <div>
+            <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Typical Fee</label>
+            <input
+              type="text"
+              value={profile.fee || ''}
+              onChange={(e) => setProfile({...profile, fee: e.target.value})}
+              className="w-full px-3 py-2 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-lg focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
+              placeholder="$500-1000, Negotiable, Free for exposure"
+            />
+            <p className="text-xs text-[color:var(--muted)] mt-1">Your typical performance fee</p>
           </div>
         </div>
 
