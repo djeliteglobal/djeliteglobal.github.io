@@ -67,6 +67,9 @@ export const TopBar: React.FC = () => {
                 </button>
             </div>
         </header>
+        {showProfileEditor && (
+            <ProfileEditor isOpen={showProfileEditor} onClose={() => setShowProfileEditor(false)} />
+        )}
     );
 };
 
@@ -113,6 +116,9 @@ export const SideNav: React.FC = () => {
                 </button>
              </div>
         </nav>
+        {showProfileEditor && (
+            <ProfileEditor isOpen={showProfileEditor} onClose={() => setShowProfileEditor(false)} />
+        )}
     );
 };
 
