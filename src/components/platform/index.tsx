@@ -40,6 +40,7 @@ export const TopBar: React.FC = () => {
     }
 
     return (
+        <>
         <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-[color:var(--border)] bg-[color:var(--surface)]/80 px-4 backdrop-blur-sm md:px-8">
             <div className="flex items-center gap-4">
                 <button onClick={toggleSidebar} className="md:hidden text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]">
@@ -70,6 +71,7 @@ export const TopBar: React.FC = () => {
         {showProfileEditor && (
             <ProfileEditor isOpen={showProfileEditor} onClose={() => setShowProfileEditor(false)} />
         )}
+        </>
     );
 };
 
@@ -79,6 +81,7 @@ export const SideNav: React.FC = () => {
     const [showProfileEditor, setShowProfileEditor] = useState(false);
     
     return (
+        <>
         <nav className={`fixed z-40 md:z-auto md:relative inset-y-0 left-0 w-64 border-r border-[color:var(--border)] bg-[color:var(--surface)] transition-transform duration-300 ease-in-out ${appState.isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
             <div className="flex h-16 items-center border-b border-[color:var(--border)] px-6 md:hidden">
                  <Logo />
@@ -119,6 +122,7 @@ export const SideNav: React.FC = () => {
         {showProfileEditor && (
             <ProfileEditor isOpen={showProfileEditor} onClose={() => setShowProfileEditor(false)} />
         )}
+        </>
     );
 };
 
