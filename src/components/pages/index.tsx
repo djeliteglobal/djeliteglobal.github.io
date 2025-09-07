@@ -496,8 +496,11 @@ export const OpportunitiesPage: React.FC = () => {
                     setMatchResult({show: true, isMatch: true});
                     setTimeout(() => setMatchResult({show: false, isMatch: false}), 3000);
                 }
-            } catch (error) {
-                console.error('Failed to record swipe:', error);
+            } catch (error: any) {
+                // Ignore duplicate swipe errors (409)
+                if (error.code !== '23505') {
+                    console.error('Failed to record swipe:', error);
+                }
             }
         });
     }, [opportunities]);
