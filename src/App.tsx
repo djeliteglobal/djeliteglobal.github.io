@@ -16,7 +16,6 @@ function App() {
   return (
     <ThemeProvider>
       <Router>
-        <LanguageSwitcher />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/funnel" element={<DJElitePage />} />

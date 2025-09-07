@@ -1,6 +1,7 @@
 import React, { useState, useContext, useRef, useEffect } from 'react';
 import { AppContext } from '../../pages/HomePage';
 import { useAuth } from '../../contexts/AuthContext';
+import { LanguageSwitcher } from '../LanguageSwitcher';
 import { NAV_ITEMS, SunIcon, MoonIcon, SearchIcon, MenuIcon, CheckCircleIcon, ChevronDownIcon, Logo, LockIcon } from '../../constants/platform';
 import type { Course, FaqItem, PricingPlan, Opportunity } from '../../types/platform';
 
@@ -58,6 +59,7 @@ export const TopBar: React.FC = () => {
                 <button onClick={toggleTheme} className="flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--surface-alt)] text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]">
                     {appState.theme === 'dark' ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
                 </button>
+                <LanguageSwitcher inline={true} />
                 <div className="h-10 w-10 rounded-full">
                     <img src={currentUser?.avatarUrl} alt={currentUser?.name} className="h-full w-full rounded-full object-cover" />
                 </div>
