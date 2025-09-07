@@ -5,21 +5,49 @@ export const fetchSwipeProfiles = async (): Promise<DJProfile[]> => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
+  // Get current user's profile
   const { data: userProfile } = await supabase
     .from('profiles')
     .select('id')
     .eq('user_id', user.id)
     .single();
 
-  if (!userProfile) throw new Error('Profile not found');
+  if (!userProfile) {
+    // Create profile if doesn't exist
+    await createProfile({ dj_name: 'New DJ', bio: 'Getting started' });
+  }
 
-  const { data, error } = await supabase.rpc('get_swipe_feed', {
-    user_profile_id: userProfile.id,
-    limit_count: 10
-  });
+  // Get profiles excluding current user and already swiped
+  const { data: swipedIds } = await supabase
+    .from('swipes')
+    .select('swiped_id')
+    .eq('swiper_id', userProfile?.id);
+
+  const excludeIds = swipedIds?.map(s => s.swiped_id) || [];
+  if (userProfile) excludeIds.push(userProfile.id);
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .not('id', 'in', `(${excludeIds.join(',')})`)
+    .limit(10);
 
   if (error) throw error;
-  return data || [];
+  
+  // Transform to match expected format
+  return (data || []).map(profile => ({
+    id: profile.id,
+    title: profile.dj_name,
+    venue: profile.venues?.[0] || 'Various Venues',
+    location: profile.location || 'Unknown',
+    date: 'Available',
+    fee: profile.fee || 'Negotiable',
+    genres: profile.genres || ['House', 'Techno'],
+    skills: profile.skills || [],
+    bio: profile.bio,
+    imageUrl: profile.images?.[0] || 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f',
+    images: profile.images || ['https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f']
+  }));
 };
 
 export const createProfile = async (profileData: {
@@ -32,6 +60,15 @@ export const createProfile = async (profileData: {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
+  // Check if profile already exists
+  const { data: existing } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('user_id', user.id)
+    .single();
+
+  if (existing) return existing;
+
   const { data: profile, error } = await supabase
     .from('profiles')
     .insert({
@@ -40,12 +77,44 @@ export const createProfile = async (profileData: {
       bio: profileData.bio,
       age: profileData.age,
       location: profileData.location,
-      experience_level: profileData.experience_level || 'Beginner'
+      experience_level: profileData.experience_level || 'Beginner',
+      genres: ['House', 'Techno'],
+      skills: ['Mixing', 'Beatmatching'],
+      venues: ['Local Clubs'],
+      images: ['https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f']
     })
     .select()
     .single();
 
   if (error) throw error;
+  return profile;
+};
+
+export const updateProfile = async (profileData: Partial<DJProfile>): Promise<DJProfile> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { data: profile, error } = await supabase
+    .from('profiles')
+    .update(profileData)
+    .eq('user_id', user.id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return profile;
+};
+
+export const getCurrentProfile = async (): Promise<DJProfile | null> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('user_id', user.id)
+    .single();
+
   return profile;
 };
 
@@ -92,7 +161,7 @@ export const fetchMatches = async (): Promise<DJProfile[]> => {
   return data || [];
 };
 
-export const undoSwipe = async (profileId: string): Promise<void> => {
+export const undoSwipe = async (): Promise<void> => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
@@ -104,11 +173,13 @@ export const undoSwipe = async (profileId: string): Promise<void> => {
 
   if (!userProfile) throw new Error('Profile not found');
 
+  // Delete most recent swipe
   const { error } = await supabase
     .from('swipes')
     .delete()
     .eq('swiper_id', userProfile.id)
-    .eq('swiped_id', profileId);
+    .order('created_at', { ascending: false })
+    .limit(1);
 
   if (error) throw error;
 };

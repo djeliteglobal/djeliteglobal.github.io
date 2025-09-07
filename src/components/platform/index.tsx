@@ -2,6 +2,7 @@ import React, { useState, useContext, useRef, useEffect } from 'react';
 import { AppContext } from '../../pages/HomePage';
 import { useAuth } from '../../contexts/AuthContext';
 import { LanguageSwitcher } from '../LanguageSwitcher';
+import { ProfileEditor } from '../profile/ProfileEditor';
 import { NAV_ITEMS, SunIcon, MoonIcon, SearchIcon, MenuIcon, CheckCircleIcon, ChevronDownIcon, Logo, LockIcon } from '../../constants/platform';
 import type { Course, FaqItem, PricingPlan, Opportunity } from '../../types/platform';
 
@@ -28,6 +29,7 @@ export const Button: React.FC<ButtonProps> = ({ variant = 'primary', children, c
 export const TopBar: React.FC = () => {
     const { appState, setAppState } = useContext(AppContext)!;
     const { currentUser } = useAuth();
+    const [showProfileEditor, setShowProfileEditor] = useState(false);
     
     const toggleTheme = () => {
         setAppState(prev => ({...prev, theme: prev.theme === 'dark' ? 'light' : 'dark' }));
@@ -60,17 +62,19 @@ export const TopBar: React.FC = () => {
                     {appState.theme === 'dark' ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
                 </button>
                 <LanguageSwitcher inline={true} />
-                <div className="h-10 w-10 rounded-full">
+                <button onClick={() => setShowProfileEditor(true)} className="h-10 w-10 rounded-full hover:ring-2 hover:ring-[color:var(--accent)] transition-all">
                     <img src={currentUser?.avatarUrl} alt={currentUser?.name} className="h-full w-full rounded-full object-cover" />
-                </div>
+                </button>
             </div>
         </header>
+        <ProfileEditor isOpen={showProfileEditor} onClose={() => setShowProfileEditor(false)} />
     );
 };
 
 export const SideNav: React.FC = () => {
     const { appState, navigate } = useContext(AppContext)!;
     const { currentUser, logout } = useAuth();
+    const [showProfileEditor, setShowProfileEditor] = useState(false);
     
     return (
         <nav className={`fixed z-40 md:z-auto md:relative inset-y-0 left-0 w-64 border-r border-[color:var(--border)] bg-[color:var(--surface)] transition-transform duration-300 ease-in-out ${appState.isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
@@ -95,12 +99,8 @@ export const SideNav: React.FC = () => {
             </div>
              <div className="absolute bottom-0 left-0 w-full p-4 space-y-2">
                 <button 
-                  onClick={() => navigate('settings')}
-                  className={`flex w-full items-center gap-3 rounded-md px-4 py-3 text-sm font-medium transition-colors ${
-                    appState.page === 'settings' 
-                        ? 'bg-[color:var(--surface-alt)] text-[color:var(--text-primary)]' 
-                        : 'text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-alt)] hover:text-[color:var(--text-primary)]'
-                  }`}>
+                  onClick={() => setShowProfileEditor(true)}
+                  className={`flex w-full items-center gap-3 rounded-md px-4 py-3 text-sm font-medium transition-colors hover:bg-[color:var(--surface-alt)] hover:text-[color:var(--text-primary)] text-[color:var(--text-secondary)]`}>
                     <img src={currentUser?.avatarUrl} alt={currentUser?.name} className="h-8 w-8 rounded-full object-cover" />
                     <div className="text-left">
                         <p className="font-semibold text-[color:var(--text-primary)]">{currentUser?.name}</p>
@@ -114,6 +114,7 @@ export const SideNav: React.FC = () => {
                 </button>
              </div>
         </nav>
+        <ProfileEditor isOpen={showProfileEditor} onClose={() => setShowProfileEditor(false)} />
     );
 };
 

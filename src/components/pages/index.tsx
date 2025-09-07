@@ -470,10 +470,11 @@ export const OpportunitiesPage: React.FC = () => {
                 await createProfile({dj_name: 'New DJ', bio: 'Getting started'});
                 
                 const profiles = await fetchSwipeProfiles();
-                setOpportunities(profiles.length > 0 ? profiles : MOCK_OPPORTUNITIES);
+                console.log('Loaded profiles:', profiles);
+                setOpportunities(profiles);
             } catch (error) {
                 console.error('Failed to load profiles:', error);
-                setOpportunities(MOCK_OPPORTUNITIES);
+                setOpportunities([]);
             } finally {
                 setLoading(false);
             }
@@ -582,8 +583,11 @@ export const OpportunitiesPage: React.FC = () => {
                                 )).reverse() // ⚠️ PROTECTED: .reverse() is critical for proper stacking
                             ) : (
                                 <div className="flex flex-col items-center justify-center h-full w-full rounded-xl bg-[color:var(--surface)] border-2 border-dashed border-[color:var(--border)]">
-                                    <p className="text-lg font-semibold text-[color:var(--text-secondary)]">No more DJs nearby!</p>
-                                    <p className="text-sm text-[color:var(--muted)]">Expand your search radius or check back later.</p>
+                                    <p className="text-lg font-semibold text-[color:var(--text-secondary)]">No more DJs to discover!</p>
+                                    <p className="text-sm text-[color:var(--muted)] mb-4">Check back later for new profiles or invite friends to join.</p>
+                                    <Button onClick={() => window.location.reload()} variant="secondary">
+                                        Refresh
+                                    </Button>
                                 </div>
                             )}
                         </div>
