@@ -34,14 +34,24 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
   const handleSave = async () => {
     setLoading(true);
     try {
-      await updateProfile({
-        ...profile,
+      const updateData = {
+        dj_name: profile.dj_name,
+        age: profile.age,
+        location: profile.location,
+        bio: profile.bio,
+        genres: profile.genres?.filter(g => g.trim()) || [],
+        skills: profile.skills?.filter(s => s.trim()) || [],
+        venues: profile.venues?.filter(v => v.trim()) || [],
+        fee: profile.fee,
         images: imageUrls.filter(url => url.trim())
-      });
+      };
+      
+      await updateProfile(updateData);
+      alert('Profile updated successfully!');
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update profile:', error);
-      alert('Failed to update profile');
+      alert(`Failed to update profile: ${error.message || 'Unknown error'}`);
     } finally {
       setLoading(false);
     }

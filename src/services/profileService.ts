@@ -94,14 +94,22 @@ export const updateProfile = async (profileData: Partial<DJProfile>): Promise<DJ
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
+  // Clean the data - remove undefined values
+  const cleanData = Object.fromEntries(
+    Object.entries(profileData).filter(([_, value]) => value !== undefined)
+  );
+
   const { data: profile, error } = await supabase
     .from('profiles')
-    .update(profileData)
+    .update(cleanData)
     .eq('user_id', user.id)
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) {
+    console.error('Update profile error:', error);
+    throw new Error(`Failed to update profile: ${error.message}`);
+  }
   return profile;
 };
 
