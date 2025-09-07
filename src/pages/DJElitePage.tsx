@@ -250,7 +250,7 @@ export const DJElitePage: React.FC = () => {
                         </div>
                         <SelectableCard id="after-card" className="bg-[color:var(--surface)] border border-[color:var(--accent)] shadow-[0_0_40px_-10px_rgba(0,245,122,0.2)] rounded-xl p-6 text-center">
                              <h3 className="font-bold text-2xl text-[color:var(--accent)]">{t('after')}</h3>
-                             <img src="/Funnel Images/after.png" alt="Professional DJ" className="my-4 rounded-lg aspect-square object-cover w-full h-48"/>
+                             <img src="/Funnel Images/Party success.jpg" alt="Professional DJ" className="my-4 rounded-lg aspect-square object-cover w-full h-48"/>
                              <ul className="text-left space-y-2 text-[color:var(--text-secondary)]">
                                 {["Regular club bookings", "Strong industry network", "Confident and skilled", "Consistent DJ income"].map(item => <li key={item} className="flex items-start"><span className="mr-2 text-green-500">✓</span> {item}</li>)}
                             </ul>
