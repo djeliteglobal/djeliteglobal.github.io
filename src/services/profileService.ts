@@ -1,4 +1,4 @@
-import { supabase } from '../config/supabase';
+import { supabase, checkConfig } from '../config/supabase';
 import { DJProfile, SwipeResult } from '../types/profile';
 
 export const fetchSwipeProfiles = async (): Promise<DJProfile[]> => {
@@ -124,13 +124,9 @@ export const deleteMatch = async (matchId: string): Promise<void> => {
 
 export const subscribeToNewsletter = async (email: string, firstName?: string): Promise<void> => {
   console.log('Attempting to subscribe:', { email, firstName });
-  console.log('Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
-  console.log('Supabase Key exists:', !!import.meta.env.VITE_SUPABASE_ANON_KEY);
   
-  // Check if Supabase is properly configured
-  if (!import.meta.env.VITE_SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL === 'https://placeholder.supabase.co') {
-    throw new Error('Supabase is not properly configured. Please check environment variables.');
-  }
+  // Vitalik's config check - fail fast with clear error
+  checkConfig();
   
   try {
     const { data, error } = await supabase

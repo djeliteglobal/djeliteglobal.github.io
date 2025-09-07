@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Newsletter Test</title>
+</head>
+<body>
+    <h1>Newsletter Test</h1>
+    <form id="testForm">
+        <input type="email" id="email" placeholder="test@example.com" required>
+        <input type="text" id="firstName" placeholder="Test Name">
+        <button type="submit">Test Newsletter</button>
+    </form>
+    <div id="result"></div>
+    
+    <script type="module">
+        document.getElementById('testForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const result = document.getElementById('result');
+            
+            try {\n                const { subscribeToNewsletter } = await import('./src/services/profileService.js');\n                const email = document.getElementById('email').value;\n                const firstName = document.getElementById('firstName').value;\n                \n                result.innerHTML = 'Testing...';\n                await subscribeToNewsletter(email, firstName);\n                result.innerHTML = '✅ SUCCESS!';\n            } catch (error) {\n                result.innerHTML = `❌ ERROR: ${error.message}`;\n                console.error('Full error:', error);\n            }\n        });\n    </script>\n</body>\n</html>
