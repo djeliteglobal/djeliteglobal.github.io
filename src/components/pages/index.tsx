@@ -497,10 +497,11 @@ export const OpportunitiesPage: React.FC = () => {
                     setTimeout(() => setMatchResult({show: false, isMatch: false}), 3000);
                 }
             } catch (error: any) {
-                // Ignore duplicate swipe errors (409)
-                if (error.code !== '23505') {
+                // Ignore duplicate swipe errors (409 conflicts)
+                if (error?.code !== '23505' && !error?.message?.includes('already exists')) {
                     console.error('Failed to record swipe:', error);
                 }
+                // Silently ignore duplicate swipes - they're expected
             }
         });
     }, [opportunities]);
