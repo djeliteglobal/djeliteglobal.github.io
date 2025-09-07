@@ -6,6 +6,7 @@ import { CheckoutPage } from './pages/CheckoutPage';
 import { SuccessPage } from './pages/SuccessPage';
 import { TermsPage } from './pages/TermsPage';
 import { PrivacyPage } from './pages/PrivacyPage';
+import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { ThemeProvider } from './theme/ThemeProvider';
 import './index.css';
 import './debug.css';
@@ -15,6 +16,7 @@ function App() {
   return (
     <ThemeProvider>
       <Router>
+        <LanguageSwitcher />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/funnel" element={<DJElitePage />} />

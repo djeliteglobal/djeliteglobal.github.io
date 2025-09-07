@@ -84,7 +84,6 @@ export const DJElitePage: React.FC = () => {
 
     return (
         <div className="bg-[color:var(--bg)] text-[color:var(--text-primary)] antialiased animate-fade-in">
-            <LanguageSwitcher />
             
             {/* Hero Section */}
             <header className="relative min-h-screen flex flex-col items-center justify-center text-center p-4 overflow-hidden">

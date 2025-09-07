@@ -5,6 +5,7 @@ import { TopBar, SideNav } from '../components/platform';
 import { LandingPage, Dashboard, CoursesPage, CourseDetailPage, CommunityPage, OpportunitiesPage, SettingsPage, EventsPage } from '../components/pages';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { AuthModal } from '../components/auth/AuthModal';
+import { useTranslation } from '../i18n/useTranslation';
 
 // Add bounce animation styles for sticky button
 const bounceInStyles = `
@@ -60,6 +61,7 @@ export const AppContext = createContext<AppContextType | null>(null);
 
 const HomePageContent: React.FC = () => {
     const { currentUser } = useAuth();
+    const { t } = useTranslation();
     const [appState, setAppState] = useState<AppState>({
         theme: 'dark',
         isLoggedIn: !!currentUser,
@@ -145,7 +147,7 @@ const HomePageContent: React.FC = () => {
                             to="/funnel" 
                             className="bg-[color:var(--accent)] text-black px-6 py-3 rounded-full font-bold hover:bg-[color:var(--accent-muted)] transition-all shadow-lg dj-button-animated"
                         >
-                            🚀 DJ Career Accelerator
+                            🚀 {t('heroTitle').split(':')[0]}
                         </Link>
                     </div>
                 </>
