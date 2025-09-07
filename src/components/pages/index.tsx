@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useState, useCallback, useEffect } from 'react';
+import React, { useContext, useMemo, useState, useCallback, useEffect, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { AppContext } from '../../pages/HomePage';
 import { useAuth } from '../../contexts/AuthContext';
@@ -455,39 +455,41 @@ export const CommunityPage: React.FC = () => {
 // Only modify UI/styling, never touch: handleSwipe, triggerSwipe, card mapping logic
 
 // Discover Page (Tinder-like DJ matching)
-export const OpportunitiesPage: React.FC = () => {
+export const OpportunitiesPage: React.FC = React.memo(() => {
     const [view, setView] = useState<'swipe' | 'list'>('swipe');
     const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
     const [loading, setLoading] = useState(true);
     const [matchResult, setMatchResult] = useState<{show: boolean, isMatch: boolean}>({show: false, isMatch: false});
     const [lastSwipedProfile, setLastSwipedProfile] = useState<Opportunity | null>(null);
 
-    // Load profiles on component mount
-    useEffect(() => {
-        const loadProfiles = async () => {
-            try {
-                // Ensure current user has a profile
-                await createProfile({dj_name: 'New DJ', bio: 'Getting started'});
-                
-                const profiles = await fetchSwipeProfiles();
-                console.log('Loaded profiles:', profiles);
-                setOpportunities(profiles);
-            } catch (error) {
-                console.error('Failed to load profiles:', error);
-                setOpportunities([]);
-            } finally {
-                setLoading(false);
-            }
-        };
-        loadProfiles();
+    // GENNADY OPTIMIZATION: Parallel loading
+    const loadProfiles = useCallback(async () => {
+        try {
+            const [_, profiles] = await Promise.all([
+                createProfile({dj_name: 'New DJ', bio: 'Getting started'}),
+                fetchSwipeProfiles()
+            ]);
+            setOpportunities(profiles);
+        } catch (error) {
+            setOpportunities([]);
+        } finally {
+            setLoading(false);
+        }
     }, []);
 
-    // ⚠️ PROTECTED: Enhanced swipe logic with API recording - DO NOT MODIFY CORE LOGIC
-    const handleSwipe = async (direction?: 'left' | 'right' | 'super') => {
-        if (opportunities.length > 0 && direction) {
-            const currentProfile = opportunities[0];
-            setLastSwipedProfile(currentProfile);
-            
+    useEffect(() => {
+        loadProfiles();
+    }, [loadProfiles]);
+
+    // GENNADY OPTIMIZATION: Optimistic updates
+    const handleSwipe = useCallback(async (direction?: 'left' | 'right' | 'super') => {
+        if (opportunities.length === 0 || !direction) return;
+        
+        const currentProfile = opportunities[0];
+        setLastSwipedProfile(currentProfile);
+        setOpportunities(prev => prev.slice(1));
+        
+        requestIdleCallback(async () => {
             try {
                 const result = await recordSwipe(currentProfile.id, direction);
                 if (result.match) {
@@ -497,9 +499,8 @@ export const OpportunitiesPage: React.FC = () => {
             } catch (error) {
                 console.error('Failed to record swipe:', error);
             }
-        }
-        setOpportunities(prev => prev.slice(1));
-    };
+        });
+    }, [opportunities]);
     
     const handleUndo = async () => {
         if (lastSwipedProfile) {
@@ -568,14 +569,14 @@ export const OpportunitiesPage: React.FC = () => {
                         <div className="relative h-[500px] w-full">
                             {opportunities.length > 0 ? (
                                 // ⚠️ PROTECTED: Card mapping logic - DO NOT MODIFY array operations, zIndex, or data-swipe-card
-                                opportunities.map((op, index) => (
+                                opportunities.slice(0, 3).map((op, index) => (
                                     <OpportunitySwipeCard
                                         key={op.id}
                                         opportunity={op}
                                         onSwipe={handleSwipe}
                                         isTop={index === 0}
                                         style={{ 
-                                            zIndex: opportunities.length - index,
+                                            zIndex: 3 - index,
                                             transform: `scale(${1 - (Math.min(index, 2) * 0.05)}) translateY(-${Math.min(index, 2) * 10}px)`,
                                         }}
                                         data-swipe-card={index === 0}

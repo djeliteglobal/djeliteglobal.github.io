@@ -116,7 +116,7 @@ export const SideNav: React.FC = () => {
     );
 };
 
-export const CourseCard: React.FC<{ course: Course }> = ({ course }) => {
+export const CourseCard: React.FC<{ course: Course }> = memo(({ course }) => {
   const { navigate } = useContext(AppContext)!;
 
   return (
@@ -144,7 +144,7 @@ export const CourseCard: React.FC<{ course: Course }> = ({ course }) => {
       </div>
     </div>
   );
-};
+});
 
 export const PricingCard: React.FC<{ plan: PricingPlan }> = ({ plan }) => {
     return (
