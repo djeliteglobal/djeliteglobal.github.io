@@ -160,6 +160,30 @@ export const subscribeToCareerAccelerator = async (email: string, firstName?: st
       console.error('Welcome email failed:', emailError);
       // Don't throw - signup was successful even if email failed
     }
+    
+    // Add to ConvertKit for automation sequence
+    try {
+      const response = await fetch(`https://api.convertkit.com/v3/forms/${import.meta.env.VITE_CONVERTKIT_FORM_ID}/subscribe`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          api_key: import.meta.env.VITE_CONVERTKIT_API_KEY,
+          email: email.trim(),
+          first_name: firstName?.trim() || 'DJ'
+        })
+      });
+      
+      if (response.ok) {
+        console.log('Added to ConvertKit automation');
+      } else {
+        console.error('ConvertKit failed:', await response.text());
+      }
+    } catch (convertKitError) {
+      console.error('ConvertKit error:', convertKitError);
+      // Don't throw - signup was successful even if ConvertKit failed
+    }
   } catch (err) {
     console.error('Career Accelerator signup error:', err);
     throw err;
