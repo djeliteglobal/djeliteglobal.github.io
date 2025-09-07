@@ -215,23 +215,15 @@ export const LandingPage: React.FC = () => {
                     <form onSubmit={async (e) => {
                         e.preventDefault();
                         const formData = new FormData(e.target as HTMLFormElement);
-                        const data = {
-                            first_name: 'Newsletter Subscriber',
-                            email: formData.get('email')
-                        };
+                        const email = formData.get('email') as string;
                         try {
-                            const response = await fetch('/.netlify/functions/subscribe', {
-                                method: 'POST',
-                                body: JSON.stringify(data)
-                            });
-                            if (response.ok) {
-                                alert('📧 Subscribed! You\'ll get weekly DJ tips and insights.');
-                                (e.target as HTMLFormElement).reset();
-                            } else {
-                                alert('Something went wrong. Please try again.');
-                            }
-                        } catch (error) {
-                            alert('Network error. Please try again.');
+                            const { subscribeToNewsletter } = await import('../../services/profileService');
+                            await subscribeToNewsletter(email, 'Newsletter Subscriber');
+                            alert('📧 Subscribed! You\'ll get weekly DJ tips and insights.');
+                            (e.target as HTMLFormElement).reset();
+                        } catch (error: any) {
+                            console.error('Newsletter signup error:', error);
+                            alert(`Error: ${error?.message || 'Something went wrong'}`);
                         }
                     }} className="mt-6 max-w-sm mx-auto flex gap-2">
                         <input type="email" name="email" placeholder="Your email address" required className="flex-grow px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />
