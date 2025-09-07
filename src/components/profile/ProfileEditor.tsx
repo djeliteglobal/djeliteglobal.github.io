@@ -38,8 +38,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
         dj_name: profile.dj_name,
         age: profile.age,
         location: profile.location,
-        bio: profile.bio,
-        profile_image_url: profile.profile_image_url
+        bio: profile.bio
       };
       
       await updateProfile(updateData);
@@ -53,31 +52,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
     }
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
 
-    if (file.size > 2 * 1024 * 1024) {
-      alert('File size must be less than 2MB');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const imageUrl = await uploadProfileImage(file);
-      setProfile({...profile, profile_image_url: imageUrl});
-      // Update first image in array
-      const newImageUrls = [...imageUrls];
-      newImageUrls[0] = imageUrl;
-      setImageUrls(newImageUrls);
-      alert('Profile picture uploaded successfully!');
-    } catch (error: any) {
-      console.error('Failed to upload image:', error);
-      alert(`Failed to upload image: ${error.message}`);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const addImageUrl = () => {
     setImageUrls([...imageUrls, '']);
@@ -152,35 +127,23 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
             />
           </div>
 
-          {/* Profile Image Upload */}
-          <div>
-            <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Profile Picture</label>
-            <div className="space-y-4">
-              {profile.profile_image_url && (
-                <div className="flex items-center gap-4">
-                  <img 
-                    src={profile.profile_image_url} 
-                    alt="Current profile" 
-                    className="w-16 h-16 rounded-full object-cover"
-                  />
-                  <span className="text-sm text-[color:var(--text-secondary)]">Current profile picture</span>
-                </div>
-              )}
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="block w-full text-sm text-[color:var(--text-secondary)] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[color:var(--accent)] file:text-black hover:file:bg-[color:var(--accent-muted)]"
-              />
-              <p className="text-xs text-[color:var(--muted)]">
-                Upload a new profile picture (JPG, PNG, GIF up to 2MB)
-              </p>
-            </div>
-          </div>
+
 
           {/* Note: Advanced fields will be added once database schema is updated */}
-          <div className="text-sm text-[color:var(--text-secondary)] italic">
-            Additional fields (genres, skills, venues, additional images) will be available once database schema is updated.
+          <div className="bg-[color:var(--surface-alt)] p-4 rounded-lg">
+            <p className="text-sm text-[color:var(--text-secondary)] mb-2">
+              <strong>Coming Soon:</strong>
+            </p>
+            <ul className="text-xs text-[color:var(--muted)] space-y-1">
+              <li>• Profile picture upload</li>
+              <li>• Music genres</li>
+              <li>• Skills & specialties</li>
+              <li>• Venues you play at</li>
+              <li>• Fee information</li>
+            </ul>
+            <p className="text-xs text-[color:var(--muted)] mt-2 italic">
+              Database schema update required
+            </p>
           </div>
         </div>
 
