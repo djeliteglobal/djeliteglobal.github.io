@@ -126,11 +126,11 @@ export const DJElitePage: React.FC = () => {
                                
                                try {
                                    console.log('⚡ VITALIK: Importing service...');
-                                   const { subscribeToNewsletter } = await import('../services/profileService');
+                                   const { subscribeToCareerAccelerator } = await import('../services/profileService');
                                    console.log('✅ VITALIK: Service imported');
                                    
-                                   console.log('📤 VITALIK: Calling subscribeToNewsletter...');
-                                   await subscribeToNewsletter(email, firstName);
+                                   console.log('📤 VITALIK: Calling subscribeToCareerAccelerator...');
+                                   await subscribeToCareerAccelerator(email, firstName);
                                    console.log('🎉 VITALIK: Newsletter subscription SUCCESS!');
                                    
                                    alert('🎉 Success! Check your email for the free training preview.');

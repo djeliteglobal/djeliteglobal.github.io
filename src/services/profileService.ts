@@ -122,6 +122,40 @@ export const deleteMatch = async (matchId: string): Promise<void> => {
   if (error) throw error;
 };
 
+export const subscribeToCareerAccelerator = async (email: string, firstName?: string): Promise<void> => {
+  console.log('Attempting Career Accelerator signup:', { email, firstName });
+  
+  // Vitalik's config check - fail fast with clear error
+  checkConfig();
+  
+  try {
+    const { data, error } = await supabase
+      .from('career_accelerator_leads')
+      .insert({
+        email: email.trim(),
+        first_name: firstName?.trim() || null
+      })
+      .select();
+
+    console.log('Career Accelerator response:', { data, error });
+    
+    if (error) {
+      // Handle duplicate email gracefully
+      if (error.code === '23505') {
+        console.log('Email already signed up for Career Accelerator');
+        return;
+      }
+      console.error('Career Accelerator error details:', error);
+      throw new Error(`Career Accelerator signup failed: ${error.message}`);
+    }
+    
+    console.log('Career Accelerator signup successful:', data);
+  } catch (err) {
+    console.error('Career Accelerator signup error:', err);
+    throw err;
+  }
+};
+
 export const subscribeToNewsletter = async (email: string, firstName?: string): Promise<void> => {
   console.log('Attempting to subscribe:', { email, firstName });
   
