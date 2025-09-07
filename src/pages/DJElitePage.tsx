@@ -177,11 +177,8 @@ export const DJElitePage: React.FC = () => {
 
             <main>
                 {/* Problem/Agitation Section */}
-                <Section id="problem" className="relative overflow-hidden" animationType="animate-fade-in-left">
-                    <img src="https://images.unsplash.com/photo-1641573481523-3e0447d7ba86" alt="DJ looking thoughtful in a club setting" className="absolute z-0 top-0 left-0 w-full h-full object-cover opacity-10"/>
-                    <div className="absolute inset-0 bg-gradient-to-b from-[color:var(--bg)]/50 via-[color:var(--bg)]/90 to-[color:var(--bg)]"></div>
-                    
-                    <div className="relative z-10">
+                <Section id="problem" animationType="animate-fade-in-left">
+                    <div>
                         <SectionHeadline>Does This Sound Familiar?</SectionHeadline>
                         <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto animate-fade-in-up animate-delay-200">
                             {PAIN_POINTS.map((point, index) => (
