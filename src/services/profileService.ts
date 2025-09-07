@@ -164,7 +164,47 @@ export const getCurrentProfile = async (): Promise<DJProfile | null> => {
     .eq('user_id', user.id)
     .single();
 
+  // Auto-sync Google profile picture if missing
+  if (profile && !profile.profile_image_url) {
+    const authProfilePic = user.user_metadata?.avatar_url || user.user_metadata?.picture;
+    if (authProfilePic) {
+      await supabase
+        .from('profiles')
+        .update({ profile_image_url: authProfilePic })
+        .eq('user_id', user.id);
+      profile.profile_image_url = authProfilePic;
+    }
+  }
+
   return profile;
+};
+
+export const syncAllGoogleProfilePictures = async (): Promise<void> => {
+  // Get all profiles without profile pictures
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('id, user_id')
+    .is('profile_image_url', null);
+
+  if (!profiles) return;
+
+  // Update each profile with their Google profile picture
+  for (const profile of profiles) {
+    try {
+      const { data: { user } } = await supabase.auth.admin.getUserById(profile.user_id);
+      if (user) {
+        const authProfilePic = user.user_metadata?.avatar_url || user.user_metadata?.picture;
+        if (authProfilePic) {
+          await supabase
+            .from('profiles')
+            .update({ profile_image_url: authProfilePic })
+            .eq('id', profile.id);
+        }
+      }
+    } catch (error) {
+      console.log('Could not sync profile:', profile.id);
+    }
+  }
 };
 
 export const recordSwipe = async (profileId: string, direction: 'left' | 'right' | 'super'): Promise<SwipeResult> => {

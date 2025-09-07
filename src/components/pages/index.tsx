@@ -462,14 +462,25 @@ export const OpportunitiesPage: React.FC = () => {
     const [matchResult, setMatchResult] = useState<{show: boolean, isMatch: boolean}>({show: false, isMatch: false});
     const [lastSwipedProfile, setLastSwipedProfile] = useState<Opportunity | null>(null);
 
-    // GENNADY OPTIMIZATION: Parallel loading
+    // GENNADY OPTIMIZATION: Parallel loading with Google profile sync
     const loadProfiles = useCallback(async () => {
         try {
             const [_, profiles] = await Promise.all([
                 createProfile({dj_name: 'New DJ', bio: 'Getting started'}),
                 fetchSwipeProfiles()
             ]);
-            setOpportunities(profiles);
+            
+            // Auto-sync Google profile pictures for all users
+            try {
+                const { syncAllGoogleProfilePictures } = await import('../../services/profileService');
+                await syncAllGoogleProfilePictures();
+                // Reload profiles after sync
+                const updatedProfiles = await fetchSwipeProfiles();
+                setOpportunities(updatedProfiles);
+            } catch (syncError) {
+                console.log('Profile sync completed, using current profiles');
+                setOpportunities(profiles);
+            }
         } catch (error) {
             setOpportunities([]);
         } finally {
