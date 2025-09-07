@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button, AccordionItem, TestimonialCard, CountdownTimer } from '../components';
+import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { 
     Logo, 
     SOCIAL_PROOF_STATS, 
@@ -16,6 +17,7 @@ import {
 import '../animations.css';
 import { useScrollAnimation } from '../useScrollAnimation';
 import { useSelection } from '../useSelection';
+import { useTranslation } from '../i18n/useTranslation';
 
 const Section: React.FC<{id: string, className?: string, children: React.ReactNode, animationType?: string} & React.HTMLAttributes<HTMLElement>> = ({ id, className, children, animationType = 'animate-fade-in-up', ...props}) => {
     const ref = useScrollAnimation(animationType);
@@ -71,6 +73,7 @@ const SectionHeadline: React.FC<{children: React.ReactNode, subheadline?: string
 export const DJElitePage: React.FC = () => {
     const [activeTestimonial, setActiveTestimonial] = useState(0);
     const { toggleSelection, isSelected } = useSelection();
+    const { t, language } = useTranslation();
     const leadMagnetPoints = [
         "How I went from busking in the street to playing at the best clubs",
         "The networking secrets I learned from 10 countries that actually work",
@@ -81,6 +84,7 @@ export const DJElitePage: React.FC = () => {
 
     return (
         <div className="bg-[color:var(--bg)] text-[color:var(--text-primary)] antialiased animate-fade-in">
+            <LanguageSwitcher />
             
             {/* Hero Section */}
             <header className="relative min-h-screen flex flex-col items-center justify-center text-center p-4 overflow-hidden">
@@ -89,15 +93,15 @@ export const DJElitePage: React.FC = () => {
 
                 <div className="relative z-10">
                     <h1 className="font-display text-4xl sm:text-6xl md:text-7xl font-bold tracking-tighter max-w-4xl mx-auto animate-fade-in-up animate-delay-200">
-                        DJ Career Accelerator: <span className="text-[color:var(--accent)]">From Bedroom to Main Stage</span> in 90 Days
+                        {t('heroTitle').split(':')[0]}: <span className="text-[color:var(--accent)]">{t('heroTitle').split(':')[1]}</span>
                     </h1>
                     <p className="mt-6 text-lg sm:text-xl text-[color:var(--text-secondary)] max-w-2xl mx-auto animate-fade-in-up animate-delay-300">
-                        discover how hundreds of djs have landed their first professional gigs using this proven method.
+                        {t('heroSubtitle')}
                     </p>
                     <div className="mt-10 max-w-lg mx-auto animate-fade-in-up animate-delay-400">
                         <div className="bg-[color:var(--surface)]/50 backdrop-blur-md border border-[color:var(--border)] rounded-xl p-6">
                            <div className="text-left mb-4">
-                                <h3 className="font-bold text-lg text-[color:var(--accent)]">🎁 FREE TRAINING PREVIEW</h3>
+                                <h3 className="font-bold text-lg text-[color:var(--accent)]">🎁 {t('freeTraining')}</h3>
                                 <ul className="mt-2 space-y-2 text-sm text-[color:var(--text-secondary)]">
                                     {leadMagnetPoints.map(point => (
                                         <li key={point} className="flex items-start">
@@ -142,12 +146,12 @@ export const DJElitePage: React.FC = () => {
                                    alert(`❌ Error: ${error?.message || 'Unknown error'}`);
                                }
                            }} className="flex flex-col gap-4">
-                               <input type="text" name="first_name" placeholder="Enter your first name" required className="w-full px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />
-                               <input type="email" name="email" placeholder="Enter your best email" required className="w-full px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />
-                               <Button type="submit" className="w-full py-3 btn-animate">GET FREE PREVIEW NOW →</Button>
+                               <input type="text" name="first_name" placeholder={t('enterName')} required className="w-full px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />
+                               <input type="email" name="email" placeholder={t('enterEmail')} required className="w-full px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />
+                               <Button type="submit" className="w-full py-3 btn-animate">{t('getPreview')}</Button>
                            </form>
                         </div>
-                        <p className="mt-4 text-xs text-[color:var(--muted)]">🔒 Your information is 100% secure. Unsubscribe anytime.</p>
+                        <p className="mt-4 text-xs text-[color:var(--muted)]">{t('secureInfo')}</p>
                     </div>
                 </div>
             </header>
@@ -179,7 +183,7 @@ export const DJElitePage: React.FC = () => {
                 {/* Problem/Agitation Section */}
                 <Section id="problem" animationType="animate-fade-in-left">
                     <div>
-                        <SectionHeadline>Does This Sound Familiar?</SectionHeadline>
+                        <SectionHeadline>{t('problemTitle')}</SectionHeadline>
                         <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto animate-fade-in-up animate-delay-200">
                             {PAIN_POINTS.map((point, index) => (
                                 <SelectableCard key={point.title} id={`pain-${index}`} className="bg-[color:var(--surface)]/80 backdrop-blur-sm border border-[color:var(--border)] rounded-lg p-6 flex items-start gap-4">
@@ -196,7 +200,7 @@ export const DJElitePage: React.FC = () => {
 
                 {/* Solution/Method Section */}
                 <Section id="solution" className="bg-[color:var(--surface-alt)]" animationType="animate-fade-in-right">
-                    <SectionHeadline subheadline="The exact framework that took me from bedroom mixing to headlining festivals">The DJ Elite 7-Step System</SectionHeadline>
+                    <SectionHeadline subheadline={language === 'es' ? 'El marco exacto que me llevó de mezclar en el dormitorio a encabezar festivales' : 'The exact framework that took me from bedroom mixing to headlining festivals'}>{t('solutionTitle')}</SectionHeadline>
                     <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
                         {METHOD_STEPS.slice(0, 3).map(step => (
                             <SelectableCard key={step.number} id={`method-${step.number}`} className="bg-[color:var(--surface)] border border-[color:var(--border)] rounded-lg p-6">
@@ -231,10 +235,10 @@ export const DJElitePage: React.FC = () => {
                 
                  {/* Transformation Section */}
                 <Section id="transformation" animationType="animate-fade-in-up">
-                    <SectionHeadline>The Transformation is Real</SectionHeadline>
+                    <SectionHeadline>{t('transformationTitle')}</SectionHeadline>
                     <div className="max-w-4xl mx-auto grid md:grid-cols-[1fr_auto_1fr] items-center gap-8">
                         <SelectableCard id="before-card" className="bg-[color:var(--surface)] border border-[color:var(--border)] rounded-xl p-6 text-center" isRedVariant={true}>
-                            <h3 className="font-bold text-2xl text-[color:var(--danger)]">BEFORE</h3>
+                            <h3 className="font-bold text-2xl text-[color:var(--danger)]">{t('before')}</h3>
                             <img src="/Funnel Images/Before.png" alt="Bedroom DJ" className="my-4 rounded-lg aspect-square object-cover w-full h-48"/>
                             <ul className="text-left space-y-2 text-[color:var(--text-secondary)]">
                                 {["Playing for empty rooms", "No industry connections", "Frustrated and stuck", "No income from DJing"].map(item => <li key={item} className="flex items-start"><span className="mr-2 text-red-500">×</span> {item}</li>)}
@@ -245,7 +249,7 @@ export const DJElitePage: React.FC = () => {
                              <div className="mt-2 text-sm font-bold bg-[color:var(--accent)] text-black rounded-full px-3 py-1">90 DAYS</div>
                         </div>
                         <SelectableCard id="after-card" className="bg-[color:var(--surface)] border border-[color:var(--accent)] shadow-[0_0_40px_-10px_rgba(0,245,122,0.2)] rounded-xl p-6 text-center">
-                             <h3 className="font-bold text-2xl text-[color:var(--accent)]">AFTER</h3>
+                             <h3 className="font-bold text-2xl text-[color:var(--accent)]">{t('after')}</h3>
                              <img src="/Funnel Images/after.png" alt="Professional DJ" className="my-4 rounded-lg aspect-square object-cover w-full h-48"/>
                              <ul className="text-left space-y-2 text-[color:var(--text-secondary)]">
                                 {["Regular club bookings", "Strong industry network", "Confident and skilled", "Consistent DJ income"].map(item => <li key={item} className="flex items-start"><span className="mr-2 text-green-500">✓</span> {item}</li>)}
@@ -394,7 +398,7 @@ export const DJElitePage: React.FC = () => {
                     <h2 className="font-display text-5xl font-bold">Your Moment is NOW</h2>
                     <p className="mt-4 max-w-2xl mx-auto text-lg text-[color:var(--text-secondary)]">Every day you wait is another day someone else takes the gig you deserve. The DJ industry is waiting for you - but only if you take action today.</p>
                     <div className="mt-12 max-w-2xl mx-auto bg-[color:var(--surface)] border border-[color:var(--accent)] rounded-2xl p-8 shadow-[0_0_60px_-15px_rgba(0,245,122,0.3)]">
-                        <img src="/Funnel Images/DJ Elite Logo.jpg" alt="DJ Elite" className="h-12 mx-auto mb-4"/>
+                        <img src="/Funnel Images/DJ Elite Logo.png" alt="DJ Elite" className="h-12 mx-auto mb-4"/>
                         <div className="my-6">
                              <span className="text-lg text-[color:var(--muted)] line-through">$3,364</span>
                              <p className="font-display text-6xl font-bold text-[color:var(--accent)]">$497</p>
@@ -402,8 +406,8 @@ export const DJElitePage: React.FC = () => {
                         </div>
                         <Button variant="purchase" className="w-full text-xl py-5 btn-animate hover-lift" onClick={() => window.location.href = '/checkout'}>
                             <div className="flex flex-col">
-                                <span>🚀 ENROLL IN DJ ELITE NOW</span>
-                                <span className="text-xs font-normal mt-1 opacity-80">90-Day Money-Back Guarantee</span>
+                                <span>{t('enrollNow')}</span>
+                                <span className="text-xs font-normal mt-1 opacity-80">{language === 'es' ? 'Garantía de 90 Días' : '90-Day Money-Back Guarantee'}</span>
                             </div>
                         </Button>
                         <p className="text-xs text-[color:var(--muted)] mt-4">This is a one-time payment. Prices will go up after the timer hits zero.</p>
@@ -413,7 +417,7 @@ export const DJElitePage: React.FC = () => {
 
             <footer className="bg-[color:var(--surface)] border-t border-[color:var(--border)] mt-20">
                 <div className="container mx-auto px-4 py-16 text-center">
-                    <img src="/Funnel Images/DJ Elite Logo.jpg" alt="DJ Elite" className="h-8 mx-auto" />
+                    <img src="/Funnel Images/DJ Elite Logo.png" alt="DJ Elite" className="h-8 mx-auto" />
                     <p className="mt-4 max-w-md mx-auto text-[color:var(--text-secondary)]">Get weekly DJ tips, industry insights, and exclusive opportunities.</p>
                     <form onSubmit={async (e) => {
                         e.preventDefault();
