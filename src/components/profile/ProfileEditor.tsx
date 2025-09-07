@@ -39,11 +39,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
         age: profile.age,
         location: profile.location,
         bio: profile.bio,
-        genres: profile.genres?.filter(g => g.trim()) || [],
-        skills: profile.skills?.filter(s => s.trim()) || [],
-        venues: profile.venues?.filter(v => v.trim()) || [],
-        fee: profile.fee,
-        images: imageUrls.filter(url => url.trim())
+        profile_image_url: profile.profile_image_url
       };
       
       await updateProfile(updateData);
@@ -182,39 +178,9 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
             </div>
           </div>
 
-          {/* Additional Images */}
-          <div>
-            <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Additional Images (URLs)</label>
-            <div className="space-y-2">
-              {imageUrls.slice(1).map((url, index) => (
-                <div key={index + 1} className="flex gap-2">
-                  <input
-                    type="url"
-                    value={url}
-                    onChange={(e) => updateImageUrl(index + 1, e.target.value)}
-                    className="flex-1 px-3 py-2 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-lg focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
-                    placeholder="https://example.com/image.jpg"
-                  />
-                  <button
-                    onClick={() => removeImageUrl(index + 1)}
-                    className="px-3 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30"
-                  >
-                    Remove
-                  </button>
-                </div>
-              ))}
-              <button
-                onClick={addImageUrl}
-                className="text-[color:var(--accent)] hover:text-[color:var(--accent-muted)] text-sm"
-              >
-                + Add Image URL
-              </button>
-            </div>
-          </div>
-
           {/* Note: Advanced fields will be added once database schema is updated */}
           <div className="text-sm text-[color:var(--text-secondary)] italic">
-            Additional fields (genres, skills, venues, fee) will be available soon.
+            Additional fields (genres, skills, venues, additional images) will be available once database schema is updated.
           </div>
         </div>
 
