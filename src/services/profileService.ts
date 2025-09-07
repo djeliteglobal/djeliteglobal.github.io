@@ -150,6 +150,16 @@ export const subscribeToCareerAccelerator = async (email: string, firstName?: st
     }
     
     console.log('Career Accelerator signup successful:', data);
+    
+    // Send welcome email via Resend
+    try {
+      const { sendWelcomeEmail } = await import('./emailService');
+      await sendWelcomeEmail(email.trim(), firstName?.trim() || 'DJ');
+      console.log('Welcome email sent successfully');
+    } catch (emailError) {
+      console.error('Welcome email failed:', emailError);
+      // Don't throw - signup was successful even if email failed
+    }
   } catch (err) {
     console.error('Career Accelerator signup error:', err);
     throw err;
