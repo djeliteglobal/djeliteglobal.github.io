@@ -29,19 +29,22 @@ export const fetchSwipeProfiles = async (): Promise<DJProfile[]> => {
   if (error) throw error;
   
   // Transform to match expected format
-  return (data || []).map(profile => ({
-    id: profile.id,
-    title: profile.dj_name || 'DJ',
-    venue: 'Local Venues',
-    location: profile.location || 'Unknown Location',
-    date: 'Available Now',
-    fee: 'Negotiable',
-    genres: ['House', 'Techno'],
-    skills: ['Mixing'],
-    bio: profile.bio || 'Passionate DJ ready to connect!',
-    imageUrl: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400',
-    images: ['https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400']
-  }));
+  return (data || []).map(profile => {
+    const profileImage = profile.profile_image_url || profile.images?.[0] || 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400';
+    return {
+      id: profile.id,
+      title: profile.dj_name || 'DJ',
+      venue: profile.venues?.[0] || 'Local Venues',
+      location: profile.location || 'Unknown Location',
+      date: 'Available Now',
+      fee: profile.fee || 'Negotiable',
+      genres: profile.genres || ['House', 'Techno'],
+      skills: profile.skills || ['Mixing'],
+      bio: profile.bio || 'Passionate DJ ready to connect!',
+      imageUrl: profileImage,
+      images: profile.images || [profileImage]
+    };
+  });
 };
 
 export const createProfile = async (profileData: {
@@ -63,6 +66,10 @@ export const createProfile = async (profileData: {
 
   if (existing) return existing;
 
+  // Use auth profile picture as default
+  const authProfilePic = user.user_metadata?.avatar_url || user.user_metadata?.picture;
+  const defaultImage = authProfilePic || 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f';
+
   const { data: profile, error } = await supabase
     .from('profiles')
     .insert({
@@ -72,16 +79,37 @@ export const createProfile = async (profileData: {
       age: profileData.age,
       location: profileData.location,
       experience_level: profileData.experience_level || 'Beginner',
+      profile_image_url: defaultImage,
       genres: ['House', 'Techno'],
       skills: ['Mixing', 'Beatmatching'],
       venues: ['Local Clubs'],
-      images: ['https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f']
+      images: [defaultImage]
     })
     .select()
     .single();
 
   if (error) throw error;
   return profile;
+};
+
+export const uploadProfileImage = async (file: File): Promise<string> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+
+  const { data, error } = await supabase.storage
+    .from('profile-images')
+    .upload(fileName, file);
+
+  if (error) throw error;
+
+  const { data: { publicUrl } } = supabase.storage
+    .from('profile-images')
+    .getPublicUrl(fileName);
+
+  return publicUrl;
 };
 
 export const updateProfile = async (profileData: Partial<DJProfile>): Promise<DJProfile> => {

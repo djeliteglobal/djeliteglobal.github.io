@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../platform';
-import { getCurrentProfile, updateProfile } from '../../services/profileService';
+import { getCurrentProfile, updateProfile, uploadProfileImage } from '../../services/profileService';
 import { DJProfile } from '../../types/profile';
 
 interface ProfileEditorProps {
@@ -38,7 +38,12 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
         dj_name: profile.dj_name,
         age: profile.age,
         location: profile.location,
-        bio: profile.bio
+        bio: profile.bio,
+        genres: profile.genres?.filter(g => g.trim()) || [],
+        skills: profile.skills?.filter(s => s.trim()) || [],
+        venues: profile.venues?.filter(v => v.trim()) || [],
+        fee: profile.fee,
+        images: imageUrls.filter(url => url.trim())
       };
       
       await updateProfile(updateData);
@@ -47,6 +52,32 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
     } catch (error: any) {
       console.error('Failed to update profile:', error);
       alert(`Failed to update profile: ${error.message || 'Unknown error'}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size must be less than 5MB');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const imageUrl = await uploadProfileImage(file);
+      setProfile({...profile, profile_image_url: imageUrl});
+      // Update first image in array
+      const newImageUrls = [...imageUrls];
+      newImageUrls[0] = imageUrl;
+      setImageUrls(newImageUrls);
+      alert('Profile picture uploaded successfully!');
+    } catch (error: any) {
+      console.error('Failed to upload image:', error);
+      alert(`Failed to upload image: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -125,34 +156,58 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
             />
           </div>
 
-          {/* Images */}
+          {/* Profile Image Upload */}
           <div>
-            <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Profile Images</label>
+            <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Profile Picture</label>
+            <div className="space-y-4">
+              {profile.profile_image_url && (
+                <div className="flex items-center gap-4">
+                  <img 
+                    src={profile.profile_image_url} 
+                    alt="Current profile" 
+                    className="w-16 h-16 rounded-full object-cover"
+                  />
+                  <span className="text-sm text-[color:var(--text-secondary)]">Current profile picture</span>
+                </div>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="block w-full text-sm text-[color:var(--text-secondary)] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[color:var(--accent)] file:text-black hover:file:bg-[color:var(--accent-muted)]"
+              />
+              <p className="text-xs text-[color:var(--muted)]">
+                Upload a new profile picture (JPG, PNG, GIF up to 5MB)
+              </p>
+            </div>
+          </div>
+
+          {/* Additional Images */}
+          <div>
+            <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Additional Images (URLs)</label>
             <div className="space-y-2">
-              {imageUrls.map((url, index) => (
-                <div key={index} className="flex gap-2">
+              {imageUrls.slice(1).map((url, index) => (
+                <div key={index + 1} className="flex gap-2">
                   <input
                     type="url"
                     value={url}
-                    onChange={(e) => updateImageUrl(index, e.target.value)}
+                    onChange={(e) => updateImageUrl(index + 1, e.target.value)}
                     className="flex-1 px-3 py-2 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-lg focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
                     placeholder="https://example.com/image.jpg"
                   />
-                  {imageUrls.length > 1 && (
-                    <button
-                      onClick={() => removeImageUrl(index)}
-                      className="px-3 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30"
-                    >
-                      Remove
-                    </button>
-                  )}
+                  <button
+                    onClick={() => removeImageUrl(index + 1)}
+                    className="px-3 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30"
+                  >
+                    Remove
+                  </button>
                 </div>
               ))}
               <button
                 onClick={addImageUrl}
                 className="text-[color:var(--accent)] hover:text-[color:var(--accent-muted)] text-sm"
               >
-                + Add Image
+                + Add Image URL
               </button>
             </div>
           </div>
