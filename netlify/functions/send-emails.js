@@ -39,8 +39,8 @@ exports.handler = async (event, context) => {
       `
     });
 
-    // Add to ConvertKit
-    const convertKitResponse = await fetch(`https://api.convertkit.com/v3/forms/${process.env.CONVERTKIT_FORM_ID}/subscribe`, {
+    // Add to ConvertKit (correct endpoint)
+    const convertKitResponse = await fetch(`https://api.convertkit.com/v3/forms/${process.env.CONVERTKIT_FORM_ID}/subscriptions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -51,6 +51,12 @@ exports.handler = async (event, context) => {
         first_name: firstName
       })
     });
+    
+    console.log('ConvertKit response status:', convertKitResponse.status);
+    if (!convertKitResponse.ok) {
+      const errorText = await convertKitResponse.text();
+      console.error('ConvertKit error:', errorText);
+    }
 
     return {
       statusCode: 200,
