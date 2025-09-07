@@ -61,8 +61,8 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      alert('File size must be less than 5MB');
+    if (file.size > 2 * 1024 * 1024) {
+      alert('File size must be less than 2MB');
       return;
     }
 
@@ -177,7 +177,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
                 className="block w-full text-sm text-[color:var(--text-secondary)] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[color:var(--accent)] file:text-black hover:file:bg-[color:var(--accent-muted)]"
               />
               <p className="text-xs text-[color:var(--muted)]">
-                Upload a new profile picture (JPG, PNG, GIF up to 5MB)
+                Upload a new profile picture (JPG, PNG, GIF up to 2MB)
               </p>
             </div>
           </div>

@@ -93,6 +93,24 @@ export const createProfile = async (profileData: {
 };
 
 export const uploadProfileImage = async (file: File): Promise<string> => {
+  // Fallback: Convert to base64 for now (until storage bucket is set up)
+  return new Promise((resolve, reject) => {
+    if (file.size > 2 * 1024 * 1024) {
+      reject(new Error('File size must be less than 2MB'));
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64String = reader.result as string;
+      resolve(base64String);
+    };
+    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.readAsDataURL(file);
+  });
+
+  // TODO: Uncomment when storage bucket is created
+  /*
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
@@ -110,6 +128,7 @@ export const uploadProfileImage = async (file: File): Promise<string> => {
     .getPublicUrl(fileName);
 
   return publicUrl;
+  */
 };
 
 export const updateProfile = async (profileData: Partial<DJProfile>): Promise<DJProfile> => {
