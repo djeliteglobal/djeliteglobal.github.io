@@ -17,36 +17,30 @@ export const fetchSwipeProfiles = async (): Promise<DJProfile[]> => {
     await createProfile({ dj_name: 'New DJ', bio: 'Getting started' });
   }
 
-  // Get profiles excluding current user and already swiped
-  const { data: swipedIds } = await supabase
-    .from('swipes')
-    .select('swiped_id')
-    .eq('swiper_id', userProfile?.id);
-
-  const excludeIds = swipedIds?.map(s => s.swiped_id) || [];
-  if (userProfile) excludeIds.push(userProfile.id);
-
+  // Get all profiles except current user (simplified for debugging)
   const { data, error } = await supabase
     .from('profiles')
     .select('*')
-    .not('id', 'in', `(${excludeIds.join(',')})`)
+    .neq('user_id', user.id)
     .limit(10);
+    
+  console.log('🔍 PROFILES DEBUG:', { data, error, userProfile });
 
   if (error) throw error;
   
   // Transform to match expected format
   return (data || []).map(profile => ({
     id: profile.id,
-    title: profile.dj_name,
-    venue: profile.venues?.[0] || 'Various Venues',
-    location: profile.location || 'Unknown',
-    date: 'Available',
-    fee: profile.fee || 'Negotiable',
-    genres: profile.genres || ['House', 'Techno'],
-    skills: profile.skills || [],
-    bio: profile.bio,
-    imageUrl: profile.images?.[0] || 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f',
-    images: profile.images || ['https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f']
+    title: profile.dj_name || 'DJ',
+    venue: 'Local Venues',
+    location: profile.location || 'Unknown Location',
+    date: 'Available Now',
+    fee: 'Negotiable',
+    genres: ['House', 'Techno'],
+    skills: ['Mixing'],
+    bio: profile.bio || 'Passionate DJ ready to connect!',
+    imageUrl: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400',
+    images: ['https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400']
   }));
 };
 
