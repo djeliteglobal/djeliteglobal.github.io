@@ -108,22 +108,38 @@ export const DJElitePage: React.FC = () => {
                                 </ul>
                            </div>
                            <form onSubmit={async (e) => {
+                               console.log('🚀 VITALIK: Form submitted!');
                                e.preventDefault();
-                               const formData = new FormData(e.target as HTMLFormElement);
+                               
+                               const form = e.target as HTMLFormElement;
+                               const formData = new FormData(form);
                                const firstName = formData.get('first_name') as string;
                                const email = formData.get('email') as string;
+                               
+                               console.log('📧 VITALIK: Form data:', { email, firstName });
+                               
+                               if (!email || !firstName) {
+                                   console.error('❌ VITALIK: Missing form data');
+                                   alert('Please fill in all fields');
+                                   return;
+                               }
+                               
                                try {
-                                   console.log('Newsletter signup attempt:', { email, firstName });
+                                   console.log('⚡ VITALIK: Importing service...');
                                    const { subscribeToNewsletter } = await import('../services/profileService');
-                                   console.log('Service imported successfully');
+                                   console.log('✅ VITALIK: Service imported');
+                                   
+                                   console.log('📤 VITALIK: Calling subscribeToNewsletter...');
                                    await subscribeToNewsletter(email, firstName);
-                                   console.log('Newsletter subscription successful');
+                                   console.log('🎉 VITALIK: Newsletter subscription SUCCESS!');
+                                   
                                    alert('🎉 Success! Check your email for the free training preview.');
-                                   (e.target as HTMLFormElement).reset();
-                               } catch (error) {
-                                   console.error('Newsletter signup error:', error);
-                                   console.error('Error details:', error.message);
-                                   alert(`Error: ${error.message}`);
+                                   form.reset();
+                               } catch (error: any) {
+                                   console.error('💥 VITALIK: Newsletter error:', error);
+                                   console.error('💥 VITALIK: Error message:', error?.message);
+                                   console.error('💥 VITALIK: Error stack:', error?.stack);
+                                   alert(`❌ Error: ${error?.message || 'Unknown error'}`);
                                }
                            }} className="flex flex-col gap-4">
                                <input type="text" name="first_name" placeholder="Enter your first name" required className="w-full px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />
