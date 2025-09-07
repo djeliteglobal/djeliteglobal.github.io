@@ -66,24 +66,27 @@ export const createProfile = async (profileData: {
 
   if (existing) return existing;
 
-  // Use auth profile picture as default
+  // Auto-sync Google profile picture on signup
   const authProfilePic = user.user_metadata?.avatar_url || user.user_metadata?.picture;
   const defaultImage = authProfilePic || 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f';
+  
+  // Use user's actual name from Google if available
+  const displayName = user.user_metadata?.full_name || user.user_metadata?.name || profileData.dj_name;
 
   const { data: profile, error } = await supabase
     .from('profiles')
     .insert({
       user_id: user.id,
-      dj_name: profileData.dj_name,
-      bio: profileData.bio,
+      dj_name: displayName,
+      bio: profileData.bio || 'New DJ ready to connect!',
       age: profileData.age,
       location: profileData.location,
       experience_level: profileData.experience_level || 'Beginner',
-      profile_image_url: defaultImage,
+      profile_image_url: authProfilePic, // Always use Google profile pic
       genres: ['House', 'Techno'],
       skills: ['Mixing', 'Beatmatching'],
       venues: ['Local Clubs'],
-      images: [defaultImage]
+      images: authProfilePic ? [authProfilePic] : [defaultImage]
     })
     .select()
     .single();

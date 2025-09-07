@@ -2,7 +2,7 @@ import React, { useState, useContext, useRef, useEffect, memo } from 'react';
 import { AppContext } from '../../pages/HomePage';
 import { useAuth } from '../../contexts/AuthContext';
 import { LanguageSwitcher } from '../LanguageSwitcher';
-import { ProfileEditor } from '../profile/ProfileEditor';
+import { TinderStyleProfileEditor } from '../profile/TinderStyleProfileEditor';
 import { NAV_ITEMS, SunIcon, MoonIcon, SearchIcon, MenuIcon, CheckCircleIcon, ChevronDownIcon, Logo, LockIcon } from '../../constants/platform';
 import type { Course, FaqItem, PricingPlan, Opportunity } from '../../types/platform';
 
@@ -69,7 +69,7 @@ export const TopBar: React.FC = () => {
             </div>
         </header>
         {showProfileEditor && (
-            <ProfileEditor isOpen={showProfileEditor} onClose={() => setShowProfileEditor(false)} />
+            <TinderStyleProfileEditor isOpen={showProfileEditor} onClose={() => setShowProfileEditor(false)} />
         )}
         </>
     );
@@ -120,7 +120,7 @@ export const SideNav: React.FC = () => {
              </div>
         </nav>
         {showProfileEditor && (
-            <ProfileEditor isOpen={showProfileEditor} onClose={() => setShowProfileEditor(false)} />
+            <TinderStyleProfileEditor isOpen={showProfileEditor} onClose={() => setShowProfileEditor(false)} />
         )}
         </>
     );
