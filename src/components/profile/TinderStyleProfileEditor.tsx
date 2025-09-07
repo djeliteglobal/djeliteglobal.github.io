@@ -12,6 +12,7 @@ export const TinderStyleProfileEditor: React.FC<TinderStyleProfileEditorProps> =
   const [profile, setProfile] = useState<Partial<DJProfile>>({});
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
+  const [additionalImages, setAdditionalImages] = useState<string[]>(['', '', '']);
 
   const steps = [
     { title: 'Profile Photo', key: 'photo' },
@@ -37,7 +38,7 @@ export const TinderStyleProfileEditor: React.FC<TinderStyleProfileEditorProps> =
     }
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number = 0) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -49,7 +50,14 @@ export const TinderStyleProfileEditor: React.FC<TinderStyleProfileEditorProps> =
     setLoading(true);
     try {
       const imageUrl = await uploadProfileImage(file);
-      setProfile({...profile, profile_image_url: imageUrl});
+      
+      if (index === 0) {
+        setProfile({...profile, profile_image_url: imageUrl});
+      } else {
+        const newImages = [...additionalImages];
+        newImages[index - 1] = imageUrl;
+        setAdditionalImages(newImages);
+      }
     } catch (error: any) {
       alert(`Failed to upload image: ${error.message}`);
     } finally {
@@ -66,6 +74,7 @@ export const TinderStyleProfileEditor: React.FC<TinderStyleProfileEditorProps> =
         location: profile.location,
         bio: profile.bio,
         profile_image_url: profile.profile_image_url,
+        images: [profile.profile_image_url, ...additionalImages].filter(img => img && img.trim()),
         genres: profile.genres || [],
         skills: profile.skills || [],
         venues: profile.venues || [],
@@ -121,21 +130,44 @@ export const TinderStyleProfileEditor: React.FC<TinderStyleProfileEditorProps> =
         {/* Content */}
         <div className="px-6 pb-6 space-y-6 max-h-[60vh] overflow-y-auto">
           {currentStep === 0 && (
-            <div className="text-center space-y-6">
-              <div className="relative mx-auto w-32 h-32">
-                <img 
-                  src={profile.profile_image_url || 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f'} 
-                  alt="Profile" 
-                  className="w-full h-full rounded-full object-cover border-4 border-[color:var(--accent)]"
-                />
-                <label className="absolute bottom-0 right-0 w-10 h-10 bg-[color:var(--accent)] rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
-                  <span className="text-black font-bold">+</span>
-                  <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                </label>
-              </div>
+            <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-semibold text-[color:var(--text-primary)]">Add Photos</h3>
-                <p className="text-sm text-[color:var(--text-secondary)]">Upload your best DJ photos to get more matches</p>
+                <h3 className="text-lg font-semibold text-[color:var(--text-primary)] text-center mb-2">Add Photos</h3>
+                <p className="text-sm text-[color:var(--text-secondary)] text-center mb-6">Upload up to 4 photos to get more matches</p>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                {/* Main profile picture */}
+                <div className="relative aspect-square">
+                  <img 
+                    src={profile.profile_image_url || 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f'} 
+                    alt="Profile" 
+                    className="w-full h-full rounded-xl object-cover border-2 border-[color:var(--accent)]"
+                  />
+                  <label className="absolute bottom-2 right-2 w-8 h-8 bg-[color:var(--accent)] rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
+                    <span className="text-black font-bold text-sm">+</span>
+                    <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, 0)} className="hidden" />
+                  </label>
+                  <div className="absolute top-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full">1</div>
+                </div>
+                
+                {/* Additional 3 pictures */}
+                {[1, 2, 3].map((index) => (
+                  <div key={index} className="relative aspect-square">
+                    <img 
+                      src={additionalImages[index - 1] || 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?blur=20'} 
+                      alt={`Photo ${index + 1}`} 
+                      className={`w-full h-full rounded-xl object-cover border-2 ${
+                        additionalImages[index - 1] ? 'border-[color:var(--accent)]' : 'border-dashed border-[color:var(--border)] opacity-50'
+                      }`}
+                    />
+                    <label className="absolute bottom-2 right-2 w-8 h-8 bg-[color:var(--accent)] rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
+                      <span className="text-black font-bold text-sm">+</span>
+                      <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, index)} className="hidden" />
+                    </label>
+                    <div className="absolute top-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full">{index + 1}</div>
+                  </div>
+                ))}
               </div>
             </div>
           )}

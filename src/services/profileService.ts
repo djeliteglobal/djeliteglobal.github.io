@@ -222,14 +222,47 @@ export const recordSwipe = async (profileId: string, direction: 'left' | 'right'
 
   if (!userProfile) throw new Error('Profile not found');
 
-  const { data, error } = await supabase.rpc('handle_swipe', {
-    swiper_profile_id: userProfile.id,
-    swiped_profile_id: profileId,
-    swipe_direction: direction
-  });
+  // Record the swipe
+  const { error: swipeError } = await supabase
+    .from('swipes')
+    .insert({
+      swiper_id: userProfile.id,
+      swiped_id: profileId,
+      direction: direction
+    });
 
-  if (error) throw error;
-  return data;
+  if (swipeError && swipeError.code !== '23505') {
+    throw swipeError;
+  }
+
+  // Check for match if it's a right swipe
+  if (direction === 'right' || direction === 'super') {
+    const { data: reverseSwipe } = await supabase
+      .from('swipes')
+      .select('*')
+      .eq('swiper_id', profileId)
+      .eq('swiped_id', userProfile.id)
+      .eq('direction', 'right')
+      .single();
+
+    if (reverseSwipe) {
+      // It's a match! Create match record
+      const { error: matchError } = await supabase
+        .from('matches')
+        .insert({
+          profile1_id: userProfile.id,
+          profile2_id: profileId
+        });
+
+      if (matchError && matchError.code !== '23505') {
+        console.error('Failed to create match:', matchError);
+      }
+
+      return { match: true };
+    }
+  }
+
+  return { match: false };
 };
 
 export const fetchMatches = async (): Promise<DJProfile[]> => {
