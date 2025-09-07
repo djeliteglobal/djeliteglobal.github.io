@@ -110,23 +110,20 @@ export const DJElitePage: React.FC = () => {
                            <form onSubmit={async (e) => {
                                e.preventDefault();
                                const formData = new FormData(e.target as HTMLFormElement);
-                               const data = {
-                                   first_name: formData.get('first_name'),
-                                   email: formData.get('email')
-                               };
+                               const firstName = formData.get('first_name') as string;
+                               const email = formData.get('email') as string;
                                try {
-                                   const response = await fetch('/.netlify/functions/subscribe', {
-                                       method: 'POST',
-                                       body: JSON.stringify(data)
-                                   });
-                                   if (response.ok) {
-                                       alert('🎉 Success! Check your email for the free training preview.');
-                                       (e.target as HTMLFormElement).reset();
-                                   } else {
-                                       alert('Something went wrong. Please try again.');
-                                   }
+                                   console.log('Newsletter signup attempt:', { email, firstName });
+                                   const { subscribeToNewsletter } = await import('../services/profileService');
+                                   console.log('Service imported successfully');
+                                   await subscribeToNewsletter(email, firstName);
+                                   console.log('Newsletter subscription successful');
+                                   alert('🎉 Success! Check your email for the free training preview.');
+                                   (e.target as HTMLFormElement).reset();
                                } catch (error) {
-                                   alert('Network error. Please try again.');
+                                   console.error('Newsletter signup error:', error);
+                                   console.error('Error details:', error.message);
+                                   alert(`Error: ${error.message}`);
                                }
                            }} className="flex flex-col gap-4">
                                <input type="text" name="first_name" placeholder="Enter your first name" required className="w-full px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />
@@ -408,23 +405,15 @@ export const DJElitePage: React.FC = () => {
                     <form onSubmit={async (e) => {
                         e.preventDefault();
                         const formData = new FormData(e.target as HTMLFormElement);
-                        const data = {
-                            first_name: 'Newsletter Subscriber',
-                            email: formData.get('email')
-                        };
+                        const email = formData.get('email') as string;
                         try {
-                            const response = await fetch('/.netlify/functions/subscribe', {
-                                method: 'POST',
-                                body: JSON.stringify(data)
-                            });
-                            if (response.ok) {
-                                alert('📧 Subscribed! You\'ll get weekly DJ tips and insights.');
-                                (e.target as HTMLFormElement).reset();
-                            } else {
-                                alert('Something went wrong. Please try again.');
-                            }
+                            const { subscribeToNewsletter } = await import('../services/profileService');
+                            await subscribeToNewsletter(email, 'Newsletter Subscriber');
+                            alert('📧 Subscribed! You\'ll get weekly DJ tips and insights.');
+                            (e.target as HTMLFormElement).reset();
                         } catch (error) {
-                            alert('Network error. Please try again.');
+                            console.error('Newsletter signup error:', error);
+                            alert('Something went wrong. Please try again.');
                         }
                     }} className="mt-6 max-w-sm mx-auto flex gap-2">
                         <input type="email" name="email" placeholder="Your email address" required className="flex-grow px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all" />

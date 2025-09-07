@@ -1,4 +1,4 @@
-export type Page = 'dashboard' | 'courses' | 'course_detail' | 'community' | 'opportunities' | 'dj_matching' | 'settings' | 'landing';
+export type Page = 'dashboard' | 'courses' | 'course_detail' | 'community' | 'opportunities' | 'events' | 'settings' | 'landing';
 
 export interface AppState {
   theme: 'light' | 'dark';
@@ -63,11 +63,15 @@ export interface FaqItem {
 
 export interface Opportunity {
   id: number;
-  title:string;
+  title: string;
   venue: string;
   location: string;
   date: string;
   genres: string[];
   fee: string;
   imageUrl: string;
+  images?: string[];  // Multiple images for Tinder-like navigation
+  bio?: string;       // Profile bio
+  age?: number;       // Age
+  skills?: string[];  // Skills like Music Production, Event Production, etc.
 }

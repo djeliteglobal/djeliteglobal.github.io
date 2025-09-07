@@ -2,7 +2,7 @@ import React, { useState, useEffect, createContext, useCallback, useMemo } from 
 import { Link } from 'react-router-dom';
 import type { AppState, AppContextType, Page } from '../types/platform';
 import { TopBar, SideNav } from '../components/platform';
-import { LandingPage, Dashboard, CoursesPage, CourseDetailPage, CommunityPage, OpportunitiesPage, SettingsPage, DJMatchingPage } from '../components/pages';
+import { LandingPage, Dashboard, CoursesPage, CourseDetailPage, CommunityPage, OpportunitiesPage, SettingsPage, EventsPage } from '../components/pages';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { AuthModal } from '../components/auth/AuthModal';
 
@@ -63,14 +63,18 @@ const HomePageContent: React.FC = () => {
     const [appState, setAppState] = useState<AppState>({
         theme: 'dark',
         isLoggedIn: !!currentUser,
-        page: 'landing',
+        page: currentUser ? 'opportunities' : 'landing',
         courseId: null,
         isSidebarOpen: false,
     });
     const [showAuthModal, setShowAuthModal] = useState(false);
 
     useEffect(() => {
-        setAppState(prev => ({ ...prev, isLoggedIn: !!currentUser }));
+        setAppState(prev => ({ 
+            ...prev, 
+            isLoggedIn: !!currentUser,
+            page: currentUser ? 'opportunities' : 'landing'
+        }));
     }, [currentUser]);
 
     useEffect(() => {
@@ -109,12 +113,12 @@ const HomePageContent: React.FC = () => {
                 return <CommunityPage />;
             case 'opportunities':
                 return <OpportunitiesPage />;
-            case 'dj_matching':
-                return <DJMatchingPage />;
+            case 'events':
+                return <EventsPage />;
             case 'settings':
                 return <SettingsPage />;
             default:
-                return <Dashboard />;
+                return <OpportunitiesPage />;
         }
     };
     

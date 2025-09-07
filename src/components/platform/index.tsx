@@ -1,7 +1,7 @@
 import React, { useState, useContext, useRef, useEffect } from 'react';
 import { AppContext } from '../../pages/HomePage';
 import { useAuth } from '../../contexts/AuthContext';
-import { NAV_ITEMS, SunIcon, MoonIcon, SearchIcon, MenuIcon, CheckCircleIcon, ChevronDownIcon, Logo } from '../../constants/platform';
+import { NAV_ITEMS, SunIcon, MoonIcon, SearchIcon, MenuIcon, CheckCircleIcon, ChevronDownIcon, Logo, LockIcon } from '../../constants/platform';
 import type { Course, FaqItem, PricingPlan, Opportunity } from '../../types/platform';
 
 // Button Component
@@ -11,11 +11,11 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export const Button: React.FC<ButtonProps> = ({ variant = 'primary', children, className = '', ...props }) => {
-  const baseClasses = 'px-6 py-3 rounded-md font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[color:var(--bg)] focus:ring-[color:var(--accent)] disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseClasses = 'px-6 py-3 rounded-md font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0B0D10] focus:ring-[#40E0D0] disabled:opacity-50 disabled:cursor-not-allowed';
   const variantClasses = {
-    primary: 'bg-[color:var(--accent)] text-black hover:bg-[color:var(--accent-muted)]',
-    secondary: 'bg-[color:var(--surface-alt)] text-[color:var(--text-primary)] hover:bg-[color:var(--elevated)] border border-[color:var(--border)]',
-    ghost: 'bg-transparent text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-alt)] hover:text-[color:var(--text-primary)]',
+    primary: 'bg-[#40E0D0] text-black hover:bg-[#20B2AA]',
+    secondary: 'bg-[#252A32] text-[#FFFFFF] hover:bg-[#2D3339] border border-[#3A4047]',
+    ghost: 'bg-transparent text-[#B8BCC8] hover:bg-[#252A32] hover:text-[#FFFFFF]',
   };
   return (
     <button className={`${baseClasses} ${variantClasses[variant]} ${className}`} {...props}>
@@ -52,7 +52,7 @@ export const TopBar: React.FC = () => {
                     <input
                         type="search"
                         placeholder="Search courses, opportunities..."
-                        className="w-full rounded-lg border border-[color:var(--border)] bg-[color:var(--surface-alt)] py-2 pl-10 pr-4 text-[color:var(--text-primary)] placeholder-[color:var(--muted)] focus:border-[color:var(--accent)] focus:outline-none focus:ring-1 focus:ring-[color:var(--accent)]"
+                        className="w-full rounded-lg border border-[#3A4047] bg-[#252A32] py-2 pl-10 pr-4 text-[#FFFFFF] placeholder-[#6B7280] focus:border-[#40E0D0] focus:outline-none focus:ring-1 focus:ring-[#40E0D0]"
                     />
                 </div>
                 <button onClick={toggleTheme} className="flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--surface-alt)] text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]">
@@ -82,8 +82,8 @@ export const SideNav: React.FC = () => {
                         onClick={() => navigate(item.page as any)}
                         className={`flex items-center gap-3 rounded-md px-4 py-3 text-sm font-medium transition-colors ${
                             appState.page === item.page
-                                ? 'bg-[color:var(--accent)] text-[#0B0D10]'
-                                : 'text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-alt)] hover:text-[color:var(--text-primary)]'
+                                ? 'bg-[#40E0D0] text-[#0B0D10]'
+                                : 'text-[#B8BCC8] hover:bg-[#252A32] hover:text-[#FFFFFF]'
                         }`}
                     >
                         <item.icon className="h-5 w-5" />
@@ -123,14 +123,17 @@ export const CourseCard: React.FC<{ course: Course }> = ({ course }) => {
       <div className="relative">
         <img src={course.imageUrl} alt={course.title} className="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-105" />
         <div className="absolute top-3 left-3 rounded-full bg-[color:var(--surface)]/80 px-3 py-1 text-xs font-semibold text-[color:var(--text-primary)] backdrop-blur-sm">{course.level}</div>
+        <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center">
+          <LockIcon className="w-3 h-3 text-white" />
+        </div>
       </div>
       <div className="p-4">
-        <p className="text-sm font-medium text-[color:var(--accent)]">{course.category.toUpperCase()}</p>
+        <p className="text-sm font-medium text-[#40E0D0]">{course.category.toUpperCase()}</p>
         <h3 className="mt-1 font-display text-lg font-bold text-[color:var(--text-primary)]">{course.title}</h3>
-        <p className="mt-1 text-sm text-[color:var(--muted)]">by {course.instructor}</p>
+        <p className="mt-1 text-sm text-[color:var(--muted)] font-mono">by {course.instructor}</p>
         <div className="mt-4">
           <div className="h-2 w-full overflow-hidden rounded-full bg-[color:var(--surface-alt)]">
-            <div className="h-full rounded-full bg-[color:var(--accent)]" style={{ width: `${course.progress}%` }}></div>
+            <div className="h-full rounded-full bg-[#40E0D0]" style={{ width: `${course.progress}%` }}></div>
           </div>
           <div className="mt-2 flex justify-between text-xs text-[color:var(--muted)]">
             <span>{course.progress > 0 ? `${course.progress}% complete` : 'Not started'}</span>
@@ -144,9 +147,9 @@ export const CourseCard: React.FC<{ course: Course }> = ({ course }) => {
 
 export const PricingCard: React.FC<{ plan: PricingPlan }> = ({ plan }) => {
     return (
-        <div className={`flex flex-col rounded-xl p-8 transition-all duration-300 ${plan.isFeatured ? 'bg-[color:var(--elevated)] border-2 border-[color:var(--accent)] scale-105' : 'bg-[color:var(--surface)] border border-[color:var(--border)]'}`}>
+        <div className={`flex flex-col rounded-xl p-8 transition-all duration-300 ${plan.isFeatured ? 'bg-[#2D3339] border-2 border-[#40E0D0] scale-105' : 'bg-[#1A1D23] border border-[#3A4047]'}`}>
             {plan.isFeatured && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-[color:var(--accent)] px-4 py-1 text-sm font-semibold text-black">BEST VALUE</div>
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-[#40E0D0] px-4 py-1 text-sm font-semibold text-black">BEST VALUE</div>
             )}
             <h3 className="font-display text-2xl font-bold text-center text-[color:var(--text-primary)]">{plan.name}</h3>
             <div className="mt-4 flex items-baseline justify-center">
@@ -187,12 +190,22 @@ export const FaqItemComponent: React.FC<{ item: FaqItem }> = ({ item }) => {
     );
 };
 
-export const OpportunitySwipeCard: React.FC<{ opportunity: Opportunity; onSwipe: (direction: 'left' | 'right') => void; isTop: boolean; style?: React.CSSProperties; }> = ({ opportunity, onSwipe, isTop, style }) => {
+// ⚠️ CRITICAL SWIPE COMPONENT - DO NOT MODIFY CORE FUNCTIONALITY
+// Enhanced with Tinder-like image navigation
+// Only modify: colors, text, images - NEVER touch drag/touch handlers or animations
+export const OpportunitySwipeCard: React.FC<{ opportunity: Opportunity; onSwipe: (direction: 'left' | 'right') => void; isTop: boolean; style?: React.CSSProperties; 'data-swipe-card'?: boolean; }> = ({ opportunity, onSwipe, isTop, style, ...props }) => {
     const cardRef = useRef<HTMLDivElement>(null);
     const isDragging = useRef(false);
     const startX = useRef(0);
     const currentX = useRef(0);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [showDetails, setShowDetails] = useState(false);
 
+    // Tinder-like: Multiple images support
+    const images = opportunity.images || [opportunity.imageUrl];
+    const totalImages = images.length;
+
+    // ⚠️ PROTECTED: Drag handlers - DO NOT MODIFY
     const handleDragStart = (clientX: number) => {
         if (!isTop) return;
         isDragging.current = true;
@@ -202,6 +215,7 @@ export const OpportunitySwipeCard: React.FC<{ opportunity: Opportunity; onSwipe:
         }
     };
 
+    // ⚠️ PROTECTED: Drag movement - DO NOT MODIFY
     const handleDragMove = (clientX: number) => {
         if (!isDragging.current || !isTop) return;
         currentX.current = clientX - startX.current;
@@ -211,6 +225,7 @@ export const OpportunitySwipeCard: React.FC<{ opportunity: Opportunity; onSwipe:
         }
     };
 
+    // ⚠️ PROTECTED: Drag end logic - DO NOT MODIFY
     const handleDragEnd = () => {
         if (!isDragging.current || !isTop) return;
         isDragging.current = false;
@@ -231,6 +246,27 @@ export const OpportunitySwipeCard: React.FC<{ opportunity: Opportunity; onSwipe:
         currentX.current = 0;
     };
 
+    // Tinder-like: Image navigation on tap
+    const handleImageTap = (e: React.MouseEvent) => {
+        if (!isTop || isDragging.current) return;
+        e.stopPropagation();
+        
+        const rect = cardRef.current?.getBoundingClientRect();
+        if (!rect) return;
+        
+        const tapX = e.clientX - rect.left;
+        const cardWidth = rect.width;
+        
+        if (tapX < cardWidth / 2) {
+            // Left tap - previous image
+            setCurrentImageIndex(prev => prev > 0 ? prev - 1 : totalImages - 1);
+        } else {
+            // Right tap - next image
+            setCurrentImageIndex(prev => prev < totalImages - 1 ? prev + 1 : 0);
+        }
+    };
+
+    // ⚠️ PROTECTED: Event handlers - DO NOT MODIFY
     const onMouseDown = (e: React.MouseEvent) => handleDragStart(e.clientX);
     const onMouseMove = (e: React.MouseEvent) => handleDragMove(e.clientX);
     const onMouseUp = () => handleDragEnd();
@@ -252,19 +288,75 @@ export const OpportunitySwipeCard: React.FC<{ opportunity: Opportunity; onSwipe:
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
+            {...props}
         >
             <div className="relative h-full w-full select-none overflow-hidden rounded-xl bg-[color:var(--surface)] shadow-elev border border-[color:var(--border)]">
-                <img src={opportunity.imageUrl} alt={opportunity.title} className="h-full w-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
+                {/* Image with tap navigation */}
+                <div className="relative h-full w-full" onClick={handleImageTap}>
+                    <img 
+                        src={images[currentImageIndex]} 
+                        alt={`${opportunity.title} - ${currentImageIndex + 1}`} 
+                        className="h-full w-full object-cover transition-opacity duration-300" 
+                    />
+                    
+                    {/* Image indicators (Tinder-style) */}
+                    {totalImages > 1 && (
+                        <div className="absolute top-4 left-4 right-4 flex gap-1">
+                            {images.map((_, index) => (
+                                <div 
+                                    key={index}
+                                    className={`h-1 flex-1 rounded-full transition-all duration-300 ${
+                                        index === currentImageIndex ? 'bg-white' : 'bg-white/30'
+                                    }`}
+                                />
+                            ))}
+                        </div>
+                    )}
+                    
+                    {/* Invisible tap zones for navigation */}
+                    <div className="absolute inset-0 flex">
+                        <div className="w-1/2 h-full" /> {/* Left tap zone */}
+                        <div className="w-1/2 h-full" /> {/* Right tap zone */}
+                    </div>
+                </div>
+                
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent pointer-events-none"></div>
+                
+                {/* Profile info */}
                 <div className="absolute bottom-0 left-0 p-6 text-white w-full">
-                    <h3 className="font-display text-3xl font-bold">{opportunity.title}</h3>
-                    <p className="mt-1 text-lg text-white/90">{opportunity.venue} - {opportunity.location}</p>
-                    <p className="mt-1 text-sm text-white/70">{opportunity.date}</p>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                        {opportunity.genres.map(genre => (
-                            <span key={genre} className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold backdrop-blur-sm">{genre}</span>
-                        ))}
-                        <span className="rounded-full bg-[color:var(--accent)]/30 px-3 py-1 text-xs font-semibold text-[color:var(--accent)] backdrop-blur-sm">{opportunity.fee}</span>
+                    <div className="flex items-end justify-between">
+                        <div className="flex-1">
+                            <h3 className="font-display text-3xl font-bold">{opportunity.title}</h3>
+                            <p className="mt-1 text-lg text-white/90">{opportunity.venue} - {opportunity.location}</p>
+                            <p className="mt-1 text-sm text-white/70">{opportunity.date}</p>
+                            
+                            {showDetails && (
+                                <div className="mt-4 space-y-2">
+                                    <p className="text-white/80">{opportunity.bio || 'Passionate DJ looking to connect and collaborate with fellow artists.'}</p>
+                                </div>
+                            )}
+                            
+                            <div className="mt-4 flex flex-wrap gap-2">
+                                {opportunity.genres.map(genre => (
+                                    <span key={genre} className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold backdrop-blur-sm">{genre}</span>
+                                ))}
+                                {opportunity.skills?.map(skill => (
+                                    <span key={skill} className="rounded-full bg-blue-500/30 px-3 py-1 text-xs font-semibold text-blue-200 backdrop-blur-sm">{skill}</span>
+                                ))}
+                                <span className="rounded-full bg-[#40E0D0]/30 px-3 py-1 text-xs font-semibold text-[#40E0D0] backdrop-blur-sm">{opportunity.fee}</span>
+                            </div>
+                        </div>
+                        
+                        {/* Info button */}
+                        <button 
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setShowDetails(!showDetails);
+                            }}
+                            className="ml-4 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors"
+                        >
+                            <span className="text-sm font-bold">i</span>
+                        </button>
                     </div>
                 </div>
             </div>

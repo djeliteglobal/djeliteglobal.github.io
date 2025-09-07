@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { TinderSwipe } from '../profile/TinderSwipe';
 import { ProfileEditor } from '../profile/ProfileEditor';
+import { LockIcon } from '../../constants/platform';
+import { Button } from '../platform';
 
 const MOCK_DJ_PROFILES = [
   {
@@ -62,8 +64,11 @@ export const DJMatchingPage: React.FC = () => {
     <div className="p-4 sm:p-6 md:p-8">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="font-display text-3xl font-bold">DJ Connect</h1>
-          <p className="text-[color:var(--text-secondary)]">Find DJs to collaborate with</p>
+          <h1 className="font-display text-3xl font-bold flex items-center gap-2">
+            Opportunities
+            <LockIcon className="w-6 h-6 text-[#FFD700]" />
+          </h1>
+          <p className="text-[color:var(--text-secondary)]">Premium gig opportunities</p>
         </div>
         
         <div className="flex gap-2">
@@ -71,7 +76,7 @@ export const DJMatchingPage: React.FC = () => {
             onClick={() => setView('swipe')}
             className={getTabButtonClass(view === 'swipe')}
           >
-            Discover
+            Gig Opportunities
           </button>
           <button
             onClick={() => setView('profile')}
@@ -83,8 +88,21 @@ export const DJMatchingPage: React.FC = () => {
       </div>
 
       {view === 'swipe' ? (
-        <div className="flex justify-center">
+        <div className="flex justify-center relative">
           <TinderSwipe profiles={profiles} onSwipe={handleSwipe} />
+          {/* Premium Barrier Overlay */}
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center rounded-xl z-10">
+            <div className="text-center p-8 bg-[color:var(--surface)] rounded-xl border border-[color:var(--border)] max-w-md">
+              <LockIcon className="w-16 h-16 text-[#FFD700] mx-auto mb-4" />
+              <h3 className="text-2xl font-bold text-[color:var(--text-primary)] mb-2">Premium Feature</h3>
+              <p className="text-[color:var(--text-secondary)] mb-6">
+                Unlock exclusive gig opportunities and connect with top venues worldwide.
+              </p>
+              <Button className="w-full">
+                🚀 Upgrade to Premium
+              </Button>
+            </div>
+          </div>
         </div>
       ) : (
         <ProfileEditor />

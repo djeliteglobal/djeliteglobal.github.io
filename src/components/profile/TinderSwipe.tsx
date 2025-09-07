@@ -127,7 +127,7 @@ export const TinderSwipe: React.FC<TinderSwipeProps> = ({ profiles, onSwipe }) =
         </button>
         <button
           onClick={() => handleSwipe('like')}
-          className="w-14 h-14 bg-green-500 rounded-full flex items-center justify-center text-white hover:bg-green-600 transition-colors"
+          className="w-14 h-14 bg-[#40E0D0] rounded-full flex items-center justify-center text-black hover:bg-[#20B2AA] transition-colors"
         >
           <HeartIcon className="w-6 h-6" />
         </button>

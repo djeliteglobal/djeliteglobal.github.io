@@ -77,13 +77,22 @@ export const HeartIcon = memo((props: React.SVGProps<SVGSVGElement>) => (
 export const XIcon = memo((props: React.SVGProps<SVGSVGElement>) => (
     <svg {...baseSVGProps} {...props}><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
 ));
+export const StarIcon = memo((props: React.SVGProps<SVGSVGElement>) => (
+    <svg {...baseSVGProps} {...props}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
+));
+export const UndoIcon = memo((props: React.SVGProps<SVGSVGElement>) => (
+    <svg {...baseSVGProps} {...props}><path d="M3 7v6h6" /><path d="m21 17a9 9 0 00-9-9 9 9 0 00-6 2.3l-3 2.7" /></svg>
+));
+export const LockIcon = memo((props: React.SVGProps<SVGSVGElement>) => (
+    <svg {...baseSVGProps} {...props}><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><circle cx="12" cy="7" r="4" /><path d="M12 3v4" /></svg>
+));
 
 export const NAV_ITEMS = [
     { name: 'Dashboard', icon: HomeIcon, page: 'dashboard' },
     { name: 'Courses', icon: BookOpenIcon, page: 'courses' },
     { name: 'Community', icon: UsersIcon, page: 'community' },
-    { name: 'Opportunities', icon: ZapIcon, page: 'opportunities' },
-    { name: 'DJ Connect', icon: HeartIcon, page: 'dj_matching' },
+    { name: 'Discover', icon: ZapIcon, page: 'opportunities' },
+    { name: 'Events', icon: HeartIcon, page: 'events' },
 ];
 
 export const MOCK_USER: User = {
@@ -103,11 +112,95 @@ export const COURSES: Course[] = [
 ];
 
 export const MOCK_OPPORTUNITIES: Opportunity[] = [
-    { id: 1, title: 'Prime Time Techno', venue: 'The Warehouse', location: 'Berlin, DE', date: 'Sat, Nov 16', genres: ['Techno', 'Industrial'], fee: '$500', imageUrl: 'https://picsum.photos/seed/gig1/600/800' },
-    { id: 2, title: 'Sunset House Session', venue: 'Beach Club Ibiza', location: 'Ibiza, ES', date: 'Fri, Nov 22', genres: ['Deep House', 'Balearic'], fee: '$800', imageUrl: 'https://picsum.photos/seed/gig2/600/800' },
-    { id: 3, title: 'Underground Bass Night', venue: 'The Sub Club', location: 'London, UK', date: 'Thu, Nov 21', genres: ['Dubstep', 'UK Garage'], fee: '$350', imageUrl: 'https://picsum.photos/seed/gig3/600/800' },
-    { id: 4, title: 'Disco Fever Rooftop Party', venue: 'Le Bain', location: 'New York, US', date: 'Sat, Nov 23', genres: ['Disco', 'Funk', 'Soul'], fee: '$600', imageUrl: 'https://picsum.photos/seed/gig4/600/800' },
-    { id: 5, title: 'Opening Slot: Major Festival', venue: 'Circuit Grounds', location: 'Miami, US', date: 'Fri, Mar 28', genres: ['EDM', 'Trance'], fee: '$1,200', imageUrl: 'https://picsum.photos/seed/gig5/600/800' },
+    { 
+        id: 1, 
+        title: 'Alex Martinez', 
+        venue: 'Berlin', 
+        location: '5 km away', 
+        date: 'Active now', 
+        genres: ['Techno', 'Industrial'], 
+        fee: 'Connect', 
+        imageUrl: 'https://picsum.photos/seed/dj1/600/800',
+        images: [
+            'https://picsum.photos/seed/dj1/600/800',
+            'https://picsum.photos/seed/dj1b/600/800',
+            'https://picsum.photos/seed/dj1c/600/800'
+        ],
+        bio: 'Techno producer and DJ from Berlin. Love dark industrial sounds and underground vibes. Looking to collaborate with like-minded artists.',
+        age: 28,
+        skills: ['Music Production', 'Event Production']
+    },
+    { 
+        id: 2, 
+        title: 'Sofia Chen', 
+        venue: 'Ibiza', 
+        location: '12 km away', 
+        date: 'Active 2h ago', 
+        genres: ['Deep House', 'Balearic'], 
+        fee: 'Connect', 
+        imageUrl: 'https://picsum.photos/seed/dj2/600/800',
+        images: [
+            'https://picsum.photos/seed/dj2/600/800',
+            'https://picsum.photos/seed/dj2b/600/800'
+        ],
+        bio: 'Sunset sessions specialist. Creating dreamy soundscapes for beach clubs and rooftops.',
+        age: 25,
+        skills: ['Bookings', 'Artist Management']
+    },
+    { 
+        id: 3, 
+        title: 'Marcus Thompson', 
+        venue: 'London', 
+        location: '8 km away', 
+        date: 'Active 1h ago', 
+        genres: ['Dubstep', 'UK Garage'], 
+        fee: 'Connect', 
+        imageUrl: 'https://picsum.photos/seed/dj3/600/800',
+        images: [
+            'https://picsum.photos/seed/dj3/600/800',
+            'https://picsum.photos/seed/dj3b/600/800',
+            'https://picsum.photos/seed/dj3c/600/800',
+            'https://picsum.photos/seed/dj3d/600/800'
+        ],
+        bio: 'Underground bass enthusiast. Resident at The Sub Club. Always pushing boundaries.',
+        age: 31,
+        skills: ['Music Production', 'Sound Engineering']
+    },
+    { 
+        id: 4, 
+        title: 'Luna Rodriguez', 
+        venue: 'New York', 
+        location: '3 km away', 
+        date: 'Active now', 
+        genres: ['Disco', 'Funk', 'Soul'], 
+        fee: 'Connect', 
+        imageUrl: 'https://picsum.photos/seed/dj4/600/800',
+        images: [
+            'https://picsum.photos/seed/dj4/600/800',
+            'https://picsum.photos/seed/dj4b/600/800'
+        ],
+        bio: 'Bringing the funk back to NYC. Vinyl collector and disco queen.',
+        age: 29,
+        skills: ['Event Production', 'Vinyl Curation']
+    },
+    { 
+        id: 5, 
+        title: 'David Kim', 
+        venue: 'Miami', 
+        location: '15 km away', 
+        date: 'Active 30m ago', 
+        genres: ['EDM', 'Trance'], 
+        fee: 'Connect', 
+        imageUrl: 'https://picsum.photos/seed/dj5/600/800',
+        images: [
+            'https://picsum.photos/seed/dj5/600/800',
+            'https://picsum.photos/seed/dj5b/600/800',
+            'https://picsum.photos/seed/dj5c/600/800'
+        ],
+        bio: 'Festival main stage experience. Looking for collaboration opportunities and new connections.',
+        age: 26,
+        skills: ['Artist Management', 'Bookings', 'Music Production']
+    },
 ];
 
 export const PRICING_PLANS: PricingPlan[] = [

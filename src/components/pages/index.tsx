@@ -1,9 +1,10 @@
-import React, { useContext, useMemo, useState, useCallback } from 'react';
+import React, { useContext, useMemo, useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { AppContext } from '../../pages/HomePage';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button, CourseCard, FaqItemComponent, PricingCard, OpportunitySwipeCard } from '../platform';
-import { COURSES, FAQ_ITEMS, PRICING_PLANS, PlayCircleIcon, VideoIcon, FileTextIcon, HelpCircleIcon, XIcon, HeartIcon, MOCK_OPPORTUNITIES } from '../../constants/platform';
+import { COURSES, FAQ_ITEMS, PRICING_PLANS, PlayCircleIcon, VideoIcon, FileTextIcon, HelpCircleIcon, XIcon, HeartIcon, StarIcon, UndoIcon, LockIcon, MOCK_OPPORTUNITIES } from '../../constants/platform';
+import { fetchSwipeProfiles, recordSwipe, undoSwipe, fetchMatches, deleteMatch, autoCreateProfile } from '../../services/profileService';
 import type { Course, Opportunity } from '../../types/platform';
 import { DJMatchingPage } from './DJMatchingPage';
 
@@ -355,12 +356,18 @@ export const CourseDetailPage: React.FC = () => {
                  <button onClick={() => navigate('courses')} className="mb-4 text-sm text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]">
                     &larr; Back to Courses
                 </button>
-                <div className="aspect-video w-full rounded-xl bg-[color:var(--elevated)] flex items-center justify-center">
+                <div className="aspect-video w-full rounded-xl bg-[color:var(--elevated)] flex items-center justify-center relative">
                     <img src={course.imageUrl} alt={course.title} className="w-full h-full object-cover rounded-xl"/>
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm rounded-xl flex flex-col items-center justify-center">
+                        <LockIcon className="w-16 h-16 text-white mb-4" />
+                        <h3 className="text-white text-xl font-bold mb-2">Course Locked</h3>
+                        <p className="text-white/80 text-center max-w-sm">Upgrade to Pro to access all courses and unlock your DJ potential</p>
+                        <Button className="mt-6">Upgrade to Pro</Button>
+                    </div>
                 </div>
                 <div className="mt-6">
                     <h1 className="font-display text-3xl font-bold">{course.title}</h1>
-                    <p className="mt-2 text-[color:var(--text-secondary)]">by {course.instructor}</p>
+                    <p className="mt-2 text-[color:var(--text-secondary)] font-mono">by {course.instructor}</p>
                 </div>
                 <div className="mt-6 border-t border-[color:var(--border)] pt-6">
                     <h2 className="font-display text-xl font-bold">About this course</h2>
@@ -378,8 +385,8 @@ export const CourseDetailPage: React.FC = () => {
                         </div>
                         <p className="mt-2 text-sm text-[color:var(--muted)]">{course.progress}% complete</p>
                     </div>
-                    <Button className="w-full mt-4">
-                        {course.progress > 0 ? 'Resume Learning' : 'Start Course'}
+                    <Button className="w-full mt-4" disabled>
+                        🔒 Locked - Upgrade to Pro
                     </Button>
                 </div>
                 <div className="border-t border-[color:var(--border)]">
@@ -451,103 +458,167 @@ export const CommunityPage: React.FC = () => {
     );
 };
 
-// Opportunities Page
+// ⚠️ CRITICAL: DO NOT MODIFY CORE SWIPING STRUCTURE BELOW
+// Enhanced with real profile integration while preserving v1 backup functionality
+// Only modify UI/styling, never touch: handleSwipe, triggerSwipe, card mapping logic
+
+// Discover Page (Tinder-like DJ matching)
 export const OpportunitiesPage: React.FC = () => {
     const [view, setView] = useState<'swipe' | 'list'>('swipe');
-    const [opportunities, setOpportunities] = useState<Opportunity[]>(MOCK_OPPORTUNITIES);
+    const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [matchResult, setMatchResult] = useState<{show: boolean, isMatch: boolean}>({show: false, isMatch: false});
+    const [lastSwipedProfile, setLastSwipedProfile] = useState<Opportunity | null>(null);
 
-    const handleSwipe = () => {
+    // Load profiles on component mount
+    useEffect(() => {
+        const loadProfiles = async () => {
+            try {
+                // Ensure current user has a profile
+                await autoCreateProfile();
+                
+                const profiles = await fetchSwipeProfiles();
+                setOpportunities(profiles.length > 0 ? profiles : MOCK_OPPORTUNITIES);
+            } catch (error) {
+                console.error('Failed to load profiles:', error);
+                setOpportunities(MOCK_OPPORTUNITIES);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadProfiles();
+    }, []);
+
+    // ⚠️ PROTECTED: Enhanced swipe logic with API recording - DO NOT MODIFY CORE LOGIC
+    const handleSwipe = async (direction?: 'left' | 'right' | 'super') => {
+        if (opportunities.length > 0 && direction) {
+            const currentProfile = opportunities[0];
+            setLastSwipedProfile(currentProfile);
+            
+            try {
+                const result = await recordSwipe(currentProfile.id, direction);
+                if (result.match) {
+                    setMatchResult({show: true, isMatch: true});
+                    setTimeout(() => setMatchResult({show: false, isMatch: false}), 3000);
+                }
+            } catch (error) {
+                console.error('Failed to record swipe:', error);
+            }
+        }
         setOpportunities(prev => prev.slice(1));
     };
     
-    const triggerSwipe = useCallback((direction: 'left' | 'right') => {
+    const handleUndo = async () => {
+        if (lastSwipedProfile) {
+            setOpportunities(prev => [lastSwipedProfile, ...prev]);
+            setLastSwipedProfile(null);
+            
+            try {
+                await undoSwipe();
+            } catch (error) {
+                console.error('Failed to undo swipe:', error);
+            }
+        }
+    };
+    
+    // ⚠️ PROTECTED: Animation trigger - DO NOT MODIFY
+    const triggerSwipe = (direction: 'left' | 'right' | 'super') => {
         const topCard = document.querySelector<HTMLElement>('[data-swipe-card="true"]');
         if (topCard) {
             topCard.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
-            topCard.classList.add(direction === 'right' ? 'swipe-out-right' : 'swipe-out-left');
-            topCard.addEventListener('animationend', handleSwipe, { once: true });
+            if (direction === 'super') {
+                topCard.classList.add('swipe-out-super');
+            } else {
+                topCard.classList.add(direction === 'right' ? 'swipe-out-right' : 'swipe-out-left');
+            }
+            topCard.addEventListener('animationend', () => handleSwipe(direction), { once: true });
         }
-    }, [handleSwipe]);
+    };
 
     return (
-        <div className="flex flex-col h-full p-4 sm:p-6 md:p-8">
-            <div className="flex-shrink-0">
-                <h1 className="font-display text-3xl font-bold">Find Your Next Gig</h1>
-                <p className="mt-1 text-[color:var(--text-secondary)]">Discover and apply to exclusive opportunities.</p>
-                
-                {/* Segmented Control */}
-                <div className="mt-6 flex justify-center border-b border-[color:var(--border)]">
-                    <div className="flex space-x-8">
-                        <button onClick={() => setView('swipe')} className={`relative py-3 px-4 font-medium transition-colors ${view === 'swipe' ? 'text-[color:var(--accent)]' : 'text-[color:var(--muted)] hover:text-[color:var(--text-primary)]'}`}>
-                            Swipe
-                            {view === 'swipe' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-[color:var(--accent)]"></span>}
-                        </button>
-                        <button onClick={() => setView('list')} className={`relative py-3 px-4 font-medium transition-colors ${view === 'list' ? 'text-[color:var(--accent)]' : 'text-[color:var(--muted)] hover:text-[color:var(--text-primary)]'}`}>
-                            List
-                            {view === 'list' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-[color:var(--accent)]"></span>}
-                        </button>
-                    </div>
+        <div className="flex flex-col h-full p-2 sm:p-4">
+            {/* Segmented Control - Moved to top */}
+            <div className="flex-shrink-0 flex justify-center border-b border-[color:var(--border)] mb-2">
+                <div className="flex space-x-8">
+                    <button onClick={() => setView('swipe')} className={`relative py-2 px-4 font-medium transition-colors ${view === 'swipe' ? 'text-[color:var(--accent)]' : 'text-[color:var(--muted)] hover:text-[color:var(--text-primary)]'}`}>
+                        Discover
+                        {view === 'swipe' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-[color:var(--accent)]"></span>}
+                    </button>
+                    <button onClick={() => setView('list')} className={`relative py-2 px-4 font-medium transition-colors ${view === 'list' ? 'text-[color:var(--accent)]' : 'text-[color:var(--muted)] hover:text-[color:var(--text-primary)]'}`}>
+                        Browse
+                        {view === 'list' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-[color:var(--accent)]"></span>}
+                    </button>
                 </div>
             </div>
 
-            <div className="flex-grow flex items-center justify-center py-6">
-                {view === 'swipe' ? (
+            {/* Match Notification */}
+            {matchResult.show && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+                    <div className="bg-gradient-to-r from-pink-500 to-purple-600 p-8 rounded-2xl text-center text-white max-w-sm mx-4">
+                        <div className="text-6xl mb-4">🎉</div>
+                        <h2 className="text-2xl font-bold mb-2">It's a Match!</h2>
+                        <p className="text-white/90">You and {opportunities[0]?.title} liked each other</p>
+                        <Button className="mt-6 bg-white text-purple-600 hover:bg-gray-100">
+                            Send Message
+                        </Button>
+                    </div>
+                </div>
+            )}
+
+            <div className="flex-grow flex items-center justify-center py-1">
+                {loading ? (
+                    <div className="flex items-center justify-center h-64">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[color:var(--accent)]"></div>
+                    </div>
+                ) : view === 'swipe' ? (
                     <div className="flex flex-col items-center w-full max-w-sm mx-auto">
                         <div className="relative h-[500px] w-full">
                             {opportunities.length > 0 ? (
-                                [...opportunities].reverse().map((op, index) => {
-                                    const reverseIndex = opportunities.length - 1 - index;
-                                    const clampedIndex = Math.min(reverseIndex, 2);
-                                    return (
-                                        <OpportunitySwipeCard
-                                            key={op.id}
-                                            opportunity={op}
-                                            onSwipe={handleSwipe}
-                                            isTop={reverseIndex === 0}
-                                            style={{ 
-                                                zIndex: reverseIndex + 1,
-                                                transform: `scale(${1 - (clampedIndex * 0.05)}) translateY(-${clampedIndex * 10}px)`,
-                                            }}
-                                        />
-                                    );
-                                })
+                                // ⚠️ PROTECTED: Card mapping logic - DO NOT MODIFY array operations, zIndex, or data-swipe-card
+                                opportunities.map((op, index) => (
+                                    <OpportunitySwipeCard
+                                        key={op.id}
+                                        opportunity={op}
+                                        onSwipe={handleSwipe}
+                                        isTop={index === 0}
+                                        style={{ 
+                                            zIndex: opportunities.length - index,
+                                            transform: `scale(${1 - (Math.min(index, 2) * 0.05)}) translateY(-${Math.min(index, 2) * 10}px)`,
+                                        }}
+                                        data-swipe-card={index === 0}
+                                    />
+                                )).reverse() // ⚠️ PROTECTED: .reverse() is critical for proper stacking
                             ) : (
                                 <div className="flex flex-col items-center justify-center h-full w-full rounded-xl bg-[color:var(--surface)] border-2 border-dashed border-[color:var(--border)]">
-                                    <p className="text-lg font-semibold text-[color:var(--text-secondary)]">No more gigs for now!</p>
-                                    <p className="text-sm text-[color:var(--muted)]">Check back later for new opportunities.</p>
+                                    <p className="text-lg font-semibold text-[color:var(--text-secondary)]">No more DJs nearby!</p>
+                                    <p className="text-sm text-[color:var(--muted)]">Expand your search radius or check back later.</p>
                                 </div>
                             )}
                         </div>
                         {opportunities.length > 0 && (
-                            <div className="mt-8 flex items-center gap-6">
-                                <button onClick={() => triggerSwipe('left')} className="flex items-center justify-center w-16 h-16 rounded-full bg-[color:var(--surface)] text-[#EF4444] shadow-soft hover:scale-105 transition-transform">
-                                    <XIcon className="w-8 h-8" />
+                            <div className="mt-8 flex items-center gap-4">
+                                <button onClick={() => triggerSwipe('left')} className="flex items-center justify-center w-14 h-14 rounded-full bg-[color:var(--surface)] text-[#EF4444] shadow-soft hover:scale-105 transition-transform">
+                                    <XIcon className="w-6 h-6" />
                                 </button>
-                                <button onClick={() => triggerSwipe('right')} className="flex items-center justify-center w-20 h-20 rounded-full bg-[color:var(--accent)] text-black shadow-elev hover:scale-105 transition-transform">
-                                    <HeartIcon className="w-10 h-10" fill="currentColor" />
+                                <button onClick={() => triggerSwipe('super')} className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500 text-white shadow-soft hover:scale-105 transition-transform">
+                                    <StarIcon className="w-5 h-5" fill="currentColor" />
+                                </button>
+                                <button onClick={() => triggerSwipe('right')} className="flex items-center justify-center w-16 h-16 rounded-full bg-[color:var(--accent)] text-black shadow-elev hover:scale-105 transition-transform">
+                                    <HeartIcon className="w-8 h-8" fill="currentColor" />
+                                </button>
+                            </div>
+                        )}
+                        {lastSwipedProfile && (
+                            <div className="mt-4">
+                                <button onClick={handleUndo} className="flex items-center gap-2 px-4 py-2 rounded-full bg-[color:var(--surface)] text-[color:var(--accent)] shadow-soft hover:scale-105 transition-transform">
+                                    <UndoIcon className="w-4 h-4" />
+                                    <span className="text-sm font-medium">Undo</span>
                                 </button>
                             </div>
                         )}
                     </div>
                 ) : (
-                    <div className="w-full max-w-4xl mx-auto">
-                        <ul className="space-y-4">
-                            {MOCK_OPPORTUNITIES.map(op => (
-                                <li key={op.id} className="flex items-center gap-4 rounded-lg bg-[color:var(--surface)] p-4 border border-[color:var(--border)]">
-                                    <img src={op.imageUrl} alt={op.title} className="w-20 h-20 rounded-md object-cover"/>
-                                    <div className="flex-grow">
-                                        <h3 className="font-bold text-[color:var(--text-primary)]">{op.title}</h3>
-                                        <p className="text-sm text-[color:var(--text-secondary)]">{op.venue}, {op.location}</p>
-                                        <p className="text-xs text-[color:var(--muted)]">{op.date}</p>
-                                    </div>
-                                    <div className="flex-shrink-0 text-right">
-                                        <p className="font-semibold text-[color:var(--accent)]">{op.fee}</p>
-                                        <Button variant="secondary" className="mt-2 px-4 py-1.5 text-sm">Details</Button>
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                    <MatchesList />
                 )}
             </div>
         </div>
@@ -593,5 +664,106 @@ export const SettingsPage: React.FC = () => {
     );
 };
 
-// DJ Matching Page Export
-export { DJMatchingPage };
+// Matches List Component
+const MatchesList: React.FC = () => {
+    const [matches, setMatches] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const loadMatches = async () => {
+            try {
+                const matchData = await fetchMatches();
+                setMatches(matchData);
+            } catch (error) {
+                console.error('Failed to load matches:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadMatches();
+    }, []);
+
+    const handleDeleteMatch = async (matchId: number) => {
+        try {
+            await deleteMatch(matchId);
+            setMatches(prev => prev.filter(m => m.match_id !== matchId));
+        } catch (error) {
+            console.error('Failed to delete match:', error);
+        }
+    };
+
+    if (loading) {
+        return <div className="flex justify-center py-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[color:var(--accent)]"></div></div>;
+    }
+
+    if (matches.length === 0) {
+        return (
+            <div className="text-center py-12">
+                <HeartIcon className="w-16 h-16 mx-auto text-[color:var(--muted)] mb-4" />
+                <h3 className="text-lg font-semibold text-[color:var(--text-secondary)] mb-2">No matches yet</h3>
+                <p className="text-[color:var(--muted)]">Start swiping to find your perfect DJ connections!</p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="w-full max-w-4xl mx-auto">
+            <ul className="space-y-4">
+                {matches.map(match => (
+                    <li key={match.id} className="flex items-center gap-4 rounded-lg bg-[color:var(--surface)] p-4 border border-[color:var(--border)]">
+                        <img src={match.images?.[0] || match.imageUrl} alt={match.dj_name} className="w-16 h-16 rounded-full object-cover"/>
+                        <div className="flex-grow">
+                            <h3 className="font-bold text-[color:var(--text-primary)]">{match.dj_name}</h3>
+                            <p className="text-sm text-[color:var(--text-secondary)]">{match.location} • {match.age} years</p>
+                            <div className="flex gap-1 mt-1">
+                                {match.genres?.slice(0, 2).map((genre: string) => (
+                                    <span key={genre} className="text-xs bg-[color:var(--accent)]/20 text-[color:var(--accent)] px-2 py-0.5 rounded-full">{genre}</span>
+                                ))}
+                                {match.skills?.slice(0, 2).map((skill: string) => (
+                                    <span key={skill} className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full">{skill}</span>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="flex-shrink-0 flex gap-2">
+                            <Button variant="secondary" className="px-3 py-1.5 text-sm">Message</Button>
+                            <button 
+                                onClick={() => handleDeleteMatch(match.match_id)}
+                                className="px-3 py-1.5 text-sm bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 transition-colors"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+};
+
+// Events Page (Locked)
+export const EventsPage: React.FC = () => {
+    return (
+        <div className="flex flex-col h-full p-2 sm:p-4">
+            {/* Single tab - no segmented control */}
+            <div className="flex-shrink-0 flex justify-center border-b border-[color:var(--border)] mb-2">
+                <div className="flex">
+                    <div className="relative py-2 px-4 font-medium text-[color:var(--accent)]">
+                        Events
+                        <span className="absolute bottom-0 left-0 w-full h-0.5 bg-[color:var(--accent)]"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div className="flex-grow flex items-center justify-center py-1">
+                <div className="flex flex-col items-center justify-center h-full w-full max-w-md mx-auto rounded-xl bg-[color:var(--surface)] border-2 border-dashed border-[color:var(--border)] p-8">
+                    <LockIcon className="w-16 h-16 text-[color:var(--muted)] mb-4" />
+                    <h3 className="text-xl font-bold text-[color:var(--text-secondary)] mb-2">Events Coming Soon</h3>
+                    <p className="text-[color:var(--muted)] text-center mb-6">Discover exclusive DJ events, club bookings, and festival opportunities.</p>
+                    <Button className="px-6 py-3">
+                        🚀 Upgrade to Pro
+                    </Button>
+                </div>
+            </div>
+        </div>
+    );
+};
