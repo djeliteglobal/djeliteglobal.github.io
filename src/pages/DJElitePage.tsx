@@ -246,7 +246,7 @@ export const DJElitePage: React.FC = () => {
                         </div>
                         <SelectableCard id="after-card" className="bg-[color:var(--surface)] border border-[color:var(--accent)] shadow-[0_0_40px_-10px_rgba(0,245,122,0.2)] rounded-xl p-6 text-center">
                              <h3 className="font-bold text-2xl text-[color:var(--accent)]">AFTER</h3>
-                             <img src="/Party success.jpg" alt="Professional DJ" className="my-4 rounded-lg aspect-square object-cover w-full h-48"/>
+                             <img src="/Funnel Images/Party success.jpg" alt="Professional DJ" className="my-4 rounded-lg aspect-square object-cover w-full h-48"/>
                              <ul className="text-left space-y-2 text-[color:var(--text-secondary)]">
                                 {["Regular club bookings", "Strong industry network", "Confident and skilled", "Consistent DJ income"].map(item => <li key={item} className="flex items-start"><span className="mr-2 text-green-500">✓</span> {item}</li>)}
                             </ul>
@@ -273,7 +273,7 @@ export const DJElitePage: React.FC = () => {
                 <Section id="instructor" animationType="animate-fade-in-right">
                     <SectionHeadline>Meet Your Mentor</SectionHeadline>
                     <div className="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
-                        <img src="/Meet your mentor.jpg" alt="DJ Elite Mentor" className="rounded-lg shadow-2xl w-full"/>
+                        <img src="/Funnel Images/Meet your mentor.jpg" alt="DJ Elite Mentor" className="rounded-lg shadow-2xl w-full"/>
                         <div>
                             <h3 className="font-display text-3xl font-bold">From Bedroom to Headliner</h3>
                             <p className="mt-4 text-[color:var(--text-secondary)]">Just 3 years ago, I was exactly where you are now. Mixing in my bedroom, dreaming of playing for real crowds, but having no idea how to make it happen.</p>
@@ -344,7 +344,7 @@ export const DJElitePage: React.FC = () => {
                 <Section id="guarantee" className="bg-[color:var(--surface-alt)]" animationType="animate-fade-in-right">
                     <div className="max-w-4xl mx-auto bg-[color:var(--surface)] border border-[color:var(--border)] rounded-xl shadow-2xl overflow-hidden md:flex">
                         <div className="p-8 flex-shrink-0 flex items-center justify-center bg-gradient-to-br from-gray-800 to-black md:w-64">
-                             <img src="/guarantee.png" alt="100% Guarantee Seal" className="w-40 h-40" />
+                             <img src="/Funnel Images/guarantee.png" alt="100% Guarantee Seal" className="w-40 h-40" />
                         </div>
                         <div className="p-8">
                              <h2 className="font-display text-3xl font-bold">Your Success is 100% Guaranteed</h2>
@@ -394,7 +394,7 @@ export const DJElitePage: React.FC = () => {
                     <h2 className="font-display text-5xl font-bold">Your Moment is NOW</h2>
                     <p className="mt-4 max-w-2xl mx-auto text-lg text-[color:var(--text-secondary)]">Every day you wait is another day someone else takes the gig you deserve. The DJ industry is waiting for you - but only if you take action today.</p>
                     <div className="mt-12 max-w-2xl mx-auto bg-[color:var(--surface)] border border-[color:var(--accent)] rounded-2xl p-8 shadow-[0_0_60px_-15px_rgba(0,245,122,0.3)]">
-                        <img src="/DJ Elite Logo.jpg" alt="DJ Elite" className="h-12 mx-auto mb-4"/>
+                        <img src="/Funnel Images/DJ Elite Logo.jpg" alt="DJ Elite" className="h-12 mx-auto mb-4"/>
                         <div className="my-6">
                              <span className="text-lg text-[color:var(--muted)] line-through">$3,364</span>
                              <p className="font-display text-6xl font-bold text-[color:var(--accent)]">$497</p>
@@ -413,7 +413,7 @@ export const DJElitePage: React.FC = () => {
 
             <footer className="bg-[color:var(--surface)] border-t border-[color:var(--border)] mt-20">
                 <div className="container mx-auto px-4 py-16 text-center">
-                    <img src="/DJ Elite Logo.jpg" alt="DJ Elite" className="h-8 mx-auto" />
+                    <img src="/Funnel Images/DJ Elite Logo.jpg" alt="DJ Elite" className="h-8 mx-auto" />
                     <p className="mt-4 max-w-md mx-auto text-[color:var(--text-secondary)]">Get weekly DJ tips, industry insights, and exclusive opportunities.</p>
                     <form onSubmit={async (e) => {
                         e.preventDefault();
