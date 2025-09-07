@@ -151,38 +151,28 @@ export const subscribeToCareerAccelerator = async (email: string, firstName?: st
     
     console.log('Career Accelerator signup successful:', data);
     
-    // Send welcome email via Resend
+    // Send emails via secure Netlify function
     try {
-      const { sendWelcomeEmail } = await import('./emailService');
-      await sendWelcomeEmail(email.trim(), firstName?.trim() || 'DJ');
-      console.log('Welcome email sent successfully');
-    } catch (emailError) {
-      console.error('Welcome email failed:', emailError);
-      // Don't throw - signup was successful even if email failed
-    }
-    
-    // Add to ConvertKit for automation sequence
-    try {
-      const response = await fetch(`https://api.convertkit.com/v3/forms/${import.meta.env.VITE_CONVERTKIT_FORM_ID}/subscribe`, {
+      const response = await fetch('/.netlify/functions/send-emails', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          api_key: import.meta.env.VITE_CONVERTKIT_API_KEY,
           email: email.trim(),
-          first_name: firstName?.trim() || 'DJ'
+          firstName: firstName?.trim() || 'DJ'
         })
       });
       
       if (response.ok) {
-        console.log('Added to ConvertKit automation');
+        const result = await response.json();
+        console.log('Emails sent:', result);
       } else {
-        console.error('ConvertKit failed:', await response.text());
+        console.error('Email function failed:', await response.text());
       }
-    } catch (convertKitError) {
-      console.error('ConvertKit error:', convertKitError);
-      // Don't throw - signup was successful even if ConvertKit failed
+    } catch (emailError) {
+      console.error('Email function error:', emailError);
+      // Don't throw - signup was successful even if emails failed
     }
   } catch (err) {
     console.error('Career Accelerator signup error:', err);
