@@ -124,21 +124,38 @@ export const deleteMatch = async (matchId: string): Promise<void> => {
 
 export const subscribeToNewsletter = async (email: string, firstName?: string): Promise<void> => {
   console.log('Attempting to subscribe:', { email, firstName });
+  console.log('Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
+  console.log('Supabase Key exists:', !!import.meta.env.VITE_SUPABASE_ANON_KEY);
   
-  const { data, error } = await supabase
-    .from('newsletter_subscribers')
-    .insert({
-      email: email.trim(),
-      first_name: firstName?.trim() || null
-    })
-    .select();
-
-  console.log('Supabase response:', { data, error });
-  
-  if (error) {
-    console.error('Supabase error details:', error);
-    throw new Error(`Newsletter signup failed: ${error.message}`);
+  // Check if Supabase is properly configured
+  if (!import.meta.env.VITE_SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL === 'https://placeholder.supabase.co') {
+    throw new Error('Supabase is not properly configured. Please check environment variables.');
   }
   
-  console.log('Newsletter subscription successful:', data);
+  try {
+    const { data, error } = await supabase
+      .from('newsletter_subscribers')
+      .insert({
+        email: email.trim(),
+        first_name: firstName?.trim() || null
+      })
+      .select();
+
+    console.log('Supabase response:', { data, error });
+    
+    if (error) {
+      // Handle duplicate email gracefully
+      if (error.code === '23505') {
+        console.log('Email already subscribed');
+        return;
+      }
+      console.error('Supabase error details:', error);
+      throw new Error(`Newsletter signup failed: ${error.message}`);
+    }
+    
+    console.log('Newsletter subscription successful:', data);
+  } catch (err) {
+    console.error('Newsletter subscription error:', err);
+    throw err;
+  }
 };
