@@ -92,6 +92,36 @@ export const fetchMatches = async (): Promise<DJProfile[]> => {
   return data || [];
 };
 
+export const undoSwipe = async (profileId: string): Promise<void> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { data: userProfile } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('user_id', user.id)
+    .single();
+
+  if (!userProfile) throw new Error('Profile not found');
+
+  const { error } = await supabase
+    .from('swipes')
+    .delete()
+    .eq('swiper_id', userProfile.id)
+    .eq('swiped_id', profileId);
+
+  if (error) throw error;
+};
+
+export const deleteMatch = async (matchId: string): Promise<void> => {
+  const { error } = await supabase
+    .from('matches')
+    .delete()
+    .eq('id', matchId);
+
+  if (error) throw error;
+};
+
 export const subscribeToNewsletter = async (email: string, firstName?: string): Promise<void> => {
   console.log('Attempting to subscribe:', { email, firstName });
   
