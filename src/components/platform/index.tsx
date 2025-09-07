@@ -1,4 +1,4 @@
-import React, { useState, useContext, useRef, useEffect } from 'react';
+import React, { useState, useContext, useRef, useEffect, memo } from 'react';
 import { AppContext } from '../../pages/HomePage';
 import { useAuth } from '../../contexts/AuthContext';
 import { LanguageSwitcher } from '../LanguageSwitcher';
@@ -116,7 +116,7 @@ export const SideNav: React.FC = () => {
     );
 };
 
-export const CourseCard: React.FC<{ course: Course }> = memo(({ course }) => {
+export const CourseCard: React.FC<{ course: Course }> = ({ course }) => {
   const { navigate } = useContext(AppContext)!;
 
   return (
@@ -144,7 +144,7 @@ export const CourseCard: React.FC<{ course: Course }> = memo(({ course }) => {
       </div>
     </div>
   );
-});
+};
 
 export const PricingCard: React.FC<{ plan: PricingPlan }> = ({ plan }) => {
     return (

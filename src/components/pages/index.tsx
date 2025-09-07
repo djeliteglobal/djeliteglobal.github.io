@@ -455,7 +455,7 @@ export const CommunityPage: React.FC = () => {
 // Only modify UI/styling, never touch: handleSwipe, triggerSwipe, card mapping logic
 
 // Discover Page (Tinder-like DJ matching)
-export const OpportunitiesPage: React.FC = React.memo(() => {
+export const OpportunitiesPage: React.FC = () => {
     const [view, setView] = useState<'swipe' | 'list'>('swipe');
     const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
     const [loading, setLoading] = useState(true);
@@ -620,7 +620,7 @@ export const OpportunitiesPage: React.FC = React.memo(() => {
             </div>
         </div>
     );
-});
+};
 
 // Settings Page
 export const SettingsPage: React.FC = () => {
