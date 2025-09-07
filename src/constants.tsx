@@ -15,16 +15,11 @@ export const SOCIAL_PROOF_STATS = [
 ];
 
 export const VENUE_LOGOS = [
-    { name: 'Ultra Music Festival', src: 'https://logos-world.net/wp-content/uploads/2021/02/Ultra-Music-Festival-Logo.png' },
-    { name: 'Tomorrowland', src: 'https://logos-world.net/wp-content/uploads/2021/02/Tomorrowland-Logo.png' },
-    { name: 'Electric Daisy Carnival', src: 'https://logos-world.net/wp-content/uploads/2021/02/Electric-Daisy-Carnival-Logo.png' },
-    { name: 'Coachella', src: 'https://logos-world.net/wp-content/uploads/2020/12/Coachella-Logo.png' },
-    { name: 'Fabric London', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Fabric_club_logo.svg/320px-Fabric_club_logo.svg.png' },
-    { name: 'Berghain Berlin', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Berghain_logo.svg/320px-Berghain_logo.svg.png' },
-    { name: 'Privilege Ibiza', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Ultra_Music_Festival_logo.svg/320px-Ultra_Music_Festival_logo.svg.png' },
-    { name: 'Ministry of Sound', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Fabric_club_logo.svg/320px-Fabric_club_logo.svg.png' },
-    { name: 'Burning Man', src: 'https://logos-world.net/wp-content/uploads/2021/02/Burning-Man-Logo.png' },
-    { name: 'Creamfields', src: 'https://logos-world.net/wp-content/uploads/2021/02/Creamfields-Logo.png' },
+    { name: 'Aqualounge', src: '/Funnel Images/Club Logos/aqualounge logo.png' },
+    { name: 'Bestiario', src: '/Funnel Images/Club Logos/bestiario logo.png' },
+    { name: 'Pizzine', src: '/Funnel Images/Club Logos/pizzine logo.png' },
+    { name: 'Resident Advisor', src: '/Funnel Images/Club Logos/resident-advisor-logo-AD11CE170C-seeklogo.com.png' },
+    { name: 'Wide Trip', src: '/Funnel Images/Club Logos/wide trip logo.png' },
 ];
 
 export const PAIN_POINTS = [
