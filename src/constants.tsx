@@ -20,6 +20,7 @@ export const VENUE_LOGOS = [
     { name: 'Pizzine', src: '/Funnel Images/Club Logos/pizzine logo.png' },
     { name: 'Resident Advisor', src: '/Funnel Images/Club Logos/resident-advisor-logo-AD11CE170C-seeklogo.com.png' },
     { name: 'Wide Trip', src: '/Funnel Images/Club Logos/wide trip logo.png' },
+    { name: 'Ibiza Sonica', src: '/Funnel Images/Club Logos/ibiza sonica logo.png' },
 ];
 
 export const PAIN_POINTS = [

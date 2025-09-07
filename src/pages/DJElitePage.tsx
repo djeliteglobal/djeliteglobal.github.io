@@ -166,9 +166,9 @@ export const DJElitePage: React.FC = () => {
                     <div className="mt-12 relative w-full overflow-hidden">
                         <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[color:var(--surface)] to-transparent z-10"></div>
                         <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-[color:var(--surface)] to-transparent z-10"></div>
-                        <div className="flex w-[200%] animate-marquee">
+                        <div className="flex animate-marquee" style={{width: `${VENUE_LOGOS.length * 2 * 120}px`}}>
                             {[...VENUE_LOGOS, ...VENUE_LOGOS].map((logo, i) => (
-                               <img key={i} src={logo.src} alt={logo.name} className="h-8 mx-12 object-contain" style={{filter: 'brightness(0) invert(0.8)'}} />
+                               <img key={i} src={logo.src} alt={logo.name} className="h-8 mx-12 object-contain flex-shrink-0" style={{filter: 'brightness(0) invert(0.8)', width: '96px'}} />
                             ))}
                         </div>
                     </div>

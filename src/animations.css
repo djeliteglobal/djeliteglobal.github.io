@@ -65,7 +65,7 @@
   }
 }
 
-/* Marquee animation for logos */
+/* Marquee animation for logos - seamless infinite scroll */
 @keyframes marquee {
   0% {
     transform: translateX(0%);
@@ -97,7 +97,8 @@
 }
 
 .animate-marquee {
-  animation: marquee 30s linear infinite;
+  animation: marquee 40s linear infinite;
+  will-change: transform;
 }
 
 /* Staggered animation delays */
