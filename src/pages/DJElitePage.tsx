@@ -235,7 +235,7 @@ export const DJElitePage: React.FC = () => {
                     <div className="max-w-4xl mx-auto grid md:grid-cols-[1fr_auto_1fr] items-center gap-8">
                         <SelectableCard id="before-card" className="bg-[color:var(--surface)] border border-[color:var(--border)] rounded-xl p-6 text-center" isRedVariant={true}>
                             <h3 className="font-bold text-2xl text-[color:var(--danger)]">BEFORE</h3>
-                            <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=400&fit=crop" alt="Bedroom DJ" className="my-4 rounded-lg aspect-square object-cover w-full h-48"/>
+                            <img src="/Funnel Images/Before.png" alt="Bedroom DJ" className="my-4 rounded-lg aspect-square object-cover w-full h-48"/>
                             <ul className="text-left space-y-2 text-[color:var(--text-secondary)]">
                                 {["Playing for empty rooms", "No industry connections", "Frustrated and stuck", "No income from DJing"].map(item => <li key={item} className="flex items-start"><span className="mr-2 text-red-500">×</span> {item}</li>)}
                             </ul>
@@ -246,7 +246,7 @@ export const DJElitePage: React.FC = () => {
                         </div>
                         <SelectableCard id="after-card" className="bg-[color:var(--surface)] border border-[color:var(--accent)] shadow-[0_0_40px_-10px_rgba(0,245,122,0.2)] rounded-xl p-6 text-center">
                              <h3 className="font-bold text-2xl text-[color:var(--accent)]">AFTER</h3>
-                             <img src="/Funnel Images/Party success.jpg" alt="Professional DJ" className="my-4 rounded-lg aspect-square object-cover w-full h-48"/>
+                             <img src="/Funnel Images/after.png" alt="Professional DJ" className="my-4 rounded-lg aspect-square object-cover w-full h-48"/>
                              <ul className="text-left space-y-2 text-[color:var(--text-secondary)]">
                                 {["Regular club bookings", "Strong industry network", "Confident and skilled", "Consistent DJ income"].map(item => <li key={item} className="flex items-start"><span className="mr-2 text-green-500">✓</span> {item}</li>)}
                             </ul>
