@@ -620,7 +620,7 @@ export const OpportunitiesPage: React.FC = React.memo(() => {
             </div>
         </div>
     );
-};
+});
 
 // Settings Page
 export const SettingsPage: React.FC = () => {
