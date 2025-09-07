@@ -19,22 +19,27 @@ exports.handler = async (event, context) => {
       from: 'DJ Elite <noreply@djelite.site>',
       to: [email],
       subject: '🎁 Your FREE DJ Training Preview is Here!',
-      text: `Hey ${firstName}!
-
-Welcome to the DJ Career Accelerator community! 🎧
-
-🎯 Your Free Training Preview:
-
-✅ How I went from busking to headlining festivals
-✅ The networking secrets that actually work  
-✅ Club owner psychology revealed
-✅ 5 conversation starters that get you remembered
-
-🚀 WATCH FREE TRAINING NOW:
-https://djelite.site/training-preview
-
-Talk soon,
-DJ Elite Team`
+      html: `<div style="max-width:600px;margin:0 auto;font-family:system-ui,sans-serif;background:#1a1d23;color:#fff;border-radius:8px;overflow:hidden">
+<div style="background:linear-gradient(135deg,#00f57a 0%,#00c766 100%);padding:32px;text-align:center">
+<h1 style="margin:0;font-size:28px;color:#000;font-weight:700">Welcome ${firstName}! 🎧</h1>
+<p style="margin:8px 0 0;color:#000;opacity:0.8">You're now part of the DJ Career Accelerator</p>
+</div>
+<div style="padding:32px">
+<h2 style="color:#00f57a;margin:0 0 20px;font-size:20px">🎯 Your Training Includes:</h2>
+<div style="background:#2a2d35;padding:20px;border-radius:6px;margin-bottom:24px">
+<p style="margin:0 0 12px;color:#fff">✅ Street to festival success story</p>
+<p style="margin:0 0 12px;color:#fff">✅ International networking tactics</p>
+<p style="margin:0 0 12px;color:#fff">✅ Club owner decision psychology</p>
+<p style="margin:0;color:#fff">✅ Memorable conversation frameworks</p>
+</div>
+<div style="text-align:center;margin:24px 0">
+<a href="https://djelite.site/training-preview" style="display:inline-block;background:#00f57a;color:#000;padding:14px 28px;text-decoration:none;border-radius:6px;font-weight:600;font-size:16px">🚀 Access Training Now</a>
+</div>
+<div style="border-top:1px solid #3a3d45;padding-top:20px;margin-top:24px">
+<p style="margin:0;color:#b8bcc8">Best regards,<br><strong style="color:#00f57a">DJ Elite Team</strong></p>
+</div>
+</div>
+</div>`
     });
 
     // Add to ConvertKit (correct endpoint)
