@@ -4,7 +4,7 @@ import { AppContext } from '../../pages/HomePage';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button, CourseCard, FaqItemComponent, PricingCard, OpportunitySwipeCard } from '../platform';
 import { COURSES, FAQ_ITEMS, PRICING_PLANS, PlayCircleIcon, VideoIcon, FileTextIcon, HelpCircleIcon, XIcon, HeartIcon, StarIcon, UndoIcon, LockIcon, MOCK_OPPORTUNITIES } from '../../constants/platform';
-import { fetchSwipeProfiles, recordSwipe, undoSwipe, fetchMatches, deleteMatch, autoCreateProfile } from '../../services/profileService';
+import { fetchSwipeProfiles, recordSwipe, undoSwipe, fetchMatches, deleteMatch, createProfile } from '../../services/profileService';
 import type { Course, Opportunity } from '../../types/platform';
 import { DJMatchingPage } from './DJMatchingPage';
 
@@ -475,7 +475,7 @@ export const OpportunitiesPage: React.FC = () => {
         const loadProfiles = async () => {
             try {
                 // Ensure current user has a profile
-                await autoCreateProfile();
+                await createProfile({dj_name: 'New DJ', bio: 'Getting started'});
                 
                 const profiles = await fetchSwipeProfiles();
                 setOpportunities(profiles.length > 0 ? profiles : MOCK_OPPORTUNITIES);
