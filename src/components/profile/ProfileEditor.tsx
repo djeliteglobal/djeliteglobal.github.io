@@ -38,12 +38,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
         dj_name: profile.dj_name,
         age: profile.age,
         location: profile.location,
-        bio: profile.bio,
-        genres: profile.genres?.filter(g => g.trim()) || [],
-        skills: profile.skills?.filter(s => s.trim()) || [],
-        venues: profile.venues?.filter(v => v.trim()) || [],
-        fee: profile.fee,
-        images: imageUrls.filter(url => url.trim())
+        bio: profile.bio
       };
       
       await updateProfile(updateData);
@@ -162,52 +157,9 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
             </div>
           </div>
 
-          {/* Genres */}
-          <div>
-            <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Genres (comma separated)</label>
-            <input
-              type="text"
-              value={profile.genres?.join(', ') || ''}
-              onChange={(e) => setProfile({...profile, genres: e.target.value.split(',').map(g => g.trim())})}
-              className="w-full px-3 py-2 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-lg focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
-              placeholder="House, Techno, Deep House"
-            />
-          </div>
-
-          {/* Skills */}
-          <div>
-            <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Skills to Help Other DJs With</label>
-            <input
-              type="text"
-              value={profile.skills?.join(', ') || ''}
-              onChange={(e) => setProfile({...profile, skills: e.target.value.split(',').map(s => s.trim())})}
-              className="w-full px-3 py-2 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-lg focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
-              placeholder="Mixing, Production, Networking, Equipment Setup"
-            />
-          </div>
-
-          {/* Venues */}
-          <div>
-            <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Venues You Play At</label>
-            <input
-              type="text"
-              value={profile.venues?.join(', ') || ''}
-              onChange={(e) => setProfile({...profile, venues: e.target.value.split(',').map(v => v.trim())})}
-              className="w-full px-3 py-2 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-lg focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
-              placeholder="Club XYZ, Festival ABC, Private Events"
-            />
-          </div>
-
-          {/* Fee */}
-          <div>
-            <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Typical Fee</label>
-            <input
-              type="text"
-              value={profile.fee || ''}
-              onChange={(e) => setProfile({...profile, fee: e.target.value})}
-              className="w-full px-3 py-2 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-lg focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
-              placeholder="$500-1000, Negotiable, Free for exposure"
-            />
+          {/* Note: Advanced fields will be added once database schema is updated */}
+          <div className="text-sm text-[color:var(--text-secondary)] italic">
+            Additional fields (genres, skills, venues, fee) will be available soon.
           </div>
         </div>
 
