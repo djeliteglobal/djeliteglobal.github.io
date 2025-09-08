@@ -33,50 +33,54 @@ export const ProfessionalSwipeCard: React.FC<ProfessionalSwipeCardProps> = ({
   };
 
   const handleDragEnd = (event: any, info: PanInfo) => {
-    const threshold = 50;
+    const threshold = 30;
     if (Math.abs(info.offset.x) > threshold) {
       const direction = info.offset.x > 0 ? 'right' : 'left';
       onSwipe(direction);
-      setTimeout(() => onCardLeftScreen(opportunity.id), 0);
+      onCardLeftScreen(opportunity.id);
     }
   };
 
   return (
       <motion.div
         className="absolute w-full h-full select-none overflow-hidden rounded-xl bg-[color:var(--surface)] shadow-2xl border border-[color:var(--border)] cursor-grab active:cursor-grabbing"
-        initial={{ scale: 0.98, opacity: 0 }}
+        initial={{ scale: 1, opacity: 1 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.05, type: "tween" }}
+        transition={{ duration: 0 }}
         drag="x"
-        dragConstraints={{ left: -300, right: 300 }}
-        dragElastic={0.1}
-        dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
+        dragConstraints={{ left: -200, right: 200 }}
+        dragElastic={0}
+        dragTransition={{ power: 0, timeConstant: 0 }}
         onDragEnd={handleDragEnd}
-        whileDrag={{ scale: 1.02, rotate: 5 }}
-        style={{ touchAction: 'none', userSelect: 'none' }}
+        whileDrag={{ scale: 1.01, rotate: 2 }}
+        style={{ 
+          touchAction: 'none', 
+          userSelect: 'none',
+          WebkitUserSelect: 'none',
+          MozUserSelect: 'none',
+          msUserSelect: 'none'
+        }}
       >
         <div className="relative h-full w-full" onClick={handleImageTap}>
           <motion.img 
             key={currentImageIndex}
             src={images[currentImageIndex]} 
             alt={`${opportunity.title} - ${currentImageIndex + 1}`} 
-            className="h-full w-full object-cover"
-            initial={{ opacity: 0 }}
+            className="h-full w-full object-cover pointer-events-none select-none"
+            draggable={false}
+            initial={{ opacity: 1 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.02 }}
+            transition={{ duration: 0 }}
           />
           
           {totalImages > 1 && (
-            <div className="absolute top-4 left-4 right-4 flex gap-1">
+            <div className="absolute top-4 left-4 right-4 flex gap-1 pointer-events-none">
               {images.map((_, index) => (
-                <motion.div 
+                <div 
                   key={index}
-                  className={`h-1 flex-1 rounded-full transition-all duration-300 ${
+                  className={`h-1 flex-1 rounded-full ${
                     index === currentImageIndex ? 'bg-white' : 'bg-white/30'
                   }`}
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ delay: index * 0.1 }}
                 />
               ))}
             </div>
@@ -85,60 +89,42 @@ export const ProfessionalSwipeCard: React.FC<ProfessionalSwipeCardProps> = ({
         
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent pointer-events-none" />
         
-        <motion.div 
-          className="absolute bottom-0 left-0 p-6 text-white w-full"
-          initial={{ y: 5, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.02 }}
+        <div 
+          className="absolute bottom-0 left-0 p-6 text-white w-full pointer-events-none"
         >
           <div className="flex items-end justify-between">
             <div className="flex-1">
-              <motion.h3 
+              <h3 
                 className="font-display text-3xl font-bold"
-                initial={{ x: -5 }}
-                animate={{ x: 0 }}
-                transition={{ delay: 0.03 }}
               >
                 {opportunity.title}
-              </motion.h3>
-              <motion.p 
+              </h3>
+              <p 
                 className="mt-1 text-lg text-white/90"
-                initial={{ x: -5 }}
-                animate={{ x: 0 }}
-                transition={{ delay: 0.04 }}
               >
                 {opportunity.venue} - {opportunity.location}
-              </motion.p>
+              </p>
               
-              <motion.div 
+              <div 
                 className="mt-4 flex flex-wrap gap-2"
-                initial={{ y: 2, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.05 }}
               >
                 {opportunity.genres.map((genre, index) => (
-                  <motion.span 
+                  <span 
                     key={genre} 
                     className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold backdrop-blur-sm"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.06 + index * 0.01 }}
                   >
                     {genre}
-                  </motion.span>
+                  </span>
                 ))}
-                <motion.span 
+                <span 
                   className="rounded-full bg-[#40E0D0]/30 px-3 py-1 text-xs font-semibold text-[#40E0D0] backdrop-blur-sm"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.07 }}
                 >
                   {opportunity.fee}
-                </motion.span>
-              </motion.div>
+                </span>
+              </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       </motion.div>
     );
 };
