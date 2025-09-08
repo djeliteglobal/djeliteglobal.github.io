@@ -337,6 +337,8 @@ export const deleteMatch = async (matchId: string): Promise<void> => {
 
   if (!userProfile) throw new Error('Profile not found');
 
+  console.log('🔍 UNMATCH DEBUG: Starting deletion for matchId:', matchId);
+
   // First get the match to find the other profile
   const { data: match } = await supabase
     .from('matches')
@@ -344,28 +346,34 @@ export const deleteMatch = async (matchId: string): Promise<void> => {
     .eq('id', matchId)
     .single();
 
+  console.log('🔍 MATCH FOUND:', match);
+
   if (match) {
     const otherProfileId = match.profile1_id === userProfile.id ? match.profile2_id : match.profile1_id;
+    console.log('🔍 OTHER PROFILE ID:', otherProfileId);
     
     // Delete the match record
-    await supabase
+    const { error: matchError } = await supabase
       .from('matches')
       .delete()
       .eq('id', matchId);
     
+    console.log('🔍 MATCH DELETE RESULT:', { matchError });
+    
     // GENNADY'S FIX: Delete BOTH swipe records to prevent re-matching
-    await supabase
+    const { error: swipe1Error } = await supabase
       .from('swipes')
       .delete()
       .eq('swiper_id', userProfile.id)
       .eq('swiped_id', otherProfileId);
       
-    await supabase
+    const { error: swipe2Error } = await supabase
       .from('swipes')
       .delete()
       .eq('swiper_id', otherProfileId)
       .eq('swiped_id', userProfile.id);
       
+    console.log('🔍 SWIPE DELETE RESULTS:', { swipe1Error, swipe2Error });
     console.log('🔥 UNMATCH COMPLETE: Deleted match and all swipe records');
   }
 };
