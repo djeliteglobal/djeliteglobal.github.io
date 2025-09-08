@@ -215,11 +215,15 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
           
           {/* More Info Button */}
           <button 
+            onMouseDown={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
+              e.preventDefault();
               setShowMoreInfo(!showMoreInfo);
             }}
-            className="ml-4 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors"
+            className="ml-4 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors z-50 relative"
+            style={{ pointerEvents: 'auto', touchAction: 'manipulation' }}
           >
             <span className="text-sm font-bold">{showMoreInfo ? '−' : 'i'}</span>
           </button>
