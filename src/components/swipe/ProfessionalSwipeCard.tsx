@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import TinderCard from 'react-tinder-card';
-import { motion } from 'framer-motion';
+import { motion, PanInfo } from 'framer-motion';
 import type { Opportunity } from '../../types/platform';
 
 interface ProfessionalSwipeCardProps {
@@ -33,20 +32,25 @@ export const ProfessionalSwipeCard: React.FC<ProfessionalSwipeCardProps> = ({
     }
   };
 
+  const handleDragEnd = (event: any, info: PanInfo) => {
+    const threshold = 100;
+    if (Math.abs(info.offset.x) > threshold) {
+      const direction = info.offset.x > 0 ? 'right' : 'left';
+      onSwipe(direction);
+      onCardLeftScreen(opportunity.id);
+    }
+  };
+
   return (
-    <TinderCard
-      className="absolute w-full h-full"
-      onSwipe={(dir) => onSwipe(dir as 'left' | 'right')}
-      onCardLeftScreen={() => onCardLeftScreen(opportunity.id)}
-      preventSwipe={['up', 'down']}
-      swipeRequirementType="position"
-      swipeThreshold={100}
-    >
       <motion.div
-        className="relative h-full w-full select-none overflow-hidden rounded-xl bg-[color:var(--surface)] shadow-2xl border border-[color:var(--border)]"
+        className="absolute w-full h-full select-none overflow-hidden rounded-xl bg-[color:var(--surface)] shadow-2xl border border-[color:var(--border)] cursor-grab active:cursor-grabbing"
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.3 }}
+        drag="x"
+        dragConstraints={{ left: 0, right: 0 }}
+        onDragEnd={handleDragEnd}
+        whileDrag={{ scale: 1.05, rotate: 5 }}
       >
         <div className="relative h-full w-full" onClick={handleImageTap}>
           <motion.img 
@@ -133,6 +137,5 @@ export const ProfessionalSwipeCard: React.FC<ProfessionalSwipeCardProps> = ({
           </div>
         </motion.div>
       </motion.div>
-    </TinderCard>
-  );
+    );
 };
