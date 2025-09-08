@@ -2,7 +2,8 @@ import React, { useContext, useMemo, useState, useCallback, useEffect, memo } fr
 import { Link } from 'react-router-dom';
 import { AppContext } from '../../pages/HomePage';
 import { useAuth } from '../../contexts/AuthContext';
-import { Button, CourseCard, FaqItemComponent, PricingCard, OpportunitySwipeCard } from '../platform';
+import { Button, CourseCard, FaqItemComponent, PricingCard } from '../platform';
+import { ProfessionalSwipeCard } from '../swipe/ProfessionalSwipeCard';
 import { COURSES, FAQ_ITEMS, PRICING_PLANS, PlayCircleIcon, VideoIcon, FileTextIcon, HelpCircleIcon, XIcon, HeartIcon, StarIcon, UndoIcon, LockIcon, MOCK_OPPORTUNITIES } from '../../constants/platform';
 import { fetchSwipeProfiles, recordSwipe, undoSwipe, fetchMatches, deleteMatch, createProfile } from '../../services/profileService';
 import type { Course, Opportunity } from '../../types/platform';
@@ -585,17 +586,21 @@ export const OpportunitiesPage: React.FC = () => {
                             {opportunities.length > 0 ? (
                                 // ⚠️ PROTECTED: Card mapping logic - DO NOT MODIFY array operations, zIndex, or data-swipe-card
                                 opportunities.slice(0, 3).map((op, index) => (
-                                    <OpportunitySwipeCard
-                                        key={op.id}
-                                        opportunity={op}
-                                        onSwipe={handleSwipe}
-                                        isTop={index === 0}
-                                        style={{ 
-                                            zIndex: 3 - index,
-                                            transform: `scale(${1 - (Math.min(index, 2) * 0.05)}) translateY(-${Math.min(index, 2) * 10}px)`,
-                                        }}
-                                        data-swipe-card={index === 0}
-                                    />
+                                    <div key={op.id} style={{ 
+                                        position: 'absolute',
+                                        width: '100%',
+                                        height: '100%',
+                                        zIndex: 3 - index,
+                                        transform: `scale(${1 - (Math.min(index, 2) * 0.05)}) translateY(-${Math.min(index, 2) * 10}px)`,
+                                    }}>
+                                        <ProfessionalSwipeCard
+                                            opportunity={op}
+                                            onSwipe={handleSwipe}
+                                            onCardLeftScreen={(id) => {
+                                                setOpportunities(prev => prev.filter(opp => opp.id !== id));
+                                            }}
+                                        />
+                                    </div>
                                 )).reverse() // ⚠️ PROTECTED: .reverse() is critical for proper stacking
                             ) : (
                                 <div className="flex flex-col items-center justify-center h-full w-full rounded-xl bg-[color:var(--surface)] border-2 border-dashed border-[color:var(--border)]">
