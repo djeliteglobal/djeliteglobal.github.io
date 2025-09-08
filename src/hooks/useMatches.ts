@@ -30,11 +30,9 @@ export const useMatches = () => {
       return { previousMatches };
     },
     onSuccess: async () => {
-      // Nuclear cache invalidation
-      await queryClient.invalidateQueries({ queryKey: ['matches'] });
-      await queryClient.refetchQueries({ queryKey: ['matches'] });
-      queryClient.removeQueries({ queryKey: ['matches'] });
-      console.log('💥 CACHE NUKED - Force refetch');
+      // Just invalidate, don't refetch immediately
+      queryClient.invalidateQueries({ queryKey: ['matches'] });
+      console.log('✅ MATCH DELETED - Cache invalidated');
     },
     onError: (err, matchId, context) => {
       queryClient.setQueryData(['matches'], context?.previousMatches);
