@@ -551,16 +551,37 @@ export const CommunityPage: React.FC = () => {
 // Enhanced with real profile integration while preserving v1 backup functionality
 // Only modify UI/styling, never touch: handleSwipe, triggerSwipe, card mapping logic
 
+// DJ loading comments
+const DJ_LOADING_COMMENTS = [
+    "🎧 Dropping the beat... Finding your perfect mix!",
+    "🔥 Spinning up some fresh connections...",
+    "🎵 Beatmatching your vibe with other DJs...",
+    "⚡ Syncing frequencies... Almost ready to drop!",
+    "🎶 Curating the perfect playlist of DJs for you...",
+    "🚀 Loading the decks... Prepare for takeoff!",
+    "💫 Mixing magic in progress...",
+    "🎤 Warming up the crowd... DJs incoming!"
+];
+
 // Discover Page (Tinder-like DJ matching)
 export const OpportunitiesPage: React.FC = () => {
     const [view, setView] = useState<'swipe' | 'list'>('swipe');
     const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
     const [loading, setLoading] = useState(true);
+    const [loadingComment, setLoadingComment] = useState(DJ_LOADING_COMMENTS[0]);
     const [matchResult, setMatchResult] = useState<{show: boolean, isMatch: boolean}>({show: false, isMatch: false});
     const [lastSwipedProfile, setLastSwipedProfile] = useState<Opportunity | null>(null);
 
     // GENNADY OPTIMIZATION: Parallel loading with Google profile sync
     const loadProfiles = useCallback(async () => {
+        // Cycle through loading comments
+        const commentInterval = setInterval(() => {
+            setLoadingComment(prev => {
+                const currentIndex = DJ_LOADING_COMMENTS.indexOf(prev);
+                return DJ_LOADING_COMMENTS[(currentIndex + 1) % DJ_LOADING_COMMENTS.length];
+            });
+        }, 1500);
+        
         try {
             const [_, profiles] = await Promise.all([
                 createProfile({dj_name: 'New DJ', bio: 'Getting started'}),
@@ -581,6 +602,7 @@ export const OpportunitiesPage: React.FC = () => {
         } catch (error) {
             setOpportunities([]);
         } finally {
+            clearInterval(commentInterval);
             setLoading(false);
         }
     }, []);
@@ -651,7 +673,7 @@ export const OpportunitiesPage: React.FC = () => {
                         {view === 'swipe' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-[color:var(--accent)]"></span>}
                     </button>
                     <button onClick={() => setView('list')} className={`relative py-2 px-4 font-medium transition-colors ${view === 'list' ? 'text-[color:var(--accent)]' : 'text-[color:var(--muted)] hover:text-[color:var(--text-primary)]'}`}>
-                        Browse
+                        Chat
                         {view === 'list' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-[color:var(--accent)]"></span>}
                     </button>
                 </div>
@@ -673,8 +695,9 @@ export const OpportunitiesPage: React.FC = () => {
 
             <div className="flex-grow flex items-center justify-center py-1">
                 {loading ? (
-                    <div className="flex items-center justify-center h-64">
+                    <div className="flex flex-col items-center justify-center h-64 space-y-4">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[color:var(--accent)]"></div>
+                        <p className="text-[color:var(--text-secondary)] text-center max-w-xs animate-pulse">{loadingComment}</p>
                     </div>
                 ) : view === 'swipe' ? (
                     <div className="flex flex-col items-center w-full max-w-sm mx-auto">
@@ -781,6 +804,88 @@ export const SettingsPage: React.FC = () => {
 const MatchesList: React.FC = () => {
     const { matches, isLoading, unmatch, isUnmatching } = useMatches();
     const [selectedMatch, setSelectedMatch] = useState<any>(null);
+    const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
+    const [lastMessages, setLastMessages] = useState<Record<string, any>>({});
+    const [loading, setLoading] = useState(true);
+    const [loadingComment, setLoadingComment] = useState(DJ_LOADING_COMMENTS[Math.floor(Math.random() * DJ_LOADING_COMMENTS.length)]);
+
+    // Load unread message counts and last messages for each match
+    useEffect(() => {
+        const loadChatData = async () => {
+            if (matches.length === 0) {
+                setLoading(false);
+                return;
+            }
+
+            // Cycle through loading comments
+            const commentInterval = setInterval(() => {
+                setLoadingComment(prev => {
+                    const currentIndex = DJ_LOADING_COMMENTS.indexOf(prev);
+                    return DJ_LOADING_COMMENTS[(currentIndex + 1) % DJ_LOADING_COMMENTS.length];
+                });
+            }, 1500);
+
+            try {
+                const { supabase } = await import('../../services/profileService');
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) return;
+
+                const { data: userProfile } = await supabase
+                    .from('profiles')
+                    .select('id')
+                    .eq('user_id', user.id)
+                    .single();
+
+                if (!userProfile) return;
+
+                const unreadData: Record<string, number> = {};
+                const lastMessageData: Record<string, any> = {};
+
+                for (const match of matches) {
+                    // Get unread count
+                    const { count } = await supabase
+                        .from('messages')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('match_id', match.match_id)
+                        .neq('sender_id', userProfile.id)
+                        .is('read_at', null);
+
+                    unreadData[match.match_id] = count || 0;
+
+                    // Get last message
+                    const { data: lastMessage } = await supabase
+                        .from('messages')
+                        .select(`
+                            *,
+                            sender:profiles!messages_sender_id_fkey(dj_name, profile_image_url)
+                        `)
+                        .eq('match_id', match.match_id)
+                        .order('created_at', { ascending: false })
+                        .limit(1)
+                        .single();
+
+                    if (lastMessage) {
+                        lastMessageData[match.match_id] = {
+                            ...lastMessage,
+                            sender_name: lastMessage.sender?.dj_name,
+                            sender_avatar: lastMessage.sender?.profile_image_url,
+                            isFromCurrentUser: lastMessage.sender_id === userProfile.id
+                        };
+                    }
+                }
+
+                setUnreadCounts(unreadData);
+                setLastMessages(lastMessageData);
+            } catch (error) {
+                console.error('Failed to load chat data:', error);
+            } finally {
+                clearInterval(commentInterval);
+                setLoading(false);
+            }
+        };
+
+        loadChatData();
+    }, [matches]);
 
     const handleDeleteMatch = async (matchId: number) => {
         try {
@@ -792,8 +897,13 @@ const MatchesList: React.FC = () => {
         }
     };
 
-    if (isLoading) {
-        return <div className="flex justify-center py-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[color:var(--accent)]"></div></div>;
+    if (isLoading || loading) {
+        return (
+            <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[color:var(--accent)]"></div>
+                <p className="text-[color:var(--text-secondary)] text-center max-w-xs animate-pulse">{loadingComment}</p>
+            </div>
+        );
     }
 
     if (matches.length === 0) {
@@ -809,43 +919,88 @@ const MatchesList: React.FC = () => {
     return (
         <div className="w-full max-w-4xl mx-auto px-4">
             <ul className="space-y-4">
-                {matches.map(match => (
-                    <li key={match.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 rounded-lg bg-[color:var(--surface)] p-4 border border-[color:var(--border)]">
-                        <img src={match.images?.[0] || match.imageUrl} alt={match.dj_name} className="w-16 h-16 rounded-full object-cover flex-shrink-0"/>
-                        <div className="flex-grow min-w-0">
-                            <h3 className="font-bold text-[color:var(--text-primary)] truncate">{match.dj_name}</h3>
-                            <p className="text-sm text-[color:var(--text-secondary)] truncate">{match.location} • {match.age} years</p>
-                            <div className="flex flex-wrap gap-1 mt-1">
-                                {match.genres?.slice(0, 2).map((genre: string) => (
-                                    <span key={genre} className="text-xs bg-[color:var(--accent)]/20 text-[color:var(--accent)] px-2 py-0.5 rounded-full">{genre}</span>
-                                ))}
-                                {match.skills?.slice(0, 2).map((skill: string) => (
-                                    <span key={skill} className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full">{skill}</span>
-                                ))}
+                {matches.map(match => {
+                    const unreadCount = unreadCounts[match.match_id] || 0;
+                    const lastMessage = lastMessages[match.match_id];
+                    const isUnread = unreadCount > 0;
+                    
+                    return (
+                        <li key={match.id} className={`flex flex-col sm:flex-row items-start sm:items-center gap-4 rounded-lg p-4 border transition-all ${
+                            isUnread 
+                                ? 'bg-[color:var(--accent)]/10 border-[color:var(--accent)]/50 shadow-[0_0_20px_-5px_rgba(0,245,122,0.3)]' 
+                                : 'bg-[color:var(--surface)] border-[color:var(--border)]'
+                        }`}>
+                            <div className="relative flex-shrink-0">
+                                <img src={match.images?.[0] || match.imageUrl} alt={match.dj_name} className="w-16 h-16 rounded-full object-cover"/>
+                                {isUnread && (
+                                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-[color:var(--accent)] text-black rounded-full flex items-center justify-center text-xs font-bold animate-pulse">
+                                        {unreadCount > 9 ? '9+' : unreadCount}
+                                    </div>
+                                )}
                             </div>
-                        </div>
-                        <div className="flex-shrink-0 flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                            <button 
-                                onClick={() => {
-                                    console.log('💬 MESSAGING: Using match_id:', match.match_id, 'for profile:', match.id);
-                                    setSelectedMatch({...match, id: match.match_id}); // Use match_id as the chat ID
-                                }}
-                                className="px-3 py-1.5 text-sm bg-[color:var(--accent)] text-black rounded hover:scale-105 transition-transform font-semibold"
-                            >
-                                Message
-                            </button>
-                            <button 
-                                onClick={() => {
-                                    console.log('🔍 DB DEBUG: Deleting match_id:', match.match_id, 'profile_id:', match.id);
-                                    handleDeleteMatch(match.match_id);
-                                }}
-                                className="px-3 py-1.5 text-sm bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 transition-colors"
-                            >
-                                Unmatch
-                            </button>
-                        </div>
-                    </li>
-                ))}
+                            <div className="flex-grow min-w-0">
+                                <div className="flex items-center gap-2">
+                                    <h3 className={`font-bold truncate ${
+                                        isUnread ? 'text-[color:var(--accent)]' : 'text-[color:var(--text-primary)]'
+                                    }`}>{match.dj_name}</h3>
+                                    {isUnread && <div className="w-2 h-2 bg-[color:var(--accent)] rounded-full animate-pulse"></div>}
+                                </div>
+                                <p className="text-sm text-[color:var(--text-secondary)] truncate">{match.location} • {match.age} years</p>
+                                {lastMessage && (
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <img 
+                                            src={lastMessage.isFromCurrentUser ? (match.images?.[0] || match.imageUrl) : lastMessage.sender_avatar} 
+                                            alt="" 
+                                            className="w-4 h-4 rounded-full object-cover"
+                                        />
+                                        <p className={`text-xs truncate max-w-48 ${
+                                            isUnread && !lastMessage.isFromCurrentUser 
+                                                ? 'text-[color:var(--accent)] font-semibold' 
+                                                : 'text-[color:var(--muted)]'
+                                        }`}>
+                                            {lastMessage.isFromCurrentUser ? 'You: ' : ''}{lastMessage.content}
+                                        </p>
+                                    </div>
+                                )}
+                                <div className="flex flex-wrap gap-1 mt-1">
+                                    {match.genres?.slice(0, 2).map((genre: string) => (
+                                        <span key={genre} className="text-xs bg-[color:var(--accent)]/20 text-[color:var(--accent)] px-2 py-0.5 rounded-full">{genre}</span>
+                                    ))}
+                                    {match.skills?.slice(0, 2).map((skill: string) => (
+                                        <span key={skill} className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full">{skill}</span>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="flex-shrink-0 flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                                <button 
+                                    onClick={() => {
+                                        console.log('💬 MESSAGING: Using match_id:', match.match_id, 'for profile:', match.id);
+                                        setSelectedMatch({...match, id: match.match_id}); // Use match_id as the chat ID
+                                    }}
+                                    className={`px-3 py-1.5 text-sm rounded hover:scale-105 transition-transform font-semibold relative ${
+                                        isUnread 
+                                            ? 'bg-[color:var(--accent)] text-black animate-pulse' 
+                                            : 'bg-[color:var(--accent)]/80 text-black'
+                                    }`}
+                                >
+                                    Message
+                                    {isUnread && (
+                                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping"></div>
+                                    )}
+                                </button>
+                                <button 
+                                    onClick={() => {
+                                        console.log('🔍 DB DEBUG: Deleting match_id:', match.match_id, 'profile_id:', match.id);
+                                        handleDeleteMatch(match.match_id);
+                                    }}
+                                    className="px-3 py-1.5 text-sm bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 transition-colors"
+                                >
+                                    Unmatch
+                                </button>
+                            </div>
+                        </li>
+                    );
+                })}
             </ul>
             
             {selectedMatch && (

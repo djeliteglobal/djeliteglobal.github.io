@@ -9,10 +9,15 @@ import { PrivacyPage } from './pages/PrivacyPage';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { ThemeProvider } from './theme/ThemeProvider';
 import { QueryProvider } from './providers/QueryProvider';
+import { notificationService } from './services/notificationService';
 import './index.css';
 import './debug.css';
 
 function App() {
+  // Initialize notifications on app start
+  React.useEffect(() => {
+    notificationService.initialize();
+  }, []);
 
   return (
     <QueryProvider>

@@ -4,6 +4,7 @@ import { useDebounce } from 'use-debounce';
 import { sendMessage, fetchMessages, subscribeToMessages, Message } from '../../services/messageService';
 import { getCurrentProfile } from '../../services/profileService';
 import { subscribeToUltraFastMessages, sendUltraFastMessage, sendTypingIndicator } from '../../services/ablyService';
+import { notificationService } from '../../services/notificationService';
 
 interface ChatInterfaceProps {
   matchId: string;
@@ -31,6 +32,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   useEffect(() => {
     const loadData = async () => {
       try {
+        // Initialize notifications
+        await notificationService.initialize();
+        
         const [profile, messageHistory] = await Promise.all([
           getCurrentProfile(),
           fetchMessages(matchId)
@@ -56,6 +60,12 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         if (prev.some(msg => msg.id === message.id) || message.sender_id === currentUserId) {
           return prev;
         }
+        
+        // Show notification for new messages from others
+        if (message.sender_id !== currentUserId) {
+          notificationService.showMessageNotification(message, matchName);
+        }
+        
         return [...prev, message];
       });
     });
@@ -75,6 +85,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           sender_name: matchName,
           sender_avatar: matchAvatar
         };
+        
+        // Show notification for Ably messages too
+        notificationService.showMessageNotification(fastMessage, matchName);
+        
         setMessages(prev => [...prev, fastMessage]);
       },
       (typing) => {
