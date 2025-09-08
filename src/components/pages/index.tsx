@@ -5,6 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Button, CourseCard, FaqItemComponent, PricingCard } from '../platform';
 import { UltraFastSwipeCard } from '../swipe/UltraFastSwipeCard';
 import { ChatInterface } from '../messaging/ChatInterface';
+import { EventCreator } from '../events/EventCreator';
 import { COURSES, FAQ_ITEMS, PRICING_PLANS, PlayCircleIcon, VideoIcon, FileTextIcon, HelpCircleIcon, XIcon, HeartIcon, StarIcon, UndoIcon, LockIcon, MOCK_OPPORTUNITIES } from '../../constants/platform';
 import { fetchSwipeProfiles, recordSwipe, undoSwipe, fetchMatches, deleteMatch, createProfile } from '../../services/profileService';
 import type { Course, Opportunity } from '../../types/platform';
@@ -406,48 +407,70 @@ export const CourseDetailPage: React.FC = () => {
 
 // Community Page
 export const CommunityPage: React.FC = () => {
+    const [showEventCreator, setShowEventCreator] = useState(false);
+    const [events, setEvents] = useState<any[]>([]);
+
+    const handleEventCreated = (event: any) => {
+        setEvents(prev => [event, ...prev]);
+    };
+
     return (
         <div className="p-4 sm:p-6 md:p-8">
-            <h1 className="font-display text-3xl font-bold">Community Hub</h1>
-            <p className="mt-1 text-[color:var(--text-secondary)]">Connect, collaborate, and grow with fellow DJs.</p>
-
-            {/* Mock Discord Embed */}
-            <div className="mt-8 flex h-[70vh] w-full rounded-xl overflow-hidden border border-[color:var(--border)] bg-[color:var(--surface)]">
-                {/* Channels */}
-                <div className="w-60 flex-shrink-0 bg-[color:var(--surface-alt)] p-4">
-                    <h2 className="font-bold text-sm text-[color:var(--muted)] mb-2">TEXT CHANNELS</h2>
-                    <ul className="space-y-1">
-                        <li className="p-2 rounded bg-[color:var(--elevated)] text-[color:var(--text-primary)] font-semibold"># general</li>
-                        <li className="p-2 rounded hover:bg-[color:var(--elevated)] text-[color:var(--text-secondary)]"># feedback</li>
-                        <li className="p-2 rounded hover:bg-[color:var(--elevated)] text-[color:var(--text-secondary)]"># gig-opportunities</li>
-                        <li className="p-2 rounded hover:bg-[color:var(--elevated)] text-[color:var(--text-secondary)]"># music-production</li>
-                    </ul>
+            <div className="flex items-center justify-between mb-6">
+                <div>
+                    <h1 className="font-display text-3xl font-bold">Event Marketplace</h1>
+                    <p className="mt-1 text-[color:var(--text-secondary)]">Create events and book DJs instantly.</p>
                 </div>
-                {/* Main Chat */}
-                <div className="flex flex-col flex-grow">
-                    <div className="flex-grow p-4 space-y-4">
-                        <div className="flex items-start gap-3">
-                            <img src="https://picsum.photos/seed/chat1/40/40" className="w-10 h-10 rounded-full" alt="avatar" />
-                            <div>
-                                <p className="font-semibold text-[color:var(--text-primary)]">DJ Hype <span className="text-xs text-[color:var(--muted)] font-normal">Today at 2:30 PM</span></p>
-                                <p>Welcome to the community everyone! Post your latest mix in #feedback for a listen.</p>
-                            </div>
-                        </div>
-                         <div className="flex items-start gap-3">
-                            <img src="https://picsum.photos/seed/chat2/40/40" className="w-10 h-10 rounded-full" alt="avatar" />
-                            <div>
-                                <p className="font-semibold text-[color:var(--text-primary)]">Alex Pro <span className="text-xs text-[color:var(--muted)] font-normal">Today at 2:32 PM</span></p>
-                                <p>Awesome! Just dropped my new techno mix. Would love some thoughts on the transitions around 30min.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="p-4">
-                        <div className="w-full rounded-lg bg-[color:var(--surface-alt)] px-4 py-2 text-[color:var(--text-secondary)]">
-                            Message #general
-                        </div>
-                    </div>
-                </div>
+                <Button 
+                    onClick={() => setShowEventCreator(true)}
+                    className="px-6 py-3 bg-[color:var(--accent)] text-black font-semibold"
+                >
+                    + Create Event
+                </Button>
             </div>
+
+            {/* Events Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {events.length === 0 ? (
+                    <div className="col-span-full flex flex-col items-center justify-center py-16 text-center">
+                        <div className="text-6xl mb-4">🎪</div>
+                        <h3 className="text-xl font-semibold text-[color:var(--text-secondary)] mb-2">No events yet</h3>
+                        <p className="text-[color:var(--muted)] mb-6">Be the first to create an event and find amazing DJs!</p>
+                        <Button onClick={() => setShowEventCreator(true)}>Create First Event</Button>
+                    </div>
+                ) : (
+                    events.map(event => (
+                        <div key={event.id} className="bg-[color:var(--surface)] rounded-xl p-6 border border-[color:var(--border)] hover:border-[color:var(--accent)] transition-colors">
+                            <div className="flex items-start justify-between mb-4">
+                                <h3 className="font-bold text-lg text-[color:var(--text-primary)]">{event.title}</h3>
+                                <span className="px-2 py-1 text-xs bg-green-500/20 text-green-400 rounded-full">{event.status}</span>
+                            </div>
+                            <p className="text-[color:var(--text-secondary)] mb-2">📍 {event.venue}</p>
+                            <p className="text-[color:var(--text-secondary)] mb-2">📅 {event.date} at {event.time}</p>
+                            <p className="text-[color:var(--text-secondary)] mb-4">💰 ${event.budget}</p>
+                            <div className="flex flex-wrap gap-1 mb-4">
+                                {event.genres.slice(0, 3).map((genre: string) => (
+                                    <span key={genre} className="text-xs bg-[color:var(--accent)]/20 text-[color:var(--accent)] px-2 py-1 rounded-full">
+                                        {genre}
+                                    </span>
+                                ))}
+                            </div>
+                            <p className="text-sm text-[color:var(--text-secondary)] mb-4 line-clamp-2">{event.description}</p>
+                            <Button className="w-full" variant="secondary">Apply as DJ</Button>
+                        </div>
+                    ))
+                )}
+            </div>
+
+            {/* Event Creator Modal */}
+            {showEventCreator && (
+                <div className="fixed inset-0 z-50">
+                    <EventCreator
+                        onClose={() => setShowEventCreator(false)}
+                        onEventCreated={handleEventCreated}
+                    />
+                </div>
+            )}
         </div>
     );
 };
