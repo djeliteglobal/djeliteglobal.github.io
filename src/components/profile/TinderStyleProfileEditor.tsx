@@ -196,6 +196,25 @@ export const TinderStyleProfileEditor: React.FC<TinderStyleProfileEditorProps> =
               </div>
               <div>
                 <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Location</label>
+                <div className="mb-2 flex flex-wrap gap-1">
+                  {['New York, NY', 'Los Angeles, CA', 'Miami, FL', 'Chicago, IL', 'Berlin, Germany', 'London, UK', 'Ibiza, Spain', 'Amsterdam, Netherlands'].map(city => {
+                    const isSelected = profile.location === city;
+                    return (
+                      <button
+                        key={city}
+                        type="button"
+                        onClick={() => setProfile({...profile, location: isSelected ? '' : city})}
+                        className={`px-2 py-1 text-xs rounded-full transition-colors ${
+                          isSelected 
+                            ? 'bg-green-500 text-white' 
+                            : 'bg-[color:var(--surface-alt)] text-[color:var(--text-secondary)] hover:bg-green-500/20'
+                        }`}
+                      >
+                        {city}
+                      </button>
+                    );
+                  })}
+                </div>
                 <input
                   type="text"
                   value={profile.location || ''}
@@ -211,6 +230,32 @@ export const TinderStyleProfileEditor: React.FC<TinderStyleProfileEditorProps> =
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Music Genres</label>
+                <div className="mb-2 flex flex-wrap gap-1">
+                  {['House', 'Techno', 'Deep House', 'Trance', 'Progressive', 'Minimal', 'Tech House', 'Drum & Bass'].map(genre => {
+                    const isSelected = profile.genres?.includes(genre);
+                    return (
+                      <button
+                        key={genre}
+                        type="button"
+                        onClick={() => {
+                          const current = profile.genres || [];
+                          if (isSelected) {
+                            setProfile({...profile, genres: current.filter(g => g !== genre)});
+                          } else {
+                            setProfile({...profile, genres: [...current, genre]});
+                          }
+                        }}
+                        className={`px-2 py-1 text-xs rounded-full transition-colors ${
+                          isSelected 
+                            ? 'bg-[color:var(--accent)] text-black' 
+                            : 'bg-[color:var(--surface-alt)] text-[color:var(--text-secondary)] hover:bg-[color:var(--accent)]/20'
+                        }`}
+                      >
+                        {genre}
+                      </button>
+                    );
+                  })}
+                </div>
                 <input
                   type="text"
                   value={profile.genres?.join(', ') || ''}
@@ -221,6 +266,32 @@ export const TinderStyleProfileEditor: React.FC<TinderStyleProfileEditorProps> =
               </div>
               <div>
                 <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Skills</label>
+                <div className="mb-2 flex flex-wrap gap-1">
+                  {['Mixing', 'Production', 'Scratching', 'Beatmatching', 'Live Performance', 'Remixing', 'Sound Design', 'Mastering'].map(skill => {
+                    const isSelected = profile.skills?.includes(skill);
+                    return (
+                      <button
+                        key={skill}
+                        type="button"
+                        onClick={() => {
+                          const current = profile.skills || [];
+                          if (isSelected) {
+                            setProfile({...profile, skills: current.filter(s => s !== skill)});
+                          } else {
+                            setProfile({...profile, skills: [...current, skill]});
+                          }
+                        }}
+                        className={`px-2 py-1 text-xs rounded-full transition-colors ${
+                          isSelected 
+                            ? 'bg-blue-500 text-white' 
+                            : 'bg-[color:var(--surface-alt)] text-[color:var(--text-secondary)] hover:bg-blue-500/20'
+                        }`}
+                      >
+                        {skill}
+                      </button>
+                    );
+                  })}
+                </div>
                 <input
                   type="text"
                   value={profile.skills?.join(', ') || ''}

@@ -15,6 +15,7 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
   onCardLeftScreen 
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showMoreInfo, setShowMoreInfo] = useState(false);
   const images = opportunity.images || [opportunity.imageUrl];
   const totalImages = images.length;
 
@@ -182,7 +183,46 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
                 {opportunity.fee}
               </animated.span>
             </div>
+            
+            {/* More Info Section */}
+            {showMoreInfo && (
+              <animated.div 
+                className="mt-4 p-4 bg-black/30 rounded-lg backdrop-blur-sm"
+                style={{
+                  transform: useSpring({
+                    from: { scale: 0.8, opacity: 0 },
+                    to: { scale: 1, opacity: 1 },
+                    config: { tension: 300, friction: 20 }
+                  }).scale.to(s => `scale(${s})`)
+                }}
+              >
+                <p className="text-white/90 text-sm leading-relaxed">{opportunity.bio}</p>
+                {opportunity.skills && opportunity.skills.length > 0 && (
+                  <div className="mt-2">
+                    <p className="text-white/70 text-xs font-semibold mb-1">Can help with:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {opportunity.skills.map(skill => (
+                        <span key={skill} className="text-xs bg-blue-500/20 text-blue-200 px-2 py-0.5 rounded">
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </animated.div>
+            )}
           </div>
+          
+          {/* More Info Button */}
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowMoreInfo(!showMoreInfo);
+            }}
+            className="ml-4 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors pointer-events-auto"
+          >
+            <span className="text-sm font-bold">{showMoreInfo ? '−' : 'i'}</span>
+          </button>
         </div>
       </div>
 
