@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import { useDebounce } from 'use-debounce';
 import { sendMessage, fetchMessages, subscribeToMessages, Message } from '../../services/messageService';
 import { getCurrentProfile } from '../../services/profileService';
 
@@ -21,6 +22,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [currentUserId, setCurrentUserId] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const [debouncedMessage] = useDebounce(newMessage, 300);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -59,6 +62,44 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Memoized message renderer for performance
+  const MessageItem = useCallback(({ index, style }: { index: number; style: any }) => {
+    const msg = messages[index];
+    const isOwn = msg.sender_id === currentUserId;
+    
+    return (
+      <div style={style}>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }} 
+          animate={{ opacity: 1, y: 0 }}
+          className={`flex p-2 ${isOwn ? 'justify-end' : 'justify-start'}`}
+        >
+          <div className={`flex items-end gap-2 max-w-[80%] ${
+            isOwn ? 'flex-row-reverse' : 'flex-row'
+          }`}>
+            <img 
+              src={isOwn ? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100' : (msg.sender_avatar || matchAvatar)} 
+              alt={isOwn ? 'You' : (msg.sender_name || matchName)}
+              className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+            />
+            <div className={`px-4 py-2 rounded-2xl ${
+              isOwn 
+                ? 'bg-[color:var(--accent)] text-black rounded-br-sm' 
+                : 'bg-[color:var(--surface)] text-[color:var(--text-primary)] rounded-bl-sm'
+            }`}>
+              <p className="text-sm">{msg.content}</p>
+              <p className="text-xs opacity-70 mt-1">
+                {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }, [messages, currentUserId, matchAvatar, matchName]);
+
+  const memoizedMessages = useMemo(() => messages, [messages]);
 
   const handleSendMessage = async () => {
     if (!newMessage.trim() || sending) return;
@@ -121,47 +162,24 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           <button onClick={onClose} className="w-8 h-8 rounded-full bg-[color:var(--surface)] hover:bg-[color:var(--border)] flex items-center justify-center">✕</button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[color:var(--bg)]">
+        <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-[color:var(--bg)] relative">
           {loading ? (
             <div className="flex justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[color:var(--accent)]"></div>
             </div>
-          ) : messages.length === 0 ? (
+          ) : memoizedMessages.length === 0 ? (
             <div className="text-center py-8 text-[color:var(--text-secondary)]">
               <p>💬 Start the conversation!</p>
             </div>
           ) : (
-            messages.map((msg) => {
-              const isOwn = msg.sender_id === currentUserId;
-              return (
-                <motion.div 
-                  key={msg.id} 
-                  initial={{ opacity: 0, y: 20 }} 
-                  animate={{ opacity: 1, y: 0 }}
-                  className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div className={`flex items-end gap-2 max-w-[80%] ${
-                    isOwn ? 'flex-row-reverse' : 'flex-row'
-                  }`}>
-                    <img 
-                      src={isOwn ? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100' : (msg.sender_avatar || matchAvatar)} 
-                      alt={isOwn ? 'You' : (msg.sender_name || matchName)}
-                      className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-                    />
-                    <div className={`px-4 py-2 rounded-2xl ${
-                      isOwn 
-                        ? 'bg-[color:var(--accent)] text-black rounded-br-sm' 
-                        : 'bg-[color:var(--surface)] text-[color:var(--text-primary)] rounded-bl-sm'
-                    }`}>
-                      <p className="text-sm">{msg.content}</p>
-                      <p className="text-xs opacity-70 mt-1">
-                        {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </p>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })
+            memoizedMessages.map((msg, index) => (
+              <MessageItem key={msg.id} index={index} style={{}} />
+            ))
+          )}
+          {isTyping && (
+            <div className="text-xs text-[color:var(--text-secondary)] italic p-2">
+              {matchName} is typing...
+            </div>
           )}
           <div ref={messagesEndRef} />
         </div>
