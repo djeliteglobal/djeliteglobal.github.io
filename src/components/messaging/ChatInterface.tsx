@@ -152,9 +152,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       // Send via ultra-fast Ably for instant delivery
       await sendUltraFastMessage(matchId, messageToSend);
       
-      // Also send via turbo Supabase for persistence
-      const { turboSendMessage } = await import('../../services/turboSupabase');
-      const realMessage = await turboSendMessage(matchId, currentUserId, messageToSend);
+      // Send via Supabase for persistence
+      const realMessage = await sendMessage(matchId, messageToSend);
       
       // Replace optimistic message with real one
       setMessages(prev => prev.map(msg => 

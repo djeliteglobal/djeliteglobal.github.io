@@ -14,6 +14,10 @@ const turboClient = new PostgrestClient(
 
 // Lightning-fast message operations
 export const turboSendMessage = async (matchId: string, senderId: string, content: string) => {
+  // Get auth token from main supabase client
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error('Not authenticated');
+  
   const { data, error } = await turboClient
     .from('messages')
     .insert({
@@ -23,7 +27,8 @@ export const turboSendMessage = async (matchId: string, senderId: string, conten
       message_type: 'text'
     })
     .select('*')
-    .single();
+    .single()
+    .setHeader('Authorization', `Bearer ${session.access_token}`);
     
   if (error) throw error;
   return data;
