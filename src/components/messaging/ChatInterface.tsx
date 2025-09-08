@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useDebounce } from 'use-debounce';
 import { sendMessage, fetchMessages, subscribeToMessages, Message } from '../../services/messageService';
 import { getCurrentProfile } from '../../services/profileService';
+import { subscribeToUltraFastMessages, sendUltraFastMessage, sendTypingIndicator } from '../../services/ablyService';
 
 interface ChatInterfaceProps {
   matchId: string;
@@ -45,10 +46,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     
     loadData();
     
-    // Subscribe to real-time messages
+    // Subscribe to Supabase real-time messages
     const unsubscribe = subscribeToMessages(matchId, (message) => {
       setMessages(prev => {
-        // Avoid duplicates and don't add our own messages from realtime
         if (prev.some(msg => msg.id === message.id) || message.sender_id === currentUserId) {
           return prev;
         }
@@ -56,7 +56,32 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       });
     });
     
-    return unsubscribe;
+    // Subscribe to ultra-fast Ably messages for instant delivery
+    const unsubscribeAbly = subscribeToUltraFastMessages(
+      matchId,
+      (message) => {
+        // Add ultra-fast message with temp ID
+        const fastMessage: Message = {
+          id: message.id,
+          match_id: matchId,
+          sender_id: 'other-user',
+          content: message.content,
+          created_at: new Date(message.timestamp).toISOString(),
+          message_type: 'text',
+          sender_name: matchName,
+          sender_avatar: matchAvatar
+        };
+        setMessages(prev => [...prev, fastMessage]);
+      },
+      (typing) => {
+        setIsTyping(typing);
+      }
+    );
+    
+    return () => {
+      unsubscribe();
+      unsubscribeAbly();
+    };
   }, [matchId]);
 
   useEffect(() => {
@@ -124,7 +149,12 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     setNewMessage('');
     
     try {
+      // Send via ultra-fast Ably for instant delivery
+      await sendUltraFastMessage(matchId, messageToSend);
+      
+      // Also send via Supabase for persistence
       const realMessage = await sendMessage(matchId, messageToSend);
+      
       // Replace optimistic message with real one
       setMessages(prev => prev.map(msg => 
         msg.id === tempId ? realMessage : msg
@@ -189,8 +219,13 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             <input
               type="text"
               value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
+              onChange={(e) => {
+                setNewMessage(e.target.value);
+                // Send typing indicator
+                sendTypingIndicator(matchId, e.target.value.length > 0);
+              }}
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+              onBlur={() => sendTypingIndicator(matchId, false)}
               placeholder="Type a message..."
               className="flex-1 px-4 py-2 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-full focus:ring-2 focus:ring-[color:var(--accent)] outline-none"
             />
