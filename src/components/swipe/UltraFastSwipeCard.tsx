@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { useSpring, animated } from 'react-spring';
 import { useDrag } from '@use-gesture/react';
 import type { Opportunity } from '../../types/platform';
@@ -16,6 +16,7 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showMoreInfo, setShowMoreInfo] = useState(false);
+  const showMoreInfoRef = useRef(false);
   const images = opportunity.images || [opportunity.imageUrl];
   const totalImages = images.length;
 
@@ -25,7 +26,7 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
     scale: 1 
   }));
 
-  const bind = useDrag(({ 
+  const bind = useDrag(useCallback(({ 
     down, 
     movement: [mx], 
     velocity: [vx], 
@@ -50,7 +51,7 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
         scale: down ? 1.02 : 1
       });
     }
-  });
+  }, [api, onSwipe, onCardLeftScreen, opportunity.id]));
 
   const handleImageTap = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -172,10 +173,19 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
         </animated.div>
       </animated.div>
       
-      {/* More Info Button - COMPLETELY OUTSIDE drag container */}
+      {/* More Info Button - BACK INSIDE but with proper isolation */}
       <button 
-        onClick={() => setShowMoreInfo(!showMoreInfo)}
-        className="absolute bottom-6 right-6 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors z-[100]"
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          const newValue = !showMoreInfoRef.current;
+          showMoreInfoRef.current = newValue;
+          setShowMoreInfo(newValue);
+        }}
+        onMouseDown={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
+        className="absolute bottom-6 right-6 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors z-50"
+        style={{ pointerEvents: 'auto' }}
       >
         <span className="text-sm font-bold">{showMoreInfo ? '−' : 'i'}</span>
       </button>
