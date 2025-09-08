@@ -90,9 +90,9 @@ export const LockIcon = memo((props: React.SVGProps<SVGSVGElement>) => (
 export const NAV_ITEMS = [
     { name: 'Dashboard', icon: HomeIcon, page: 'dashboard' },
     { name: 'Courses', icon: BookOpenIcon, page: 'courses' },
-    { name: 'Community', icon: UsersIcon, page: 'community' },
+    { name: 'Events', icon: UsersIcon, page: 'community' },
     { name: 'Discover', icon: ZapIcon, page: 'opportunities' },
-    { name: 'Events', icon: HeartIcon, page: 'events' },
+    { name: 'Community', icon: HeartIcon, page: 'events' },
 ];
 
 export const MOCK_USER: User = {

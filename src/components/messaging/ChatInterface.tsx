@@ -21,6 +21,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [currentUserId, setCurrentUserId] = useState<string>('');
+  const [currentUserProfile, setCurrentUserProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
@@ -35,7 +36,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           fetchMessages(matchId)
         ]);
         
-        if (profile) setCurrentUserId(profile.id);
+        if (profile) {
+          setCurrentUserId(profile.id);
+          setCurrentUserProfile(profile);
+        }
         setMessages(messageHistory);
       } catch (error) {
         console.error('Failed to load chat data:', error);
@@ -104,7 +108,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             isOwn ? 'flex-row-reverse' : 'flex-row'
           }`}>
             <img 
-              src={isOwn ? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100' : (msg.sender_avatar || matchAvatar)} 
+              src={isOwn ? (currentUserProfile?.images?.[0] || currentUserProfile?.profile_image_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100') : (msg.sender_avatar || matchAvatar)} 
               alt={isOwn ? 'You' : (msg.sender_name || matchName)}
               className="w-8 h-8 rounded-full object-cover flex-shrink-0"
             />
