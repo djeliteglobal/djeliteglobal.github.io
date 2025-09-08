@@ -1,4 +1,7 @@
 import { supabase, checkConfig } from '../config/supabase';
+
+// Export supabase for other services
+export { supabase };
 import { DJProfile, SwipeResult } from '../types/profile';
 
 export const fetchSwipeProfiles = async (): Promise<DJProfile[]> => {
@@ -45,6 +48,18 @@ export const fetchSwipeProfiles = async (): Promise<DJProfile[]> => {
       images: profile.images || [profileImage]
     };
   });
+};
+
+// Debug function to check Supabase connection
+export const testSupabaseConnection = async (): Promise<boolean> => {
+  try {
+    const { data, error } = await supabase.from('events').select('count').limit(1);
+    console.log('🔍 SUPABASE TEST:', { data, error });
+    return !error;
+  } catch (error) {
+    console.error('🚨 SUPABASE CONNECTION FAILED:', error);
+    return false;
+  }
 };
 
 export const createProfile = async (profileData: {

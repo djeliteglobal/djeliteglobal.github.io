@@ -417,8 +417,14 @@ export const CommunityPage: React.FC = () => {
     useEffect(() => {
         const loadEvents = async () => {
             try {
+                // Test Supabase connection first
+                const { testSupabaseConnection } = await import('../../services/profileService');
+                const isConnected = await testSupabaseConnection();
+                console.log('🔍 SUPABASE CONNECTION:', isConnected ? 'WORKING' : 'FAILED');
+                
                 const { fetchEvents } = await import('../../services/eventService');
                 const eventData = await fetchEvents();
+                console.log('🎪 EVENTS LOADED:', eventData.length, 'events');
                 setEvents(eventData);
             } catch (error) {
                 console.error('Failed to load events:', error);
