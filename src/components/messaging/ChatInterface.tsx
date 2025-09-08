@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useDebounce } from 'use-debounce';
+import { FixedSizeList as List } from 'react-window';
 import { sendMessage, fetchMessages, subscribeToMessages, Message } from '../../services/messageService';
 import { getCurrentProfile } from '../../services/profileService';
 import { subscribeToUltraFastMessages, sendUltraFastMessage, sendTypingIndicator } from '../../services/ablyService';
@@ -27,7 +28,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [sending, setSending] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [debouncedMessage] = useDebounce(newMessage, 300);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<any>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -102,45 +103,14 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     };
   }, [matchId]);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
 
-  // Memoized message renderer for performance
-  const MessageItem = useCallback(({ index, style }: { index: number; style: any }) => {
-    const msg = messages[index];
-    const isOwn = msg.sender_id === currentUserId;
-    
-    return (
-      <div style={style}>
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }} 
-          animate={{ opacity: 1, y: 0 }}
-          className={`flex p-2 ${isOwn ? 'justify-end' : 'justify-start'}`}
-        >
-          <div className={`flex items-end gap-2 max-w-[80%] ${
-            isOwn ? 'flex-row-reverse' : 'flex-row'
-          }`}>
-            <img 
-              src={isOwn ? (currentUserProfile?.images?.[0] || currentUserProfile?.profile_image_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100') : (msg.sender_avatar || matchAvatar)} 
-              alt={isOwn ? 'You' : (msg.sender_name || matchName)}
-              className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-            />
-            <div className={`px-4 py-2 rounded-2xl ${
-              isOwn 
-                ? 'bg-[color:var(--accent)] text-black rounded-br-sm' 
-                : 'bg-[color:var(--surface)] text-[color:var(--text-primary)] rounded-bl-sm'
-            }`}>
-              <p className="text-sm">{msg.content}</p>
-              <p className="text-xs opacity-70 mt-1">
-                {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </p>
-            </div>
-          </div>
-        </motion.div>
-      </div>
-    );
-  }, [messages, currentUserId, matchAvatar, matchName]);
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    if (listRef.current && messages.length > 0) {
+      listRef.current.scrollToItem(messages.length - 1, 'end');
+    }
+  }, [messages]);
 
   const memoizedMessages = useMemo(() => messages, [messages]);
 
@@ -210,7 +180,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           <button onClick={onClose} className="w-8 h-8 rounded-full bg-[color:var(--surface)] hover:bg-[color:var(--border)] flex items-center justify-center">✕</button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-[color:var(--bg)] relative">
+        <div className="flex-1 overflow-hidden bg-[color:var(--bg)] relative">
           {loading ? (
             <div className="flex justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[color:var(--accent)]"></div>
@@ -220,16 +190,55 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
               <p>💬 Start the conversation!</p>
             </div>
           ) : (
-            memoizedMessages.map((msg, index) => (
-              <MessageItem key={msg.id} index={index} style={{}} />
-            ))
+            <List
+              ref={listRef}
+              height={400}
+              itemCount={memoizedMessages.length}
+              itemSize={80}
+              itemData={memoizedMessages}
+              className="p-2"
+            >
+              {({ index, style, data }) => {
+                const msg = data[index];
+                const isOwn = msg.sender_id === currentUserId;
+                
+                return (
+                  <div style={style}>
+                    <motion.div 
+                      initial={{ opacity: 0, y: 20 }} 
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`flex p-2 ${isOwn ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div className={`flex items-end gap-2 max-w-[80%] ${
+                        isOwn ? 'flex-row-reverse' : 'flex-row'
+                      }`}>
+                        <img 
+                          src={isOwn ? (currentUserProfile?.images?.[0] || currentUserProfile?.profile_image_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100') : (msg.sender_avatar || matchAvatar)} 
+                          alt={isOwn ? 'You' : (msg.sender_name || matchName)}
+                          className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                        />
+                        <div className={`px-4 py-2 rounded-2xl ${
+                          isOwn 
+                            ? 'bg-[color:var(--accent)] text-black rounded-br-sm' 
+                            : 'bg-[color:var(--surface)] text-[color:var(--text-primary)] rounded-bl-sm'
+                        }`}>
+                          <p className={`text-sm ${isOwn ? 'text-black' : 'text-[color:var(--text-primary)]'}`}>{msg.content}</p>
+                          <p className={`text-xs opacity-70 mt-1 ${isOwn ? 'text-black' : 'text-[color:var(--text-secondary)]'}`}>
+                            {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </div>
+                );
+              }}
+            </List>
           )}
           {isTyping && (
-            <div className="text-xs text-[color:var(--text-secondary)] italic p-2">
+            <div className="absolute bottom-2 left-4 text-xs text-[color:var(--text-secondary)] italic">
               {matchName} is typing...
             </div>
           )}
-          <div ref={messagesEndRef} />
         </div>
 
         <div className="p-4 border-t border-[color:var(--border)] bg-[color:var(--surface)]">
