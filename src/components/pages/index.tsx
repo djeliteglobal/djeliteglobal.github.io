@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { AppContext } from '../../pages/HomePage';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button, CourseCard, FaqItemComponent, PricingCard } from '../platform';
-import { ProfessionalSwipeCard } from '../swipe/ProfessionalSwipeCard';
+import { UltraFastSwipeCard } from '../swipe/UltraFastSwipeCard';
 import { COURSES, FAQ_ITEMS, PRICING_PLANS, PlayCircleIcon, VideoIcon, FileTextIcon, HelpCircleIcon, XIcon, HeartIcon, StarIcon, UndoIcon, LockIcon, MOCK_OPPORTUNITIES } from '../../constants/platform';
 import { fetchSwipeProfiles, recordSwipe, undoSwipe, fetchMatches, deleteMatch, createProfile } from '../../services/profileService';
 import type { Course, Opportunity } from '../../types/platform';
@@ -593,7 +593,7 @@ export const OpportunitiesPage: React.FC = () => {
                                         zIndex: 3 - index,
                                         transform: `scale(${1 - (Math.min(index, 2) * 0.05)}) translateY(-${Math.min(index, 2) * 10}px)`,
                                     }}>
-                                        <ProfessionalSwipeCard
+                                        <UltraFastSwipeCard
                                             opportunity={op}
                                             onSwipe={handleSwipe}
                                             onCardLeftScreen={(id) => {
