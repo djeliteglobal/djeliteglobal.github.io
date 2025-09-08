@@ -807,15 +807,15 @@ const MatchesList: React.FC = () => {
     }
 
     return (
-        <div className="w-full max-w-4xl mx-auto">
+        <div className="w-full max-w-4xl mx-auto px-4">
             <ul className="space-y-4">
                 {matches.map(match => (
-                    <li key={match.id} className="flex items-center gap-4 rounded-lg bg-[color:var(--surface)] p-4 border border-[color:var(--border)]">
-                        <img src={match.images?.[0] || match.imageUrl} alt={match.dj_name} className="w-16 h-16 rounded-full object-cover"/>
-                        <div className="flex-grow">
-                            <h3 className="font-bold text-[color:var(--text-primary)]">{match.dj_name}</h3>
-                            <p className="text-sm text-[color:var(--text-secondary)]">{match.location} • {match.age} years</p>
-                            <div className="flex gap-1 mt-1">
+                    <li key={match.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 rounded-lg bg-[color:var(--surface)] p-4 border border-[color:var(--border)]">
+                        <img src={match.images?.[0] || match.imageUrl} alt={match.dj_name} className="w-16 h-16 rounded-full object-cover flex-shrink-0"/>
+                        <div className="flex-grow min-w-0">
+                            <h3 className="font-bold text-[color:var(--text-primary)] truncate">{match.dj_name}</h3>
+                            <p className="text-sm text-[color:var(--text-secondary)] truncate">{match.location} • {match.age} years</p>
+                            <div className="flex flex-wrap gap-1 mt-1">
                                 {match.genres?.slice(0, 2).map((genre: string) => (
                                     <span key={genre} className="text-xs bg-[color:var(--accent)]/20 text-[color:var(--accent)] px-2 py-0.5 rounded-full">{genre}</span>
                                 ))}
@@ -824,7 +824,7 @@ const MatchesList: React.FC = () => {
                                 ))}
                             </div>
                         </div>
-                        <div className="flex-shrink-0 flex gap-2">
+                        <div className="flex-shrink-0 flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                             <button 
                                 onClick={() => setSelectedMatch(match)}
                                 className="px-3 py-1.5 text-sm bg-[color:var(--accent)] text-black rounded hover:scale-105 transition-transform font-semibold"
@@ -832,7 +832,10 @@ const MatchesList: React.FC = () => {
                                 Message
                             </button>
                             <button 
-                                onClick={() => handleDeleteMatch(match.match_id)}
+                                onClick={() => {
+                                    console.log('🔍 DB DEBUG: Deleting match_id:', match.match_id, 'profile_id:', match.id);
+                                    handleDeleteMatch(match.match_id);
+                                }}
                                 className="px-3 py-1.5 text-sm bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 transition-colors"
                             >
                                 Unmatch
