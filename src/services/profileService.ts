@@ -352,15 +352,28 @@ export const deleteMatch = async (matchId: string): Promise<void> => {
     const otherProfileId = match.profile1_id === userProfile.id ? match.profile2_id : match.profile1_id;
     console.log('🔍 OTHER PROFILE ID:', otherProfileId);
     
-    // Delete the match record
-    const { error: matchError } = await supabase
+    // GENNADY'S NUCLEAR OPTION: Delete ALL matches between these two profiles
+    const { error: matchError1 } = await supabase
+      .from('matches')
+      .delete()
+      .eq('profile1_id', userProfile.id)
+      .eq('profile2_id', otherProfileId);
+      
+    const { error: matchError2 } = await supabase
+      .from('matches')
+      .delete()
+      .eq('profile1_id', otherProfileId)
+      .eq('profile2_id', userProfile.id);
+    
+    // Also delete by specific ID
+    const { error: matchError3 } = await supabase
       .from('matches')
       .delete()
       .eq('id', matchId);
     
-    console.log('🔍 MATCH DELETE RESULT:', { matchError });
+    console.log('🔍 NUCLEAR MATCH DELETE:', { matchError1, matchError2, matchError3 });
     
-    // GENNADY'S FIX: Delete BOTH swipe records to prevent re-matching
+    // Delete ALL swipe records between these profiles
     const { error: swipe1Error } = await supabase
       .from('swipes')
       .delete()
@@ -374,7 +387,7 @@ export const deleteMatch = async (matchId: string): Promise<void> => {
       .eq('swiped_id', userProfile.id);
       
     console.log('🔍 SWIPE DELETE RESULTS:', { swipe1Error, swipe2Error });
-    console.log('🔥 UNMATCH COMPLETE: Deleted match and all swipe records');
+    console.log('💥 NUCLEAR UNMATCH COMPLETE: Obliterated all records!');
   }
 };
 
