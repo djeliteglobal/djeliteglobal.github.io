@@ -10,13 +10,22 @@ import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { ThemeProvider } from './theme/ThemeProvider';
 import { QueryProvider } from './providers/QueryProvider';
 import { notificationService } from './services/notificationService';
+import { startPeriodicProfileSync } from './services/profileService';
 import './index.css';
 import './debug.css';
 
 function App() {
-  // Initialize notifications on app start
+  // Initialize notifications and profile sync on app start
   React.useEffect(() => {
     notificationService.initialize();
+    
+    // Start automatic Google profile picture sync
+    const stopSync = startPeriodicProfileSync();
+    
+    // Cleanup on unmount
+    return () => {
+      stopSync();
+    };
   }, []);
 
   return (

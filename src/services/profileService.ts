@@ -80,7 +80,28 @@ export const createProfile = async (profileData: {
     .eq('user_id', user.id)
     .single();
 
-  if (existing) return existing;
+  if (existing) {
+    // Update existing profile with latest Google picture
+    const googlePicture = user.user_metadata?.avatar_url || user.user_metadata?.picture;
+    if (googlePicture) {
+      const currentImages = existing.images || [];
+      const newImages = [googlePicture, ...currentImages.filter((img: string) => img !== googlePicture)];
+      
+      const { data: updatedProfile } = await supabase
+        .from('profiles')
+        .update({
+          profile_image_url: googlePicture,
+          images: newImages,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', existing.id)
+        .select()
+        .single();
+      
+      return updatedProfile || existing;
+    }
+    return existing;
+  }
 
   // Auto-sync Google profile picture on signup
   const authProfilePic = user.user_metadata?.avatar_url || user.user_metadata?.picture;
@@ -199,8 +220,93 @@ export const getCurrentProfile = async (): Promise<DJProfile | null> => {
 };
 
 export const syncAllGoogleProfilePictures = async (): Promise<void> => {
-  // Skip admin operations that cause 403 errors
-  console.log('Profile sync skipped - requires admin permissions');
+  try {
+    console.log('🔄 SYNC: Starting Google profile picture sync for all users...');
+    
+    // Get all profiles
+    const { data: profiles, error } = await supabase
+      .from('profiles')
+      .select('id, user_id, dj_name, profile_image_url, images');
+    
+    if (error) {
+      console.error('❌ SYNC ERROR: Failed to fetch profiles:', error);
+      return;
+    }
+    
+    if (!profiles || profiles.length === 0) {
+      console.log('✅ SYNC: No profiles found');
+      return;
+    }
+    
+    console.log(`🔄 SYNC: Processing ${profiles.length} profiles`);
+    
+    for (const profile of profiles) {
+      try {
+        // Get user's Google profile from auth metadata (client-side approach)
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        
+        if (userError || !user) {
+          console.log(`⚠️ SYNC: No user found for profile ${profile.id}`);
+          continue;
+        }
+        
+        // Only update current user's profile to avoid permission issues
+        if (profile.user_id !== user.id) continue;
+        
+        const googlePicture = user.user_metadata?.avatar_url || user.user_metadata?.picture;
+        
+        if (googlePicture) {
+          const updates: any = {
+            profile_image_url: googlePicture
+          };
+          
+          // Always update images array with Google picture as first image
+          const currentImages = profile.images || [];
+          const newImages = [googlePicture, ...currentImages.filter((img: string) => img !== googlePicture)];
+          updates.images = newImages;
+          
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update(updates)
+            .eq('id', profile.id);
+          
+          if (updateError) {
+            console.error(`❌ SYNC ERROR: Failed to update profile ${profile.id}:`, updateError);
+          } else {
+            console.log(`✅ SYNC: Updated ${profile.dj_name} with Google picture`);
+          }
+        } else {
+          console.log(`⚠️ SYNC: No Google picture for ${profile.dj_name}`);
+        }
+      } catch (profileError) {
+        console.error(`❌ SYNC ERROR: Failed to process profile ${profile.id}:`, profileError);
+      }
+    }
+    
+    console.log('🎉 SYNC: Google profile picture sync completed!');
+  } catch (error) {
+    console.error('💥 SYNC FATAL ERROR:', error);
+  }
+};
+
+// Periodic sync function that runs every 30 minutes
+export const startPeriodicProfileSync = (): (() => void) => {
+  console.log('🔄 PERIODIC SYNC: Starting automatic Google profile picture sync...');
+  
+  // Run immediately
+  syncAllGoogleProfilePictures();
+  
+  // Then run every 30 minutes
+  const interval = setInterval(() => {
+    console.log('⏰ PERIODIC SYNC: Running scheduled Google profile sync...');
+    syncAllGoogleProfilePictures();
+  }, 30 * 60 * 1000); // 30 minutes
+  
+  // Return cleanup function
+  return () => {
+    console.log('🛑 PERIODIC SYNC: Stopping automatic sync...');
+    clearInterval(interval);
+  };
 };
 
 export const recordSwipe = async (profileId: string, direction: 'left' | 'right' | 'super'): Promise<SwipeResult> => {
