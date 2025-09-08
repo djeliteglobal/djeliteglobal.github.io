@@ -9,6 +9,7 @@ import { EventCreator } from '../events/EventCreator';
 import { DJApplicationModal } from '../events/DJApplicationModal';
 import { COURSES, FAQ_ITEMS, PRICING_PLANS, PlayCircleIcon, VideoIcon, FileTextIcon, HelpCircleIcon, XIcon, HeartIcon, StarIcon, UndoIcon, LockIcon, MOCK_OPPORTUNITIES } from '../../constants/platform';
 import { fetchSwipeProfiles, recordSwipe, undoSwipe, fetchMatches, deleteMatch, createProfile } from '../../services/profileService';
+import { useMatches } from '../../hooks/useMatches';
 import type { Course, Opportunity } from '../../types/platform';
 import { DJMatchingPage } from './DJMatchingPage';
 
@@ -778,36 +779,20 @@ export const SettingsPage: React.FC = () => {
 
 // Matches List Component
 const MatchesList: React.FC = () => {
-    const [matches, setMatches] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+    const { matches, isLoading, unmatch, isUnmatching } = useMatches();
     const [selectedMatch, setSelectedMatch] = useState<any>(null);
-
-    useEffect(() => {
-        const loadMatches = async () => {
-            try {
-                const matchData = await fetchMatches();
-                setMatches(matchData);
-            } catch (error) {
-                console.error('Failed to load matches:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        loadMatches();
-    }, []);
 
     const handleDeleteMatch = async (matchId: number) => {
         try {
             console.log('🔥 UNMATCHING:', matchId);
-            await deleteMatch(matchId.toString());
-            setMatches(prev => prev.filter(m => m.match_id !== matchId));
+            unmatch(matchId.toString());
             console.log('✅ UNMATCH SUCCESS: They won\'t appear again until you both swipe right');
         } catch (error) {
             console.error('❌ UNMATCH FAILED:', error);
         }
     };
 
-    if (loading) {
+    if (isLoading) {
         return <div className="flex justify-center py-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[color:var(--accent)]"></div></div>;
     }
 
