@@ -1,26 +1,27 @@
 import Ably from 'ably';
 
 // Ultra-low latency messaging with Ably
-const ably = new Ably.Realtime({
-  key: import.meta.env.VITE_ABLY_API_KEY || 'demo-key',
+const ablyKey = import.meta.env.VITE_ABLY_API_KEY;
+const ably = ablyKey ? new Ably.Realtime({
+  key: ablyKey,
   clientId: 'dj-elite-user',
   echoMessages: false,
   autoConnect: true
-});
+}) : null;
 
 export const subscribeToUltraFastMessages = (
   matchId: string,
   onMessage: (message: any) => void,
   onTyping: (isTyping: boolean) => void
 ) => {
+  if (!ably) return () => {};
+  
   const channel = ably.channels.get(`chat:${matchId}`);
   
-  // Subscribe to messages with <50ms latency
   channel.subscribe('message', (message) => {
     onMessage(message.data);
   });
   
-  // Subscribe to typing indicators
   channel.subscribe('typing', (message) => {
     onTyping(message.data.isTyping);
   });
@@ -32,6 +33,8 @@ export const subscribeToUltraFastMessages = (
 };
 
 export const sendUltraFastMessage = async (matchId: string, content: string) => {
+  if (!ably) return;
+  
   const channel = ably.channels.get(`chat:${matchId}`);
   
   await channel.publish('message', {
@@ -42,6 +45,8 @@ export const sendUltraFastMessage = async (matchId: string, content: string) => 
 };
 
 export const sendTypingIndicator = (matchId: string, isTyping: boolean) => {
+  if (!ably) return;
+  
   const channel = ably.channels.get(`chat:${matchId}`);
   
   channel.publish('typing', {
