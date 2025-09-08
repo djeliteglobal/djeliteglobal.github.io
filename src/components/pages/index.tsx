@@ -6,6 +6,7 @@ import { Button, CourseCard, FaqItemComponent, PricingCard } from '../platform';
 import { UltraFastSwipeCard } from '../swipe/UltraFastSwipeCard';
 import { ChatInterface } from '../messaging/ChatInterface';
 import { EventCreator } from '../events/EventCreator';
+import { DJApplicationModal } from '../events/DJApplicationModal';
 import { COURSES, FAQ_ITEMS, PRICING_PLANS, PlayCircleIcon, VideoIcon, FileTextIcon, HelpCircleIcon, XIcon, HeartIcon, StarIcon, UndoIcon, LockIcon, MOCK_OPPORTUNITIES } from '../../constants/platform';
 import { fetchSwipeProfiles, recordSwipe, undoSwipe, fetchMatches, deleteMatch, createProfile } from '../../services/profileService';
 import type { Course, Opportunity } from '../../types/platform';
@@ -408,10 +409,26 @@ export const CourseDetailPage: React.FC = () => {
 // Community Page
 export const CommunityPage: React.FC = () => {
     const [showEventCreator, setShowEventCreator] = useState(false);
-    const [events, setEvents] = useState<any[]>([]);
+    const [selectedEvent, setSelectedEvent] = useState<any>(null);
+    const [events, setEvents] = useState<any[]>(() => {
+        const saved = localStorage.getItem('dj-events');
+        return saved ? JSON.parse(saved) : [];
+    });
 
     const handleEventCreated = (event: any) => {
-        setEvents(prev => [event, ...prev]);
+        const newEvents = [event, ...events];
+        setEvents(newEvents);
+        localStorage.setItem('dj-events', JSON.stringify(newEvents));
+    };
+
+    const handleApplicationSubmitted = (application: any) => {
+        const updatedEvents = events.map(event => 
+            event.id === application.eventId 
+                ? { ...event, applications: [...(event.applications || []), application] }
+                : event
+        );
+        setEvents(updatedEvents);
+        localStorage.setItem('dj-events', JSON.stringify(updatedEvents));
     };
 
     return (
@@ -456,7 +473,17 @@ export const CommunityPage: React.FC = () => {
                                 ))}
                             </div>
                             <p className="text-sm text-[color:var(--text-secondary)] mb-4 line-clamp-2">{event.description}</p>
-                            <Button className="w-full" variant="secondary">Apply as DJ</Button>
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm text-[color:var(--text-secondary)]">
+                                    {event.applications?.length || 0} applications
+                                </span>
+                                <Button 
+                                    onClick={() => setSelectedEvent(event)}
+                                    className="px-4 py-2"
+                                >
+                                    Apply as DJ
+                                </Button>
+                            </div>
                         </div>
                     ))
                 )}
@@ -470,6 +497,15 @@ export const CommunityPage: React.FC = () => {
                         onEventCreated={handleEventCreated}
                     />
                 </div>
+            )}
+
+            {/* DJ Application Modal */}
+            {selectedEvent && (
+                <DJApplicationModal
+                    event={selectedEvent}
+                    onClose={() => setSelectedEvent(null)}
+                    onApplicationSubmitted={handleApplicationSubmitted}
+                />
             )}
         </div>
     );
