@@ -44,7 +44,13 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     
     // Subscribe to real-time messages
     const unsubscribe = subscribeToMessages(matchId, (message) => {
-      setMessages(prev => [...prev, message]);
+      setMessages(prev => {
+        // Avoid duplicates and don't add our own messages from realtime
+        if (prev.some(msg => msg.id === message.id) || message.sender_id === currentUserId) {
+          return prev;
+        }
+        return [...prev, message];
+      });
     });
     
     return unsubscribe;
@@ -59,13 +65,34 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     
     setSending(true);
     const messageToSend = newMessage;
+    const tempId = `temp-${Date.now()}`;
+    
+    // Optimistic update - show message instantly
+    const optimisticMessage: Message = {
+      id: tempId,
+      match_id: matchId,
+      sender_id: currentUserId,
+      content: messageToSend,
+      created_at: new Date().toISOString(),
+      message_type: 'text',
+      sender_name: 'You',
+      sender_avatar: ''
+    };
+    
+    setMessages(prev => [...prev, optimisticMessage]);
     setNewMessage('');
     
     try {
-      await sendMessage(matchId, messageToSend);
+      const realMessage = await sendMessage(matchId, messageToSend);
+      // Replace optimistic message with real one
+      setMessages(prev => prev.map(msg => 
+        msg.id === tempId ? realMessage : msg
+      ));
     } catch (error) {
       console.error('Failed to send message:', error);
-      setNewMessage(messageToSend); // Restore message on error
+      // Remove failed message
+      setMessages(prev => prev.filter(msg => msg.id !== tempId));
+      setNewMessage(messageToSend);
     } finally {
       setSending(false);
     }
