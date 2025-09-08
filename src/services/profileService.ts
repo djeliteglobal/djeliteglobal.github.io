@@ -188,19 +188,102 @@ export const syncAllGoogleProfilePictures = async (): Promise<void> => {
 };
 
 export const recordSwipe = async (profileId: string, direction: 'left' | 'right' | 'super'): Promise<SwipeResult> => {
-  // Simplified matching - always show match for right swipes for demo
-  if (direction === 'right' || direction === 'super') {
-    // 50% chance of match for demo purposes
-    const isMatch = Math.random() > 0.5;
-    return { match: isMatch };
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { data: userProfile } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('user_id', user.id)
+    .single();
+
+  if (!userProfile) throw new Error('Profile not found');
+
+  try {
+    // Record the swipe
+    await supabase
+      .from('swipes')
+      .insert({
+        swiper_id: userProfile.id,
+        swiped_id: profileId,
+        direction: direction
+      });
+  } catch (error: any) {
+    // Ignore duplicate swipes
+    if (error.code !== '23505') {
+      console.error('Swipe error:', error);
+    }
   }
-  
+
+  // Check for match if it's a right swipe
+  if (direction === 'right' || direction === 'super') {
+    try {
+      const { data: reverseSwipe } = await supabase
+        .from('swipes')
+        .select('*')
+        .eq('swiper_id', profileId)
+        .eq('swiped_id', userProfile.id)
+        .eq('direction', 'right')
+        .single();
+
+      if (reverseSwipe) {
+        // It's a match!
+        try {
+          await supabase
+            .from('matches')
+            .insert({
+              profile1_id: userProfile.id,
+              profile2_id: profileId
+            });
+        } catch (matchError: any) {
+          // Ignore duplicate matches
+          if (matchError.code !== '23505') {
+            console.error('Match error:', matchError);
+          }
+        }
+        return { match: true };
+      }
+    } catch (error) {
+      console.error('Match check error:', error);
+    }
+  }
+
   return { match: false };
 };
 
 export const fetchMatches = async (): Promise<DJProfile[]> => {
-  // Return empty matches for now - will implement when database is properly set up
-  return [];
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { data: userProfile } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('user_id', user.id)
+    .single();
+
+  if (!userProfile) return [];
+
+  try {
+    const { data: matches } = await supabase
+      .from('matches')
+      .select(`
+        *,
+        profile1:profiles!matches_profile1_id_fkey(*),
+        profile2:profiles!matches_profile2_id_fkey(*)
+      `)
+      .or(`profile1_id.eq.${userProfile.id},profile2_id.eq.${userProfile.id}`);
+
+    return (matches || []).map(match => {
+      const otherProfile = match.profile1_id === userProfile.id ? match.profile2 : match.profile1;
+      return {
+        ...otherProfile,
+        match_id: match.id
+      };
+    });
+  } catch (error) {
+    console.error('Fetch matches error:', error);
+    return [];
+  }
 };
 
 export const undoSwipe = async (): Promise<void> => {
