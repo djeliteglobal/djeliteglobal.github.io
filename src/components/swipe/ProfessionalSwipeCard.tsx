@@ -33,24 +33,27 @@ export const ProfessionalSwipeCard: React.FC<ProfessionalSwipeCardProps> = ({
   };
 
   const handleDragEnd = (event: any, info: PanInfo) => {
-    const threshold = 100;
+    const threshold = 50;
     if (Math.abs(info.offset.x) > threshold) {
       const direction = info.offset.x > 0 ? 'right' : 'left';
       onSwipe(direction);
-      onCardLeftScreen(opportunity.id);
+      setTimeout(() => onCardLeftScreen(opportunity.id), 0);
     }
   };
 
   return (
       <motion.div
         className="absolute w-full h-full select-none overflow-hidden rounded-xl bg-[color:var(--surface)] shadow-2xl border border-[color:var(--border)] cursor-grab active:cursor-grabbing"
-        initial={{ scale: 0.95, opacity: 0 }}
+        initial={{ scale: 0.98, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.3 }}
+        transition={{ duration: 0.05, type: "tween" }}
         drag="x"
-        dragConstraints={{ left: 0, right: 0 }}
+        dragConstraints={{ left: -300, right: 300 }}
+        dragElastic={0.1}
+        dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
         onDragEnd={handleDragEnd}
-        whileDrag={{ scale: 1.05, rotate: 5 }}
+        whileDrag={{ scale: 1.02, rotate: 5 }}
+        style={{ touchAction: 'none', userSelect: 'none' }}
       >
         <div className="relative h-full w-full" onClick={handleImageTap}>
           <motion.img 
@@ -60,7 +63,7 @@ export const ProfessionalSwipeCard: React.FC<ProfessionalSwipeCardProps> = ({
             className="h-full w-full object-cover"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.02 }}
           />
           
           {totalImages > 1 && (
@@ -84,34 +87,34 @@ export const ProfessionalSwipeCard: React.FC<ProfessionalSwipeCardProps> = ({
         
         <motion.div 
           className="absolute bottom-0 left-0 p-6 text-white w-full"
-          initial={{ y: 20, opacity: 0 }}
+          initial={{ y: 5, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.02 }}
         >
           <div className="flex items-end justify-between">
             <div className="flex-1">
               <motion.h3 
                 className="font-display text-3xl font-bold"
-                initial={{ x: -20 }}
+                initial={{ x: -5 }}
                 animate={{ x: 0 }}
-                transition={{ delay: 0.3 }}
+                transition={{ delay: 0.03 }}
               >
                 {opportunity.title}
               </motion.h3>
               <motion.p 
                 className="mt-1 text-lg text-white/90"
-                initial={{ x: -20 }}
+                initial={{ x: -5 }}
                 animate={{ x: 0 }}
-                transition={{ delay: 0.4 }}
+                transition={{ delay: 0.04 }}
               >
                 {opportunity.venue} - {opportunity.location}
               </motion.p>
               
               <motion.div 
                 className="mt-4 flex flex-wrap gap-2"
-                initial={{ y: 10, opacity: 0 }}
+                initial={{ y: 2, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.6 }}
+                transition={{ delay: 0.05 }}
               >
                 {opportunity.genres.map((genre, index) => (
                   <motion.span 
@@ -119,7 +122,7 @@ export const ProfessionalSwipeCard: React.FC<ProfessionalSwipeCardProps> = ({
                     className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold backdrop-blur-sm"
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    transition={{ delay: 0.7 + index * 0.1 }}
+                    transition={{ delay: 0.06 + index * 0.01 }}
                   >
                     {genre}
                   </motion.span>
@@ -128,7 +131,7 @@ export const ProfessionalSwipeCard: React.FC<ProfessionalSwipeCardProps> = ({
                   className="rounded-full bg-[#40E0D0]/30 px-3 py-1 text-xs font-semibold text-[#40E0D0] backdrop-blur-sm"
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  transition={{ delay: 0.9 }}
+                  transition={{ delay: 0.07 }}
                 >
                   {opportunity.fee}
                 </motion.span>
