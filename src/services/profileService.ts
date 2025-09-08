@@ -34,7 +34,7 @@ export const fetchSwipeProfiles = async (): Promise<DJProfile[]> => {
   
   // Transform to match expected format
   return (data || []).map(profile => {
-    const profileImage = profile.profile_image_url || profile.images?.[0] || 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400';
+    const profileImage = profile.profile_image_url || profile.images?.[0] || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDQwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjMTExMTExIi8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE0MCIgcj0iNjAiIGZpbGw9IiMzMzMzMzMiLz4KPHBhdGggZD0iTTEwMCAzMDBDMTAwIDI1MCA0NSAyMDAgMjAwIDIwMFMzMDAgMjUwIDMwMCAzMDBWNDAwSDEwMFYzMDBaIiBmaWxsPSIjMzMzMzMzIi8+Cjwvc3ZnPgo=';
     return {
       id: profile.id,
       title: profile.dj_name || 'DJ',
@@ -115,7 +115,7 @@ export const createProfile = async (profileData: {
 
   // Auto-sync Google profile picture on signup
   const authProfilePic = user.user_metadata?.avatar_url || user.user_metadata?.picture;
-  const defaultImage = authProfilePic || 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f';
+  const defaultImage = authProfilePic || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDQwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjMTExMTExIi8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE0MCIgcj0iNjAiIGZpbGw9IiMzMzMzMzMiLz4KPHBhdGggZD0iTTEwMCAzMDBDMTAwIDI1MCA0NSAyMDAgMjAwIDIwMFMzMDAgMjUwIDMwMCAzMDBWNDAwSDEwMFYzMDBaIiBmaWxsPSIjMzMzMzMzIi8+Cjwvc3ZnPgo=';
   
   // Use user's actual name from Google if available
   const displayName = user.user_metadata?.full_name || user.user_metadata?.name || profileData.dj_name;
