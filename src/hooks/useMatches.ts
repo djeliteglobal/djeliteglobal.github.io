@@ -7,32 +7,38 @@ export const useMatches = () => {
   const matchesQuery = useQuery({
     queryKey: ['matches'],
     queryFn: fetchMatches,
-    staleTime: 0, // Always fresh
+    staleTime: 0,
+    gcTime: 0, // No cache
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
   });
 
   const unmatchMutation = useMutation({
     mutationFn: deleteMatch,
     onMutate: async (matchId) => {
-      // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['matches'] });
       
-      // Snapshot previous value
       const previousMatches = queryClient.getQueryData(['matches']);
       
-      // Optimistically remove match
-      queryClient.setQueryData(['matches'], (old: any[]) => 
-        old?.filter(match => match.match_id !== matchId) || []
-      );
+      // Aggressively remove match
+      queryClient.setQueryData(['matches'], (old: any[]) => {
+        const filtered = old?.filter(match => match.match_id !== matchId) || [];
+        console.log('🚀 OPTIMISTIC REMOVAL:', { matchId, before: old?.length, after: filtered.length });
+        return filtered;
+      });
       
       return { previousMatches };
     },
-    onError: (err, matchId, context) => {
-      // Rollback on error
-      queryClient.setQueryData(['matches'], context?.previousMatches);
+    onSuccess: async () => {
+      // Nuclear cache invalidation
+      await queryClient.invalidateQueries({ queryKey: ['matches'] });
+      await queryClient.refetchQueries({ queryKey: ['matches'] });
+      queryClient.removeQueries({ queryKey: ['matches'] });
+      console.log('💥 CACHE NUKED - Force refetch');
     },
-    onSettled: () => {
-      // Always refetch after mutation
-      queryClient.invalidateQueries({ queryKey: ['matches'] });
+    onError: (err, matchId, context) => {
+      queryClient.setQueryData(['matches'], context?.previousMatches);
+      console.error('❌ Unmatch failed, rolled back');
     },
   });
 
@@ -41,5 +47,6 @@ export const useMatches = () => {
     isLoading: matchesQuery.isLoading,
     unmatch: unmatchMutation.mutate,
     isUnmatching: unmatchMutation.isPending,
+    refetch: matchesQuery.refetch,
   };
 };
