@@ -20,6 +20,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [newMessage, setNewMessage] = useState('');
   const [currentUserId, setCurrentUserId] = useState<string>('');
   const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -54,13 +55,19 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   }, [messages]);
 
   const handleSendMessage = async () => {
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() || sending) return;
+    
+    setSending(true);
+    const messageToSend = newMessage;
+    setNewMessage('');
     
     try {
-      await sendMessage(matchId, newMessage);
-      setNewMessage('');
+      await sendMessage(matchId, messageToSend);
     } catch (error) {
       console.error('Failed to send message:', error);
+      setNewMessage(messageToSend); // Restore message on error
+    } finally {
+      setSending(false);
     }
   };
 
@@ -144,10 +151,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             />
             <button
               onClick={handleSendMessage}
-              disabled={!newMessage.trim()}
+              disabled={!newMessage.trim() || sending}
               className="w-10 h-10 bg-[color:var(--accent)] text-black rounded-full flex items-center justify-center hover:scale-105 transition-transform disabled:opacity-50"
             >
-              ➤
+              {sending ? '⏳' : '➤'}
             </button>
           </div>
         </div>
