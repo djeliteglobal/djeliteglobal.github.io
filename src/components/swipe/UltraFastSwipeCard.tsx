@@ -151,6 +151,23 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
                 </div>
               )}
             </div>
+            
+            {/* More Info Button - BACK INSIDE where it belongs */}
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                const newValue = !showMoreInfoRef.current;
+                showMoreInfoRef.current = newValue;
+                setShowMoreInfo(newValue);
+              }}
+              onMouseDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
+              className="ml-4 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors z-50 relative"
+              style={{ pointerEvents: 'auto' }}
+            >
+              <span className="text-sm font-bold">{showMoreInfo ? '\u2212' : 'i'}</span>
+            </button>
           </div>
         </div>
 
@@ -173,22 +190,7 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
         </animated.div>
       </animated.div>
       
-      {/* More Info Button - BACK INSIDE but with proper isolation */}
-      <button 
-        onClick={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-          const newValue = !showMoreInfoRef.current;
-          showMoreInfoRef.current = newValue;
-          setShowMoreInfo(newValue);
-        }}
-        onMouseDown={(e) => e.stopPropagation()}
-        onTouchStart={(e) => e.stopPropagation()}
-        className="absolute bottom-6 right-6 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors z-50"
-        style={{ pointerEvents: 'auto' }}
-      >
-        <span className="text-sm font-bold">{showMoreInfo ? '−' : 'i'}</span>
-      </button>
+
     </div>
   );
 };
