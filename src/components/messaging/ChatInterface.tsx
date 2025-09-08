@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import { MessageBox } from 'react-chat-elements';
-import 'react-chat-elements/dist/main.css';
 import { motion } from 'framer-motion';
 
 interface ChatInterfaceProps {
@@ -86,23 +84,31 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
         <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[color:var(--bg)]">
           {messages.map((msg) => (
-            <motion.div key={msg.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-              <MessageBox
-                position={msg.position}
-                type={msg.type}
-                text={msg.text}
-                date={msg.date}
-                avatar={msg.avatar}
-                title={msg.title}
-                focus={false}
-                titleColor="#40E0D0"
-                forwarded={false}
-                replyButton={false}
-                removeButton={false}
-                status="read"
-                notch={true}
-                retracted={false}
-              />
+            <motion.div 
+              key={msg.id} 
+              initial={{ opacity: 0, y: 20 }} 
+              animate={{ opacity: 1, y: 0 }}
+              className={`flex ${msg.position === 'right' ? 'justify-end' : 'justify-start'}`}
+            >
+              <div className={`flex items-end gap-2 max-w-[80%] ${
+                msg.position === 'right' ? 'flex-row-reverse' : 'flex-row'
+              }`}>
+                <img 
+                  src={msg.avatar} 
+                  alt={msg.title}
+                  className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                />
+                <div className={`px-4 py-2 rounded-2xl ${
+                  msg.position === 'right' 
+                    ? 'bg-[color:var(--accent)] text-black rounded-br-sm' 
+                    : 'bg-[color:var(--surface)] text-[color:var(--text-primary)] rounded-bl-sm'
+                }`}>
+                  <p className="text-sm">{msg.text}</p>
+                  <p className="text-xs opacity-70 mt-1">
+                    {msg.date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                </div>
+              </div>
             </motion.div>
           ))}
         </div>
