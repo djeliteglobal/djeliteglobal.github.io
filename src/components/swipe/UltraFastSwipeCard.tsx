@@ -108,25 +108,79 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
       <div className="absolute bottom-0 left-0 p-6 text-white w-full pointer-events-none">
         <div className="flex items-end justify-between">
           <div className="flex-1">
-            <h3 className="font-display text-3xl font-bold">
+            <animated.h3 
+              className="font-display text-3xl font-bold"
+              style={{
+                transform: useSpring({
+                  from: { scale: 0.8, y: 10 },
+                  to: { scale: 1, y: 0 },
+                  delay: 50,
+                  config: { tension: 400, friction: 15 }
+                }).scale.to(s => `scale(${s})`)
+              }}
+            >
               {opportunity.title}
-            </h3>
-            <p className="mt-1 text-lg text-white/90">
+            </animated.h3>
+            <animated.p 
+              className="mt-1 text-lg text-white/90"
+              style={{
+                transform: useSpring({
+                  from: { scale: 0.8, y: 10 },
+                  to: { scale: 1, y: 0 },
+                  delay: 100,
+                  config: { tension: 400, friction: 15 }
+                }).scale.to(s => `scale(${s})`)
+              }}
+            >
               {opportunity.venue} - {opportunity.location}
-            </p>
+            </animated.p>
             
             <div className="mt-4 flex flex-wrap gap-2">
-              {opportunity.genres.map((genre) => (
-                <span 
+              {opportunity.genres.map((genre, index) => (
+                <animated.span 
                   key={genre} 
                   className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold backdrop-blur-sm"
+                  style={{
+                    transform: useSpring({
+                      from: { scale: 0, y: 20 },
+                      to: { scale: 1, y: 0 },
+                      delay: 100 + index * 50,
+                      config: { tension: 300, friction: 10 }
+                    }).scale.to(s => `scale(${s})`)
+                  }}
                 >
                   {genre}
-                </span>
+                </animated.span>
               ))}
-              <span className="rounded-full bg-[#40E0D0]/30 px-3 py-1 text-xs font-semibold text-[#40E0D0] backdrop-blur-sm">
+              {opportunity.skills?.map((skill, index) => (
+                <animated.span 
+                  key={skill} 
+                  className="rounded-full bg-blue-500/30 px-3 py-1 text-xs font-semibold text-blue-200 backdrop-blur-sm"
+                  style={{
+                    transform: useSpring({
+                      from: { scale: 0, y: 20 },
+                      to: { scale: 1, y: 0 },
+                      delay: 200 + index * 50,
+                      config: { tension: 300, friction: 10 }
+                    }).scale.to(s => `scale(${s})`)
+                  }}
+                >
+                  {skill}
+                </animated.span>
+              ))}
+              <animated.span 
+                className="rounded-full bg-[#40E0D0]/30 px-3 py-1 text-xs font-semibold text-[#40E0D0] backdrop-blur-sm"
+                style={{
+                  transform: useSpring({
+                    from: { scale: 0, y: 20 },
+                    to: { scale: 1, y: 0 },
+                    delay: 300,
+                    config: { tension: 300, friction: 10 }
+                  }).scale.to(s => `scale(${s})`)
+                }}
+              >
                 {opportunity.fee}
-              </span>
+              </animated.span>
             </div>
           </div>
         </div>
