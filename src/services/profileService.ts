@@ -326,20 +326,50 @@ export const undoSwipe = async (): Promise<void> => {
 };
 
 export const deleteMatch = async (matchId: string): Promise<void> => {
-  console.log('🎯 TRIGGER-POWERED UNMATCH:', matchId);
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { data: userProfile } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('user_id', user.id)
+    .single();
+
+  if (!userProfile) throw new Error('Profile not found');
+
+  console.log('🎯 HYBRID UNMATCH:', matchId);
   
-  // Database trigger automatically deletes swipes!
-  const { error } = await supabase
+  // Get match details first
+  const { data: match } = await supabase
     .from('matches')
-    .delete()
-    .eq('id', matchId);
+    .select('profile1_id, profile2_id')
+    .eq('id', matchId)
+    .single();
+
+  if (match) {
+    const otherProfileId = match.profile1_id === userProfile.id ? match.profile2_id : match.profile1_id;
     
-  if (error) {
-    console.error('❌ UNMATCH FAILED:', error);
-    throw error;
+    // Delete match (trigger should handle swipes)
+    const { error: matchError } = await supabase
+      .from('matches')
+      .delete()
+      .eq('id', matchId);
+      
+    // Manual cleanup as fallback
+    await supabase
+      .from('swipes')
+      .delete()
+      .eq('swiper_id', userProfile.id)
+      .eq('swiped_id', otherProfileId);
+      
+    await supabase
+      .from('swipes')
+      .delete()
+      .eq('swiper_id', otherProfileId)
+      .eq('swiped_id', userProfile.id);
+      
+    console.log('✨ HYBRID UNMATCH COMPLETE: Trigger + manual cleanup!');
   }
-  
-  console.log('✨ TRIGGER UNMATCH COMPLETE: Match + swipes auto-deleted!');
 };
 
 export const subscribeToCareerAccelerator = async (email: string, firstName?: string): Promise<void> => {
