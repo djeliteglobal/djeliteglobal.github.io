@@ -2,7 +2,7 @@ import Ably from 'ably';
 
 // Ultra-low latency messaging with Ably
 const ably = new Ably.Realtime({
-  key: 'demo-key', // Replace with your Ably key
+  key: import.meta.env.VITE_ABLY_API_KEY || 'demo-key',
   clientId: 'dj-elite-user',
   echoMessages: false,
   autoConnect: true
