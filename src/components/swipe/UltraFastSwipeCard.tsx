@@ -30,31 +30,25 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
     velocity: [vx], 
     direction: [xDir] 
   }) => {
-    const trigger = velocity > 0.2 || Math.abs(mx) > 100;
-    const dir = xDir < 0 ? -1 : 1;
+    const trigger = Math.abs(mx) > 80;
+    const dir = mx > 0 ? 1 : -1;
     
     if (!down && trigger) {
       const direction = dir > 0 ? 'right' : 'left';
       onSwipe(direction);
       api.start({ 
-        x: dir * 1000, 
-        rotate: dir * 30, 
-        scale: 0.8,
-        config: { tension: 200, friction: 20 }
+        x: dir * 800, 
+        rotate: dir * 20, 
+        scale: 0.9
       });
-      setTimeout(() => onCardLeftScreen(opportunity.id), 300);
+      setTimeout(() => onCardLeftScreen(opportunity.id), 200);
     } else {
       api.start({ 
         x: down ? mx : 0, 
-        rotate: down ? mx / 10 : 0,
-        scale: down ? 1.05 : 1,
-        config: { tension: 500, friction: 50 }
+        rotate: down ? mx / 15 : 0,
+        scale: down ? 1.02 : 1
       });
     }
-  }, {
-    axis: 'x',
-    bounds: { left: -300, right: 300 },
-    rubberband: true
   });
 
   const handleImageTap = (e: React.MouseEvent) => {
