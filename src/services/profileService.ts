@@ -21,23 +21,14 @@ export const fetchSwipeProfiles = async (): Promise<DJProfile[]> => {
     return [];
   }
 
-  // Get all swiped profile IDs to exclude them
-  const { data: swipedProfiles } = await supabase
-    .from('swipes')
-    .select('swiped_id')
-    .eq('swiper_id', userProfile.id);
-
-  const swipedIds = swipedProfiles?.map(s => s.swiped_id) || [];
-
-  // Get profiles excluding current user and already swiped profiles
+  // TESTING MODE: Show all profiles (no filtering)
   const { data, error } = await supabase
     .from('profiles')
     .select('*')
     .neq('user_id', user.id)
-    .not('id', 'in', `(${swipedIds.length > 0 ? swipedIds.join(',') : 'null'})`)
     .limit(10);
     
-  console.log('🔍 PROFILES DEBUG:', { data, error, userProfile, excludedIds: swipedIds });
+  console.log('🔍 PROFILES DEBUG (TESTING MODE):', { data, error, userProfile });
 
   if (error) throw error;
   
