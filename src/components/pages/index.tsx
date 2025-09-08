@@ -410,25 +410,48 @@ export const CourseDetailPage: React.FC = () => {
 export const CommunityPage: React.FC = () => {
     const [showEventCreator, setShowEventCreator] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState<any>(null);
-    const [events, setEvents] = useState<any[]>(() => {
-        const saved = localStorage.getItem('dj-events');
-        return saved ? JSON.parse(saved) : [];
-    });
+    const [events, setEvents] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    const handleEventCreated = (event: any) => {
-        const newEvents = [event, ...events];
-        setEvents(newEvents);
-        localStorage.setItem('dj-events', JSON.stringify(newEvents));
+    // Load events from shared database
+    useEffect(() => {
+        const loadEvents = async () => {
+            try {
+                const { fetchEvents } = await import('../../services/eventService');
+                const eventData = await fetchEvents();
+                setEvents(eventData);
+            } catch (error) {
+                console.error('Failed to load events:', error);
+                setEvents([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadEvents();
+    }, []);
+
+    const handleEventCreated = async (event: any) => {
+        try {
+            const { createEvent } = await import('../../services/eventService');
+            const createdEvent = await createEvent(event);
+            setEvents(prev => [createdEvent, ...prev]);
+        } catch (error) {
+            console.error('Failed to create event:', error);
+        }
     };
 
-    const handleApplicationSubmitted = (application: any) => {
-        const updatedEvents = events.map(event => 
-            event.id === application.eventId 
-                ? { ...event, applications: [...(event.applications || []), application] }
-                : event
-        );
-        setEvents(updatedEvents);
-        localStorage.setItem('dj-events', JSON.stringify(updatedEvents));
+    const handleApplicationSubmitted = async (application: any) => {
+        try {
+            const { submitApplication } = await import('../../services/eventService');
+            await submitApplication(application);
+            setEvents(prev => prev.map(event => 
+                event.id === application.eventId 
+                    ? { ...event, applications: [...(event.applications || []), application] }
+                    : event
+            ));
+        } catch (error) {
+            console.error('Failed to submit application:', error);
+        }
     };
 
     return (
@@ -447,7 +470,12 @@ export const CommunityPage: React.FC = () => {
             </div>
 
             {/* Events Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {loading ? (
+                <div className="flex justify-center py-16">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[color:var(--accent)]"></div>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {events.length === 0 ? (
                     <div className="col-span-full flex flex-col items-center justify-center py-16 text-center">
                         <div className="text-6xl mb-4">🎪</div>
@@ -486,8 +514,9 @@ export const CommunityPage: React.FC = () => {
                             </div>
                         </div>
                     ))
-                )}
-            </div>
+                    )}
+                </div>
+            )}
 
             {/* Event Creator Modal */}
             {showEventCreator && (
