@@ -106,7 +106,7 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent pointer-events-none" />
       
       {/* Profile info */}
-      <div className="absolute bottom-0 left-0 p-6 text-white w-full pointer-events-none">
+      <div className="absolute bottom-0 left-0 p-6 text-white w-full">
         <div className="flex items-end justify-between">
           <div className="flex-1">
             <animated.h3 
@@ -219,7 +219,7 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
               e.stopPropagation();
               setShowMoreInfo(!showMoreInfo);
             }}
-            className="ml-4 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors pointer-events-auto"
+            className="ml-4 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors"
           >
             <span className="text-sm font-bold">{showMoreInfo ? '−' : 'i'}</span>
           </button>
