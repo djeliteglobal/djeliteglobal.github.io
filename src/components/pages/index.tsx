@@ -826,7 +826,10 @@ const MatchesList: React.FC = () => {
                         </div>
                         <div className="flex-shrink-0 flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                             <button 
-                                onClick={() => setSelectedMatch(match)}
+                                onClick={() => {
+                                    console.log('💬 MESSAGING: Using match_id:', match.match_id, 'for profile:', match.id);
+                                    setSelectedMatch({...match, id: match.match_id}); // Use match_id as the chat ID
+                                }}
                                 className="px-3 py-1.5 text-sm bg-[color:var(--accent)] text-black rounded hover:scale-105 transition-transform font-semibold"
                             >
                                 Message
@@ -848,7 +851,7 @@ const MatchesList: React.FC = () => {
             {selectedMatch && (
                 <div className="fixed inset-0 z-50">
                     <ChatInterface
-                        matchId={selectedMatch.id}
+                        matchId={selectedMatch.id} // This is now the match_id
                         matchName={selectedMatch.dj_name}
                         matchAvatar={selectedMatch.images?.[0] || selectedMatch.imageUrl}
                         onClose={() => setSelectedMatch(null)}
