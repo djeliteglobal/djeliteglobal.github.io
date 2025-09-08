@@ -139,11 +139,19 @@ export const TinderStyleProfileEditor: React.FC<TinderStyleProfileEditorProps> =
               <div className="grid grid-cols-2 gap-4">
                 {/* Main profile picture */}
                 <div className="relative aspect-square">
-                  <img 
-                    src={profile.profile_image_url || 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f'} 
-                    alt="Profile" 
-                    className="w-full h-full rounded-xl object-cover border-2 border-[color:var(--accent)]"
-                  />
+                  {profile.profile_image_url ? (
+                    <img 
+                      src={profile.profile_image_url} 
+                      alt="Profile" 
+                      className="w-full h-full rounded-xl object-cover border-2 border-[color:var(--accent)]"
+                    />
+                  ) : (
+                    <div className="w-full h-full rounded-xl bg-[color:var(--surface-alt)] border-2 border-[color:var(--accent)] flex items-center justify-center">
+                      <svg className="w-16 h-16 text-[color:var(--text-secondary)]" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                      </svg>
+                    </div>
+                  )}
                   <label className="absolute bottom-2 right-2 w-8 h-8 bg-[color:var(--accent)] rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
                     <span className="text-black font-bold text-sm">+</span>
                     <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, 0)} className="hidden" />

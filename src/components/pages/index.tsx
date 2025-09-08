@@ -842,7 +842,7 @@ const MatchesList: React.FC = () => {
                                 onClick={() => handleDeleteMatch(match.match_id)}
                                 className="px-3 py-1.5 text-sm bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 transition-colors"
                             >
-                                Delete
+                                Unmatch
                             </button>
                         </div>
                     </li>

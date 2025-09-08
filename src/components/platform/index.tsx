@@ -63,8 +63,16 @@ export const TopBar: React.FC = () => {
                     {appState.theme === 'dark' ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
                 </button>
                 <LanguageSwitcher inline={true} />
-                <button onClick={() => setShowProfileEditor(true)} className="h-10 w-10 rounded-full hover:ring-2 hover:ring-[color:var(--accent)] transition-all">
-                    <img src={currentUser?.avatarUrl} alt={currentUser?.name} className="h-full w-full rounded-full object-cover" />
+                <button onClick={() => setShowProfileEditor(true)} className="h-10 w-10 rounded-full hover:ring-2 hover:ring-[color:var(--accent)] transition-all overflow-hidden">
+                    {currentUser?.profile_image_url ? (
+                        <img src={currentUser.profile_image_url} alt={currentUser?.name} className="h-full w-full rounded-full object-cover" />
+                    ) : (
+                        <div className="h-full w-full rounded-full bg-[color:var(--surface-alt)] flex items-center justify-center">
+                            <svg className="w-5 h-5 text-[color:var(--text-secondary)]" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            </svg>
+                        </div>
+                    )}
                 </button>
             </div>
         </header>
@@ -106,7 +114,15 @@ export const SideNav: React.FC = () => {
                 <button 
                   onClick={() => setShowProfileEditor(true)}
                   className={`flex w-full items-center gap-3 rounded-md px-4 py-3 text-sm font-medium transition-colors hover:bg-[color:var(--surface-alt)] hover:text-[color:var(--text-primary)] text-[color:var(--text-secondary)]`}>
-                    <img src={currentUser?.avatarUrl} alt={currentUser?.name} className="h-8 w-8 rounded-full object-cover" />
+                    {currentUser?.profile_image_url ? (
+                        <img src={currentUser.profile_image_url} alt={currentUser?.name} className="h-8 w-8 rounded-full object-cover" />
+                    ) : (
+                        <div className="h-8 w-8 rounded-full bg-[color:var(--surface-alt)] flex items-center justify-center">
+                            <svg className="w-4 h-4 text-[color:var(--text-secondary)]" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            </svg>
+                        </div>
+                    )}
                     <div className="text-left">
                         <p className="font-semibold text-[color:var(--text-primary)]">{currentUser?.name}</p>
                         <p className="text-xs text-[color:var(--muted)]">{currentUser?.plan}</p>
