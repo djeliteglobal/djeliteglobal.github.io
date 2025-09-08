@@ -798,10 +798,12 @@ const MatchesList: React.FC = () => {
 
     const handleDeleteMatch = async (matchId: number) => {
         try {
-            await deleteMatch(matchId);
+            console.log('🔥 UNMATCHING:', matchId);
+            await deleteMatch(matchId.toString());
             setMatches(prev => prev.filter(m => m.match_id !== matchId));
+            console.log('✅ UNMATCH SUCCESS: They won\'t appear again until you both swipe right');
         } catch (error) {
-            console.error('Failed to delete match:', error);
+            console.error('❌ UNMATCH FAILED:', error);
         }
     };
 

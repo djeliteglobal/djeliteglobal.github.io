@@ -325,12 +325,48 @@ export const undoSwipe = async (): Promise<void> => {
 };
 
 export const deleteMatch = async (matchId: string): Promise<void> => {
-  const { error } = await supabase
-    .from('matches')
-    .delete()
-    .eq('id', matchId);
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
 
-  if (error) throw error;
+  const { data: userProfile } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('user_id', user.id)
+    .single();
+
+  if (!userProfile) throw new Error('Profile not found');
+
+  // First get the match to find the other profile
+  const { data: match } = await supabase
+    .from('matches')
+    .select('profile1_id, profile2_id')
+    .eq('id', matchId)
+    .single();
+
+  if (match) {
+    const otherProfileId = match.profile1_id === userProfile.id ? match.profile2_id : match.profile1_id;
+    
+    // Delete the match record
+    await supabase
+      .from('matches')
+      .delete()
+      .eq('id', matchId);
+    
+    // GENNADY'S FIX: Delete BOTH swipe records to prevent re-matching
+    await supabase
+      .from('swipes')
+      .delete()
+      .eq('swiper_id', userProfile.id)
+      .eq('swiped_id', otherProfileId);
+      
+    await supabase
+      .from('swipes')
+      .delete()
+      .eq('swiper_id', otherProfileId)
+      .eq('swiped_id', userProfile.id);
+      
+    console.log('🔥 UNMATCH COMPLETE: Deleted match and all swipe records');
+  }
 };
 
 export const subscribeToCareerAccelerator = async (email: string, firstName?: string): Promise<void> => {
