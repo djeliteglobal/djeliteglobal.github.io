@@ -29,8 +29,14 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
     down, 
     movement: [mx], 
     velocity: [vx], 
-    direction: [xDir] 
+    direction: [xDir],
+    event
   }) => {
+    // Vitalik's fix: Ignore drag if clicking info button
+    if (event?.target?.closest?.('.info-button')) {
+      return;
+    }
+    
     const trigger = Math.abs(mx) > 80;
     const dir = mx > 0 ? 1 : -1;
     
@@ -222,8 +228,8 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
               e.preventDefault();
               setShowMoreInfo(!showMoreInfo);
             }}
-            className="ml-4 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors z-50 relative"
-            style={{ pointerEvents: 'auto', touchAction: 'manipulation' }}
+            className="info-button ml-4 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors z-50 relative"
+            style={{ pointerEvents: 'auto', touchAction: 'none' }}
           >
             <span className="text-sm font-bold">{showMoreInfo ? '−' : 'i'}</span>
           </button>
