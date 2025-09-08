@@ -18,16 +18,26 @@ export const fetchSwipeProfiles = async (): Promise<DJProfile[]> => {
   if (!userProfile) {
     // Create profile if doesn't exist
     await createProfile({ dj_name: 'New DJ', bio: 'Getting started' });
+    return [];
   }
 
-  // Get all profiles except current user (simplified for debugging)
+  // Get all swiped profile IDs to exclude them
+  const { data: swipedProfiles } = await supabase
+    .from('swipes')
+    .select('swiped_id')
+    .eq('swiper_id', userProfile.id);
+
+  const swipedIds = swipedProfiles?.map(s => s.swiped_id) || [];
+
+  // Get profiles excluding current user and already swiped profiles
   const { data, error } = await supabase
     .from('profiles')
     .select('*')
     .neq('user_id', user.id)
+    .not('id', 'in', `(${swipedIds.length > 0 ? swipedIds.join(',') : 'null'})`)
     .limit(10);
     
-  console.log('🔍 PROFILES DEBUG:', { data, error, userProfile });
+  console.log('🔍 PROFILES DEBUG:', { data, error, userProfile, excludedIds: swipedIds });
 
   if (error) throw error;
   
