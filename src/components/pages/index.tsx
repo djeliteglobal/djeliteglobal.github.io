@@ -4,6 +4,7 @@ import { AppContext } from '../../pages/HomePage';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button, CourseCard, FaqItemComponent, PricingCard } from '../platform';
 import { UltraFastSwipeCard } from '../swipe/UltraFastSwipeCard';
+import { ChatInterface } from '../messaging/ChatInterface';
 import { COURSES, FAQ_ITEMS, PRICING_PLANS, PlayCircleIcon, VideoIcon, FileTextIcon, HelpCircleIcon, XIcon, HeartIcon, StarIcon, UndoIcon, LockIcon, MOCK_OPPORTUNITIES } from '../../constants/platform';
 import { fetchSwipeProfiles, recordSwipe, undoSwipe, fetchMatches, deleteMatch, createProfile } from '../../services/profileService';
 import type { Course, Opportunity } from '../../types/platform';
@@ -685,6 +686,7 @@ export const SettingsPage: React.FC = () => {
 const MatchesList: React.FC = () => {
     const [matches, setMatches] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [selectedMatch, setSelectedMatch] = useState<any>(null);
 
     useEffect(() => {
         const loadMatches = async () => {
@@ -742,7 +744,12 @@ const MatchesList: React.FC = () => {
                             </div>
                         </div>
                         <div className="flex-shrink-0 flex gap-2">
-                            <Button variant="secondary" className="px-3 py-1.5 text-sm">Message</Button>
+                            <button 
+                                onClick={() => setSelectedMatch(match)}
+                                className="px-3 py-1.5 text-sm bg-[color:var(--accent)] text-black rounded hover:scale-105 transition-transform font-semibold"
+                            >
+                                Message
+                            </button>
                             <button 
                                 onClick={() => handleDeleteMatch(match.match_id)}
                                 className="px-3 py-1.5 text-sm bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 transition-colors"
@@ -753,6 +760,17 @@ const MatchesList: React.FC = () => {
                     </li>
                 ))}
             </ul>
+            
+            {selectedMatch && (
+                <div className="fixed inset-0 z-50">
+                    <ChatInterface
+                        matchId={selectedMatch.id}
+                        matchName={selectedMatch.dj_name}
+                        matchAvatar={selectedMatch.images?.[0] || selectedMatch.imageUrl}
+                        onClose={() => setSelectedMatch(null)}
+                    />
+                </div>
+            )}
         </div>
     );
 };
