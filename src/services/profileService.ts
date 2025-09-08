@@ -81,19 +81,29 @@ export const createProfile = async (profileData: {
     .single();
 
   if (existing) {
-    // Update existing profile with latest Google picture
+    // Update existing profile with latest Google data
     const googlePicture = user.user_metadata?.avatar_url || user.user_metadata?.picture;
+    const googleName = user.user_metadata?.full_name || user.user_metadata?.name;
+    
+    const updates: any = { updated_at: new Date().toISOString() };
+    
+    // Update name if it's "New DJ" or empty
+    if (googleName && (existing.dj_name === 'New DJ' || !existing.dj_name || existing.dj_name.trim() === '')) {
+      updates.dj_name = googleName;
+    }
+    
+    // Update profile picture
     if (googlePicture) {
       const currentImages = existing.images || [];
       const newImages = [googlePicture, ...currentImages.filter((img: string) => img !== googlePicture)];
-      
+      updates.profile_image_url = googlePicture;
+      updates.images = newImages;
+    }
+    
+    if (Object.keys(updates).length > 1) { // More than just updated_at
       const { data: updatedProfile } = await supabase
         .from('profiles')
-        .update({
-          profile_image_url: googlePicture,
-          images: newImages,
-          updated_at: new Date().toISOString()
-        })
+        .update(updates)
         .eq('id', existing.id)
         .select()
         .single();
@@ -254,16 +264,27 @@ export const syncAllGoogleProfilePictures = async (): Promise<void> => {
         if (profile.user_id !== user.id) continue;
         
         const googlePicture = user.user_metadata?.avatar_url || user.user_metadata?.picture;
+        const googleName = user.user_metadata?.full_name || user.user_metadata?.name;
         
+        const updates: any = {};
+        
+        // Update name if it's "New DJ" or empty
+        if (googleName && (profile.dj_name === 'New DJ' || !profile.dj_name || profile.dj_name.trim() === '')) {
+          updates.dj_name = googleName;
+        }
+        
+        // Update profile picture
         if (googlePicture) {
-          const updates: any = {
-            profile_image_url: googlePicture
-          };
+          updates.profile_image_url = googlePicture;
           
           // Always update images array with Google picture as first image
           const currentImages = profile.images || [];
           const newImages = [googlePicture, ...currentImages.filter((img: string) => img !== googlePicture)];
           updates.images = newImages;
+        }
+        
+        // Only update if we have changes
+        if (Object.keys(updates).length > 0) {
           
           const { error: updateError } = await supabase
             .from('profiles')
@@ -273,10 +294,10 @@ export const syncAllGoogleProfilePictures = async (): Promise<void> => {
           if (updateError) {
             console.error(`❌ SYNC ERROR: Failed to update profile ${profile.id}:`, updateError);
           } else {
-            console.log(`✅ SYNC: Updated ${profile.dj_name} with Google picture`);
+            console.log(`✅ SYNC: Updated ${updates.dj_name || profile.dj_name} with Google data`);
           }
         } else {
-          console.log(`⚠️ SYNC: No Google picture for ${profile.dj_name}`);
+          console.log(`⚠️ SYNC: No updates needed for ${profile.dj_name}`);
         }
       } catch (profileError) {
         console.error(`❌ SYNC ERROR: Failed to process profile ${profile.id}:`, profileError);
