@@ -1,7 +1,15 @@
 // Security utility for input sanitization
 export const sanitizeForLog = (input: any): string => {
+  if (input === null || input === undefined) {
+    return '[null]';
+  }
+  
   if (typeof input !== 'string') {
-    input = String(input);
+    try {
+      input = String(input);
+    } catch (e) {
+      return '[invalid]';
+    }
   }
   
   return input
