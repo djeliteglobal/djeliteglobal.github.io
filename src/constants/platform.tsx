@@ -104,14 +104,43 @@ export const MOCK_USER: User = {
 
 // Lazy load courses data
 export const loadCourses = async (): Promise<Course[]> => {
-  const { courses } = await import('../data/constants.json');
-  return courses as Course[];
+  try {
+    const { courses } = await import('../data/constants.json');
+    return (courses || []).map((course: any) => ({
+      id: course.id || 0,
+      title: course.title || 'Untitled Course',
+      description: course.description || 'No description available',
+      duration: course.duration || '1 week',
+      level: course.level || 'Beginner',
+      instructor: course.instructor || 'DJ Elite Team',
+      imageUrl: course.imageUrl || 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400',
+      progress: course.progress || 0,
+      isLocked: course.isLocked !== false
+    }));
+  } catch (error) {
+    console.error('Failed to load courses:', error);
+    return [];
+  }
 };
 
 // Lazy load opportunities data
 export const loadOpportunities = async (): Promise<Opportunity[]> => {
-  const { mockOpportunities } = await import('../data/constants.json');
-  return mockOpportunities as Opportunity[];
+  try {
+    const { mockOpportunities } = await import('../data/constants.json');
+    return (mockOpportunities || []).map((opp: any) => ({
+      id: opp.id || 0,
+      title: opp.title || 'Untitled Opportunity',
+      venue: opp.venue || 'Unknown Venue',
+      location: opp.location || 'Unknown Location',
+      fee: opp.fee || '$0',
+      type: opp.type || 'Gig',
+      imageUrl: opp.imageUrl || 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400',
+      description: opp.description || 'No description available'
+    }));
+  } catch (error) {
+    console.error('Failed to load opportunities:', error);
+    return [];
+  }
 };
 
 export const PRICING_PLANS: PricingPlan[] = [

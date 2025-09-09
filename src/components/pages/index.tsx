@@ -254,9 +254,17 @@ export const Dashboard: React.FC = () => {
     const { currentUser } = useAuth();
     const [courses, setCourses] = useState<Course[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     
     useEffect(() => {
-        loadCourses().then(setCourses).finally(() => setLoading(false));
+        loadCourses()
+            .then(setCourses)
+            .catch(err => {
+                console.error('Dashboard error:', err);
+                setError('Failed to load courses');
+                setCourses([]);
+            })
+            .finally(() => setLoading(false));
     }, []);
     
     const inProgressCourse = courses.find(c => c.progress > 0 && c.progress < 100);
@@ -337,11 +345,33 @@ export const Dashboard: React.FC = () => {
 export const CoursesPage: React.FC = () => {
     const [courses, setCourses] = useState<Course[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     
     useEffect(() => {
-        loadCourses().then(setCourses).finally(() => setLoading(false));
+        loadCourses()
+            .then(setCourses)
+            .catch(err => {
+                console.error('Courses error:', err);
+                setError('Failed to load courses');
+                setCourses([]);
+            })
+            .finally(() => setLoading(false));
     }, []);
     
+    if (error) {
+        return (
+            <div className="min-h-full bg-[color:var(--bg)] text-[color:var(--text-primary)] p-4 sm:p-6 md:p-8">
+                <h1 className="font-display text-3xl font-bold text-[color:var(--text-primary)]">All Courses</h1>
+                <div className="mt-8 text-center py-8">
+                    <p className="text-red-400 mb-4">{error}</p>
+                    <button onClick={() => window.location.reload()} className="px-4 py-2 bg-[color:var(--accent)] text-black rounded">
+                        Retry
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-full bg-[color:var(--bg)] text-[color:var(--text-primary)] p-4 sm:p-6 md:p-8">
             <h1 className="font-display text-3xl font-bold text-[color:var(--text-primary)]">All Courses</h1>
@@ -350,6 +380,10 @@ export const CoursesPage: React.FC = () => {
                 {loading ? (
                     <div className="col-span-full text-center py-8">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[color:var(--accent)] mx-auto"></div>
+                    </div>
+                ) : courses.length === 0 ? (
+                    <div className="col-span-full text-center py-8">
+                        <p className="text-[color:var(--text-secondary)]">No courses available</p>
                     </div>
                 ) : (
                     courses.map(course => (
