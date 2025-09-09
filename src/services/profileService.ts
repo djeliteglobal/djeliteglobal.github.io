@@ -92,12 +92,22 @@ export const createProfile = async (profileData: {
       updates.dj_name = googleName;
     }
     
-    // Update profile picture
+    // Smart profile picture logic: Only auto-update if user hasn't uploaded their own image
     if (googlePicture) {
       const currentImages = existing.images || [];
-      const newImages = [googlePicture, ...currentImages.filter((img: string) => img !== googlePicture)];
-      updates.profile_image_url = googlePicture;
-      updates.images = newImages;
+      const hasUserUploadedImage = currentImages.some((img: string) => 
+        !img.includes('googleusercontent.com') && 
+        !img.includes('data:image/svg') &&
+        !img.includes('unsplash.com') &&
+        !img.includes('picsum.photos')
+      );
+      
+      // Only update if user hasn't uploaded their own image
+      if (!hasUserUploadedImage) {
+        const newImages = [googlePicture, ...currentImages.filter((img: string) => img !== googlePicture)];
+        updates.profile_image_url = googlePicture;
+        updates.images = newImages;
+      }
     }
     
     if (Object.keys(updates).length > 1) { // More than just updated_at
@@ -273,14 +283,22 @@ export const syncAllGoogleProfilePictures = async (): Promise<void> => {
           updates.dj_name = googleName;
         }
         
-        // Update profile picture
+        // Smart profile picture logic: Only auto-update if user hasn't uploaded their own image
         if (googlePicture) {
-          updates.profile_image_url = googlePicture;
-          
-          // Always update images array with Google picture as first image
           const currentImages = profile.images || [];
-          const newImages = [googlePicture, ...currentImages.filter((img: string) => img !== googlePicture)];
-          updates.images = newImages;
+          const hasUserUploadedImage = currentImages.some((img: string) => 
+            !img.includes('googleusercontent.com') && 
+            !img.includes('data:image/svg') &&
+            !img.includes('unsplash.com') &&
+            !img.includes('picsum.photos')
+          );
+          
+          // Only update if user hasn't uploaded their own image
+          if (!hasUserUploadedImage) {
+            updates.profile_image_url = googlePicture;
+            const newImages = [googlePicture, ...currentImages.filter((img: string) => img !== googlePicture)];
+            updates.images = newImages;
+          }
         }
         
         // Only update if we have changes
