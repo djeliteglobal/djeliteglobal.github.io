@@ -9,7 +9,7 @@ import { OptimizedImage } from '../OptimizedImage';
 import { ProfileThumbnail } from '../ProfileThumbnail';
 import { EventCreator } from '../events/EventCreator';
 import { DJApplicationModal } from '../events/DJApplicationModal';
-import { COURSES, FAQ_ITEMS, PRICING_PLANS, PlayCircleIcon, VideoIcon, FileTextIcon, HelpCircleIcon, XIcon, HeartIcon, StarIcon, UndoIcon, LockIcon, MOCK_OPPORTUNITIES } from '../../constants/platform';
+import { loadCourses, FAQ_ITEMS, PRICING_PLANS, PlayCircleIcon, VideoIcon, FileTextIcon, HelpCircleIcon, XIcon, HeartIcon, StarIcon, UndoIcon, LockIcon, loadOpportunities } from '../../constants/platform';
 import { fetchSwipeProfiles, recordSwipe, undoSwipe, fetchMatches, deleteMatch, createProfile } from '../../services/profileService';
 import { useMatches } from '../../hooks/useMatches';
 import type { Course, Opportunity } from '../../types/platform';
@@ -60,7 +60,7 @@ export const LandingPage: React.FC = () => {
                         {/* Swipe Right Logo */}
                         <div className="mb-6 flex justify-center">
                             <img 
-                                src="/Swipe Right.png" 
+                                src="/swipe-right.png" 
                                 alt="Swipe Right" 
                                 className="w-20 h-20"
                                 style={{
@@ -252,7 +252,14 @@ export const LandingPage: React.FC = () => {
 // Dashboard Page
 export const Dashboard: React.FC = () => {
     const { currentUser } = useAuth();
-    const inProgressCourse = COURSES.find(c => c.progress > 0 && c.progress < 100);
+    const [courses, setCourses] = useState<Course[]>([]);
+    const [loading, setLoading] = useState(true);
+    
+    useEffect(() => {
+        loadCourses().then(setCourses).finally(() => setLoading(false));
+    }, []);
+    
+    const inProgressCourse = courses.find(c => c.progress > 0 && c.progress < 100);
     return (
         <div className="p-4 sm:p-6 md:p-8">
             <h1 className="font-display text-3xl font-bold">Welcome back, {currentUser?.name.split(' ')[0]}!</h1>
@@ -283,7 +290,13 @@ export const Dashboard: React.FC = () => {
                     <div>
                         <h2 className="font-display text-2xl font-bold">Recommended For You</h2>
                         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            {COURSES.slice(0, 2).map(course => <CourseCard key={course.id} course={course} />)}
+                            {loading ? (
+                                <div className="col-span-2 text-center py-8">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[color:var(--accent)] mx-auto"></div>
+                                </div>
+                            ) : (
+                                courses.slice(0, 2).map(course => <CourseCard key={course.id} course={course} />)
+                            )}
                         </div>
                     </div>
                 </div>
@@ -322,15 +335,28 @@ export const Dashboard: React.FC = () => {
 
 // Courses Page
 export const CoursesPage: React.FC = () => {
+    const [courses, setCourses] = useState<Course[]>([]);
+    const [loading, setLoading] = useState(true);
+    
+    useEffect(() => {
+        loadCourses().then(setCourses).finally(() => setLoading(false));
+    }, []);
+    
     return (
          <div className="p-4 sm:p-6 md:p-8">
             <h1 className="font-display text-3xl font-bold">All Courses</h1>
             <p className="mt-1 text-[color:var(--text-secondary)]">Expand your skills and master the craft.</p>
             {/* Filters would go here */}
             <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {COURSES.map(course => (
-                    <CourseCard key={course.id} course={course} />
-                ))}
+                {loading ? (
+                    <div className="col-span-full text-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[color:var(--accent)] mx-auto"></div>
+                    </div>
+                ) : (
+                    courses.map(course => (
+                        <CourseCard key={course.id} course={course} />
+                    ))
+                )}
             </div>
         </div>
     );
@@ -340,10 +366,24 @@ export const CoursesPage: React.FC = () => {
 export const CourseDetailPage: React.FC = () => {
     const { appState, navigate } = useContext(AppContext)!;
     
-    const course = useMemo(() => {
-        return COURSES.find(c => c.id === appState.courseId);
+    const [course, setCourse] = useState<Course | null>(null);
+    const [loading, setLoading] = useState(true);
+    
+    useEffect(() => {
+        loadCourses().then(courses => {
+            const foundCourse = courses.find(c => c.id === appState.courseId);
+            setCourse(foundCourse || null);
+        }).finally(() => setLoading(false));
     }, [appState.courseId]);
 
+    if (loading) {
+        return (
+            <div className="p-8 text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[color:var(--accent)] mx-auto"></div>
+            </div>
+        );
+    }
+    
     if (!course) {
         return <div className="p-8 text-center">Course not found. <button onClick={() => navigate('courses')} className="text-[color:var(--accent)]">Go back to courses</button></div>;
     }

@@ -1,5 +1,18 @@
 import { Handler } from '@netlify/functions';
 
+const sanitizeForLog = (input: any): string => {
+  if (typeof input !== 'string') {
+    input = String(input);
+  }
+  return input.replace(/[\r\n\t]/g, ' ').replace(/[<>]/g, '').substring(0, 500);
+};
+
+const API_ENDPOINTS = [
+  process.env.SYSTEMEIO_API_ENDPOINT || 'https://api.systeme.io/contacts',
+  'https://systeme.io/api/contacts',
+  'https://app.systeme.io/api/contacts'
+];
+
 const handler: Handler = async (event) => {
   console.log('Systeme.io subscription request received');
   
@@ -20,23 +33,21 @@ const handler: Handler = async (event) => {
     const email = params.get('email');
     const first_name = params.get('first_name') || '';
     
-    console.log('Adding contact:', { email, first_name });
+    console.log('Adding contact:', sanitizeForLog(JSON.stringify({ email: email?.substring(0, 20), first_name })));
     
     if (!email) {
       throw new Error('Email is required');
     }
 
-    // Try different API endpoints
-    const endpoints = [
-      'https://api.systeme.io/contacts',
-      'https://systeme.io/api/contacts',
-      'https://app.systeme.io/api/contacts'
-    ];
+    // Validate API key
+    if (!process.env.SYSTEMEIO_API_KEY) {
+      throw new Error('SYSTEMEIO_API_KEY not configured');
+    }
     
     let response;
     let lastError;
     
-    for (const endpoint of endpoints) {
+    for (const endpoint of API_ENDPOINTS) {
       try {
         response = await fetch(endpoint, {
           method: 'POST',
@@ -63,7 +74,7 @@ const handler: Handler = async (event) => {
     }
 
     const result = await response.json();
-    console.log('Contact added successfully:', result);
+    console.log('Contact added successfully:', sanitizeForLog(JSON.stringify(result)));
 
     return {
       statusCode: 200,
@@ -75,10 +86,11 @@ const handler: Handler = async (event) => {
     };
 
   } catch (error) {
-    console.error('Error adding contact to Systeme.io:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Error adding contact to Systeme.io:', sanitizeForLog(errorMessage));
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: error.message }),
+      body: JSON.stringify({ error: 'Subscription failed' }),
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json'

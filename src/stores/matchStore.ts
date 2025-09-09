@@ -1,16 +1,8 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { deleteMatch, fetchMatches } from '../services/profileService';
-
-interface MatchStore {
-  matches: any[];
-  unmatchedIds: Set<string>;
-  isLoading: boolean;
-  
-  loadMatches: () => Promise<void>;
-  unmatch: (matchId: string) => Promise<void>;
-  isUnmatched: (profileId: string) => boolean;
-}
+import { sanitizeForLog, validateInput } from '../utils/sanitizer';
+import type { Match, MatchStore } from '../types/match';
 
 export const useMatchStore = create<MatchStore>()(
   subscribeWithSelector((set, get) => ({
@@ -31,7 +23,7 @@ export const useMatchStore = create<MatchStore>()(
         
         set({ matches: filteredMatches, isLoading: false });
       } catch (error) {
-        console.error('Load matches error:', error);
+        console.error('Load matches error:', sanitizeForLog(error));
         set({ isLoading: false });
       }
     },
@@ -40,6 +32,12 @@ export const useMatchStore = create<MatchStore>()(
       const { matches, unmatchedIds } = get();
       
       // Find the match to get profile ID
+      // Validate input to prevent NoSQL injection
+      if (!validateInput(matchId, 50)) {
+        console.error('Invalid match ID provided');
+        return;
+      }
+      
       const match = matches.find(m => m.match_id === matchId);
       if (!match) return;
       
@@ -51,9 +49,9 @@ export const useMatchStore = create<MatchStore>()(
       
       try {
         await deleteMatch(matchId);
-        console.log('✅ Unmatch successful');
+        console.log('✅ Unmatch successful for ID:', sanitizeForLog(matchId));
       } catch (error) {
-        console.error('❌ Unmatch failed:', error);
+        console.error('❌ Unmatch failed:', sanitizeForLog(error));
         // Rollback on error
         set({ matches, unmatchedIds });
       }

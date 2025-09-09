@@ -1,12 +1,19 @@
 import { PostgrestClient } from '@supabase/postgrest-js';
-import { supabase } from './profileService';
+import { supabase } from '../config/supabase';
 
 // Ultra-fast Supabase client with connection pooling
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables');
+}
+
 const turboClient = new PostgrestClient(
-  'https://sxdlagcwryzzozyuznth.supabase.co/rest/v1',
+  `${supabaseUrl}/rest/v1`,
   {
     headers: {
-      apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4ZGxhZ2N3cnl6em96eXV6bnRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5NzI5NzQsImV4cCI6MjA1MDU0ODk3NH0.Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8',
+      apikey: supabaseAnonKey,
       'Content-Type': 'application/json'
     }
   }

@@ -90,9 +90,9 @@ export const LockIcon = memo((props: React.SVGProps<SVGSVGElement>) => (
 export const NAV_ITEMS = [
     { name: 'Dashboard', icon: HomeIcon, page: 'dashboard' },
     { name: 'Courses', icon: BookOpenIcon, page: 'courses' },
-    { name: 'Events', icon: UsersIcon, page: 'community' },
+    { name: 'Events', icon: UsersIcon, page: 'events' },
     { name: 'Discover', icon: ZapIcon, page: 'opportunities' },
-    { name: 'Community', icon: HeartIcon, page: 'events' },
+    { name: 'Community', icon: HeartIcon, page: 'community' },
 ];
 
 export const MOCK_USER: User = {
@@ -102,106 +102,17 @@ export const MOCK_USER: User = {
     plan: 'Pro Annual'
 };
 
-export const COURSES: Course[] = [
-    { id: 1, title: 'The Art of Transition', instructor: 'DJ Hype', duration: '5h 30m', level: 'Intermediate', category: 'Mixing', imageUrl: 'https://images.unsplash.com/photo-1641573481523-3e0447d7ba86', progress: 60, description: 'Master seamless transitions and advanced mixing techniques.', modules: [{id: 1, title: "Module 1", lessons: [{id:1, title: "Intro", duration: "5m", type: 'video'}]}] },
-    { id: 2, title: 'Advanced Harmonic Mixing', instructor: 'Carl Cox', duration: '8h 15m', level: 'Advanced', category: 'Music Theory', imageUrl: 'https://images.unsplash.com/photo-1618409698993-11872c0048e3', progress: 25, description: 'Dive deep into key mixing and energy management to create unforgettable sets.', modules: [{id: 1, title: "Module 1", lessons: [{id:1, title: "Intro", duration: "5m", type: 'video'}]}] },
-    { id: 3, title: 'Building Your DJ Brand', instructor: 'Nina Kraviz', duration: '4h 0m', level: 'All Levels', category: 'Career', imageUrl: 'https://plus.unsplash.com/premium_photo-1728650295285-e6d61f7900f5', progress: 95, description: 'Learn to market yourself, build a following, and get booked.', modules: [{id: 1, title: "Module 1", lessons: [{id:1, title: "Intro", duration: "5m", type: 'video'}]}] },
-    { id: 4, title: 'Beatmatching Fundamentals', instructor: 'Frankie Knuckles', duration: '3h 45m', level: 'Beginner', category: 'Mixing', imageUrl: 'https://images.unsplash.com/photo-1713450604431-fcbfcb4209d3', progress: 0, description: 'The essential starting point for any aspiring DJ.', modules: [{id: 1, title: "Module 1", lessons: [{id:1, title: "Intro", duration: "5m", type: 'video'}]}] },
-    { id: 5, title: 'Live Performance with Ableton', instructor: 'Richie Hawtin', duration: '12h', level: 'Advanced', category: 'Performance', imageUrl: 'https://images.unsplash.com/photo-1667830494763-621e251801c4', progress: 10, description: 'Integrate Ableton Live into your DJ sets for ultimate creativity.', modules: [{id: 1, title: "Module 1", lessons: [{id:1, title: "Intro", duration: "5m", type: 'video'}]}] },
-    { id: 6, title: 'Vinyl DJing 101', instructor: 'Grandmaster Flash', duration: '6h 20m', level: 'Beginner', category: 'Turntablism', imageUrl: 'https://images.unsplash.com/photo-1713450604431-fcbfcb4209d3', progress: 0, description: 'Learn the original art form from a pioneer.', modules: [{id: 1, title: "Module 1", lessons: [{id:1, title: "Intro", duration: "5m", type: 'video'}]}] },
-];
+// Lazy load courses data
+export const loadCourses = async (): Promise<Course[]> => {
+  const { courses } = await import('../data/constants.json');
+  return courses as Course[];
+};
 
-export const MOCK_OPPORTUNITIES: Opportunity[] = [
-    { 
-        id: 1, 
-        title: 'Alex Martinez', 
-        venue: 'Berlin', 
-        location: '5 km away', 
-        date: 'Active now', 
-        genres: ['Techno', 'Industrial'], 
-        fee: 'Connect', 
-        imageUrl: 'https://picsum.photos/seed/dj1/600/800',
-        images: [
-            'https://picsum.photos/seed/dj1/600/800',
-            'https://picsum.photos/seed/dj1b/600/800',
-            'https://picsum.photos/seed/dj1c/600/800'
-        ],
-        bio: 'Techno producer and DJ from Berlin. Love dark industrial sounds and underground vibes. Looking to collaborate with like-minded artists.',
-        age: 28,
-        skills: ['Music Production', 'Event Production']
-    },
-    { 
-        id: 2, 
-        title: 'Sofia Chen', 
-        venue: 'Ibiza', 
-        location: '12 km away', 
-        date: 'Active 2h ago', 
-        genres: ['Deep House', 'Balearic'], 
-        fee: 'Connect', 
-        imageUrl: 'https://picsum.photos/seed/dj2/600/800',
-        images: [
-            'https://picsum.photos/seed/dj2/600/800',
-            'https://picsum.photos/seed/dj2b/600/800'
-        ],
-        bio: 'Sunset sessions specialist. Creating dreamy soundscapes for beach clubs and rooftops.',
-        age: 25,
-        skills: ['Bookings', 'Artist Management']
-    },
-    { 
-        id: 3, 
-        title: 'Marcus Thompson', 
-        venue: 'London', 
-        location: '8 km away', 
-        date: 'Active 1h ago', 
-        genres: ['Dubstep', 'UK Garage'], 
-        fee: 'Connect', 
-        imageUrl: 'https://picsum.photos/seed/dj3/600/800',
-        images: [
-            'https://picsum.photos/seed/dj3/600/800',
-            'https://picsum.photos/seed/dj3b/600/800',
-            'https://picsum.photos/seed/dj3c/600/800',
-            'https://picsum.photos/seed/dj3d/600/800'
-        ],
-        bio: 'Underground bass enthusiast. Resident at The Sub Club. Always pushing boundaries.',
-        age: 31,
-        skills: ['Music Production', 'Sound Engineering']
-    },
-    { 
-        id: 4, 
-        title: 'Luna Rodriguez', 
-        venue: 'New York', 
-        location: '3 km away', 
-        date: 'Active now', 
-        genres: ['Disco', 'Funk', 'Soul'], 
-        fee: 'Connect', 
-        imageUrl: 'https://picsum.photos/seed/dj4/600/800',
-        images: [
-            'https://picsum.photos/seed/dj4/600/800',
-            'https://picsum.photos/seed/dj4b/600/800'
-        ],
-        bio: 'Bringing the funk back to NYC. Vinyl collector and disco queen.',
-        age: 29,
-        skills: ['Event Production', 'Vinyl Curation']
-    },
-    { 
-        id: 5, 
-        title: 'David Kim', 
-        venue: 'Miami', 
-        location: '15 km away', 
-        date: 'Active 30m ago', 
-        genres: ['EDM', 'Trance'], 
-        fee: 'Connect', 
-        imageUrl: 'https://picsum.photos/seed/dj5/600/800',
-        images: [
-            'https://picsum.photos/seed/dj5/600/800',
-            'https://picsum.photos/seed/dj5b/600/800',
-            'https://picsum.photos/seed/dj5c/600/800'
-        ],
-        bio: 'Festival main stage experience. Looking for collaboration opportunities and new connections.',
-        age: 26,
-        skills: ['Artist Management', 'Bookings', 'Music Production']
-    },
-];
+// Lazy load opportunities data
+export const loadOpportunities = async (): Promise<Opportunity[]> => {
+  const { mockOpportunities } = await import('../data/constants.json');
+  return mockOpportunities as Opportunity[];
+};
 
 export const PRICING_PLANS: PricingPlan[] = [
     {

@@ -1,0 +1,36 @@
+{
+  "courses": [
+    {
+      "id": 1,
+      "title": "DJ Fundamentals",
+      "description": "Master the basics of DJing",
+      "duration": "4 weeks",
+      "level": "Beginner"
+    },
+    {
+      "id": 2,
+      "title": "Advanced Mixing",
+      "description": "Professional mixing techniques",
+      "duration": "6 weeks", 
+      "level": "Advanced"
+    }
+  ],
+  "mockOpportunities": [
+    {
+      "id": 1,
+      "title": "Club Night Resident",
+      "venue": "Skybar",
+      "location": "Miami, FL",
+      "fee": "$500/night",
+      "type": "Residency"
+    },
+    {
+      "id": 2,
+      "title": "Festival Performance",
+      "venue": "Summer Beats",
+      "location": "Los Angeles, CA", 
+      "fee": "$2000",
+      "type": "Festival"
+    }
+  ]
+}

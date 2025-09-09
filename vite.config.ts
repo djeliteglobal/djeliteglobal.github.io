@@ -45,7 +45,7 @@ export default defineConfig({
         display: 'standalone',
         icons: [
           {
-            src: '/Swipe Right.png',
+            src: '/swipe-right.png',
             sizes: '192x192',
             type: 'image/png'
           }
@@ -58,17 +58,19 @@ export default defineConfig({
       output: {
         manualChunks: {
           // Core React chunk (loads first)
-          vendor: ['react', 'react-dom'],
+          'vendor-core': ['react', 'react-dom'],
           // Database services (lazy load)
-          supabase: ['@supabase/supabase-js'],
+          'vendor-db': ['@supabase/supabase-js', '@supabase/postgrest-js'],
           // Real-time messaging (lazy load)
-          ably: ['ably'],
+          'vendor-realtime': ['ably', 'pusher-js', 'socket.io-client'],
           // UI libraries (lazy load)
-          ui: ['framer-motion', '@tanstack/react-query'],
+          'vendor-ui': ['framer-motion', '@tanstack/react-query', 'react-spring'],
           // Router (loads with main)
-          router: ['react-router-dom'],
+          'vendor-router': ['react-router-dom'],
+          // Payment processing
+          'vendor-payment': ['@stripe/stripe-js', '@stripe/react-stripe-js'],
           // Utils (shared)
-          utils: ['use-debounce']
+          'vendor-utils': ['use-debounce', 'zustand', 'zod']
         }
       }
     },
@@ -84,7 +86,7 @@ export default defineConfig({
         safari10: true
       }
     },
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 500,
     sourcemap: false
   },
   optimizeDeps: {

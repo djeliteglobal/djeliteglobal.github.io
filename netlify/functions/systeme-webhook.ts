@@ -1,5 +1,12 @@
 import { Handler } from '@netlify/functions';
 
+const sanitizeForLog = (input: any): string => {
+  if (typeof input !== 'string') {
+    input = String(input);
+  }
+  return input.replace(/[\r\n\t]/g, ' ').replace(/[<>]/g, '').substring(0, 500);
+};
+
 const handler: Handler = async (event) => {
   console.log('Webhook received from Systeme.io');
   
@@ -12,7 +19,7 @@ const handler: Handler = async (event) => {
 
   try {
     const webhookData = JSON.parse(event.body || '{}');
-    console.log('Webhook data:', webhookData);
+    console.log('Webhook data received:', sanitizeForLog(JSON.stringify(webhookData)));
 
     // Process the webhook data here
     // This will be called when events happen in Systeme.io
@@ -23,10 +30,11 @@ const handler: Handler = async (event) => {
     };
 
   } catch (error) {
-    console.error('Error processing webhook:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Error processing webhook:', sanitizeForLog(errorMessage));
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: error.message })
+      body: JSON.stringify({ error: 'Internal server error' })
     };
   }
 };

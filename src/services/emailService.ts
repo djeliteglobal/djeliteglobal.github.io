@@ -1,8 +1,16 @@
 import { Resend } from 'resend';
+import { sanitizeForLog, sanitizeEmail, validateInput } from '../utils/sanitizer';
 
 const resend = new Resend(import.meta.env.VITE_RESEND_API_KEY);
 
 export const sendWelcomeEmail = async (email: string, firstName: string) => {
+  if (!validateInput(email, 100) || !validateInput(firstName, 50)) {
+    throw new Error('Invalid input parameters');
+  }
+  
+  const sanitizedEmail = sanitizeEmail(email);
+  const sanitizedName = sanitizeForLog(firstName);
+  
   try {
     const { data, error } = await resend.emails.send({
       from: 'DJ Elite <noreply@djelite.site>',
@@ -33,10 +41,10 @@ export const sendWelcomeEmail = async (email: string, firstName: string) => {
       throw new Error(`Email failed: ${error.message}`);
     }
 
-    console.log('Welcome email sent:', data);
+    console.log('Welcome email sent to:', sanitizeForLog(email));
     return data;
   } catch (error) {
-    console.error('Welcome email error:', error);
+    console.error('Welcome email error:', sanitizeForLog(error));
     throw error;
   }
 };

@@ -39,8 +39,8 @@ export const handler: Handler = async (event, context) => {
   } catch (err) {
     return {
       statusCode: 400,
-      body: `Webhook Error: ${err.message}`,
-      headers: { 'Access-control-Allow-Origin': '*' },
+      body: JSON.stringify({ error: 'Webhook processing failed' }),
+      headers: { 'Access-Control-Allow-Origin': '*' },
     };
   }
 };

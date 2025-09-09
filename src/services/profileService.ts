@@ -1,8 +1,12 @@
 import { supabase, checkConfig } from '../config/supabase';
+import { sanitizeForLog, validateInput } from '../utils/sanitizer';
 
 // Export supabase for other services
 export { supabase };
 import { DJProfile, SwipeResult } from '../types/profile';
+
+// Default profile image constant
+const DEFAULT_PROFILE_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDQwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjMTExMTExIi8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE0MCIgcj0iNjAiIGZpbGw9IiMzMzMzMzMiLz4KPHBhdGggZD0iTTEwMCAzMDBDMTAwIDI1MCA0NSAyMDAgMjAwIDIwMFMzMDAgMjUwIDMwMCAzMDBWNDAwSDEwMFYzMDBaIiBmaWxsPSIjMzMzMzMzIi8+Cjwvc3ZnPgo=';
 
 export const fetchSwipeProfiles = async (): Promise<DJProfile[]> => {
   const { data: { user } } = await supabase.auth.getUser();
@@ -34,7 +38,7 @@ export const fetchSwipeProfiles = async (): Promise<DJProfile[]> => {
   
   // Transform to match expected format
   return (data || []).map(profile => {
-    const profileImage = profile.profile_image_url || profile.images?.[0] || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDQwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjMTExMTExIi8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE0MCIgcj0iNjAiIGZpbGw9IiMzMzMzMzMiLz4KPHBhdGggZD0iTTEwMCAzMDBDMTAwIDI1MCA0NSAyMDAgMjAwIDIwMFMzMDAgMjUwIDMwMCAzMDBWNDAwSDEwMFYzMDBaIiBmaWxsPSIjMzMzMzMzIi8+Cjwvc3ZnPgo=';
+    const profileImage = profile.profile_image_url || profile.images?.[0] || DEFAULT_PROFILE_IMAGE;
     return {
       id: profile.id,
       title: profile.dj_name || 'DJ',
@@ -125,7 +129,7 @@ export const createProfile = async (profileData: {
 
   // Auto-sync Google profile picture on signup
   const authProfilePic = user.user_metadata?.avatar_url || user.user_metadata?.picture;
-  const defaultImage = authProfilePic || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDQwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjMTExMTExIi8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE0MCIgcj0iNjAiIGZpbGw9IiMzMzMzMzMiLz4KPHBhdGggZD0iTTEwMCAzMDBDMTAwIDI1MCA0NSAyMDAgMjAwIDIwMFMzMDAgMjUwIDMwMCAzMDBWNDAwSDEwMFYzMDBaIiBmaWxsPSIjMzMzMzMzIi8+Cjwvc3ZnPgo=';
+  const defaultImage = authProfilePic || DEFAULT_PROFILE_IMAGE;
   
   // Use user's actual name from Google if available
   const displayName = user.user_metadata?.full_name || user.user_metadata?.name || profileData.dj_name;
@@ -143,7 +147,7 @@ export const createProfile = async (profileData: {
       genres: ['House', 'Techno'],
       skills: ['Mixing', 'Beatmatching'],
       venues: ['Local Clubs'],
-      images: authProfilePic ? [authProfilePic] : [defaultImage]
+      images: authProfilePic ? [authProfilePic] : [DEFAULT_PROFILE_IMAGE]
     })
     .select()
     .single();
@@ -239,14 +243,21 @@ export const getCurrentProfile = async (): Promise<DJProfile | null> => {
   return profile;
 };
 
-export const syncAllGoogleProfilePictures = async (): Promise<void> => {
+export const syncCurrentUserGoogleProfile = async (): Promise<void> => {
   try {
     console.log('🔄 SYNC: Starting Google profile picture sync for all users...');
     
-    // Get all profiles
+    // Get current user only for efficiency
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      console.log('⚠️ SYNC: No authenticated user');
+      return;
+    }
+    
     const { data: profiles, error } = await supabase
       .from('profiles')
-      .select('id, user_id, dj_name, profile_image_url, images');
+      .select('id, user_id, dj_name, profile_image_url, images')
+      .eq('user_id', user.id);
     
     if (error) {
       console.error('❌ SYNC ERROR: Failed to fetch profiles:', error);
@@ -262,16 +273,7 @@ export const syncAllGoogleProfilePictures = async (): Promise<void> => {
     
     for (const profile of profiles) {
       try {
-        // Get user's Google profile from auth metadata (client-side approach)
-        const { data: { user }, error: userError } = await supabase.auth.getUser();
-        
-        if (userError || !user) {
-          console.log(`⚠️ SYNC: No user found for profile ${profile.id}`);
-          continue;
-        }
-        
-        // Only update current user's profile to avoid permission issues
-        if (profile.user_id !== user.id) continue;
+        // User is already validated above
         
         const googlePicture = user.user_metadata?.avatar_url || user.user_metadata?.picture;
         const googleName = user.user_metadata?.full_name || user.user_metadata?.name;
@@ -312,19 +314,19 @@ export const syncAllGoogleProfilePictures = async (): Promise<void> => {
           if (updateError) {
             console.error(`❌ SYNC ERROR: Failed to update profile ${profile.id}:`, updateError);
           } else {
-            console.log(`✅ SYNC: Updated ${updates.dj_name || profile.dj_name} with Google data`);
+            console.log(`✅ SYNC: Updated ${sanitizeForLog(updates.dj_name || profile.dj_name)} with Google data`);
           }
         } else {
-          console.log(`⚠️ SYNC: No updates needed for ${profile.dj_name}`);
+          console.log(`⚠️ SYNC: No updates needed for ${sanitizeForLog(profile.dj_name)}`);
         }
       } catch (profileError) {
-        console.error(`❌ SYNC ERROR: Failed to process profile ${profile.id}:`, profileError);
+        console.error(`❌ SYNC ERROR: Failed to process profile ${sanitizeForLog(profile.id)}:`, sanitizeForLog(profileError));
       }
     }
     
     console.log('🎉 SYNC: Google profile picture sync completed!');
   } catch (error) {
-    console.error('💥 SYNC FATAL ERROR:', error);
+    console.error('💥 SYNC FATAL ERROR:', sanitizeForLog(error));
   }
 };
 
@@ -333,13 +335,13 @@ export const startPeriodicProfileSync = (): (() => void) => {
   console.log('🔄 PERIODIC SYNC: Starting automatic Google profile picture sync...');
   
   // Run immediately
-  syncAllGoogleProfilePictures();
+  syncCurrentUserGoogleProfile();
   
-  // Then run every 30 minutes
+  // Then run every 2 hours (reduced frequency)
   const interval = setInterval(() => {
     console.log('⏰ PERIODIC SYNC: Running scheduled Google profile sync...');
-    syncAllGoogleProfilePictures();
-  }, 30 * 60 * 1000); // 30 minutes
+    syncCurrentUserGoogleProfile();
+  }, 2 * 60 * 60 * 1000); // 2 hours
   
   // Return cleanup function
   return () => {
@@ -471,6 +473,10 @@ export const undoSwipe = async (): Promise<void> => {
 };
 
 export const deleteMatch = async (matchId: string): Promise<void> => {
+  if (!validateInput(matchId, 50)) {
+    throw new Error('Invalid match ID');
+  }
+  
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
@@ -482,7 +488,7 @@ export const deleteMatch = async (matchId: string): Promise<void> => {
 
   if (!userProfile) throw new Error('Profile not found');
 
-  console.log('🎯 HYBRID UNMATCH:', matchId);
+  console.log('🎯 HYBRID UNMATCH:', sanitizeForLog(matchId));
   
   // Get match details first
   const { data: match } = await supabase
@@ -494,24 +500,31 @@ export const deleteMatch = async (matchId: string): Promise<void> => {
   if (match) {
     const otherProfileId = match.profile1_id === userProfile.id ? match.profile2_id : match.profile1_id;
     
-    // Delete match (trigger should handle swipes)
-    const { error: matchError } = await supabase
-      .from('matches')
-      .delete()
-      .eq('id', matchId);
+    try {
+      // Delete match (trigger should handle swipes)
+      const { error: matchError } = await supabase
+        .from('matches')
+        .delete()
+        .eq('id', matchId);
+        
+      if (matchError) throw matchError;
       
-    // Manual cleanup as fallback
-    await supabase
-      .from('swipes')
-      .delete()
-      .eq('swiper_id', userProfile.id)
-      .eq('swiped_id', otherProfileId);
-      
-    await supabase
-      .from('swipes')
-      .delete()
-      .eq('swiper_id', otherProfileId)
-      .eq('swiped_id', userProfile.id);
+      // Manual cleanup as fallback
+      await supabase
+        .from('swipes')
+        .delete()
+        .eq('swiper_id', userProfile.id)
+        .eq('swiped_id', otherProfileId);
+        
+      await supabase
+        .from('swipes')
+        .delete()
+        .eq('swiper_id', otherProfileId)
+        .eq('swiped_id', userProfile.id);
+    } catch (deleteError) {
+      console.error('Delete match error:', sanitizeForLog(deleteError));
+      throw deleteError;
+    }
       
     console.log('✨ HYBRID UNMATCH COMPLETE: Trigger + manual cleanup!');
   }
