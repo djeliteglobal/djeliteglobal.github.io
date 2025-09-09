@@ -13,10 +13,10 @@ export const useTranslation = () => {
   const [language, setLanguage] = useState<Language>(globalLanguage);
 
   useEffect(() => {
-    const savedLang = localStorage.getItem('language') as Language;
+    const savedLang = localStorage.getItem('language');
     if (savedLang && (savedLang === 'en' || savedLang === 'es')) {
-      globalLanguage = savedLang;
-      setLanguage(savedLang);
+      globalLanguage = savedLang as Language;
+      setLanguage(savedLang as Language);
     }
   }, []);
 

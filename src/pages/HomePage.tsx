@@ -51,11 +51,14 @@ const bounceInStyles = `
   }
 `;
 
-// Inject styles
-if (typeof document !== 'undefined') {
+// Inject styles with proper cleanup
+let stylesInjected = false;
+if (typeof document !== 'undefined' && !stylesInjected) {
   const styleSheet = document.createElement('style');
   styleSheet.textContent = bounceInStyles;
+  styleSheet.id = 'dj-bounce-styles';
   document.head.appendChild(styleSheet);
+  stylesInjected = true;
 }
 
 export const AppContext = createContext<AppContextType | null>(null);
@@ -150,7 +153,11 @@ const HomePageContent: React.FC = () => {
                             to="/funnel" 
                             className="bg-[color:var(--accent)] text-black px-6 py-3 rounded-full font-bold hover:bg-[color:var(--accent-muted)] transition-all shadow-lg dj-button-animated"
                         >
-                            🚀 {t('heroTitle').split(':')[0]}
+                            🚀 {(() => {
+                                const title = t('heroTitle');
+                                const colonIndex = title.indexOf(':');
+                                return colonIndex > 0 ? title.substring(0, colonIndex) : 'Start Now';
+                            })()}
                         </Link>
                     </div>
                 </>

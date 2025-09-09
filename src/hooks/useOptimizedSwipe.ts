@@ -20,10 +20,14 @@ export const useOptimizedSwipe = (onSwipe: (direction: 'left' | 'right') => void
     if (!isDragging.current) return;
     
     currentX.current = clientX - startX.current;
-    if (cardRef.current) {
-      const rotate = currentX.current / 20;
-      cardRef.current.style.transform = `translate3d(${currentX.current}px, 0, 0) rotate(${rotate}deg)`;
-    }
+    
+    // Use requestAnimationFrame to throttle DOM updates
+    requestAnimationFrame(() => {
+      if (cardRef.current && isDragging.current) {
+        const rotate = currentX.current / 20;
+        cardRef.current.style.transform = `translate3d(${currentX.current}px, 0, 0) rotate(${rotate}deg)`;
+      }
+    });
   }, []);
 
   const handleDragEnd = useCallback(() => {

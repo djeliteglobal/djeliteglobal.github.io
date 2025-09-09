@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import '../styles/pages.css';
 
 export const PrivacyPage: React.FC = () => {
   return (
-    <div style={{ backgroundColor: '#0B0D10', color: '#FFFFFF', minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
+    <div className="page-container">
       <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Header */}
         <div className="mb-12">

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { useDebounce } from 'use-debounce';
 import { sendMessage, fetchMessages, subscribeToMessages, Message } from '../../services/messageService';
 import { getCurrentProfile } from '../../services/profileService';
 import { subscribeToUltraFastMessages, sendUltraFastMessage, sendTypingIndicator } from '../../services/ablyService';
@@ -27,7 +26,6 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
-  const [debouncedMessage] = useDebounce(newMessage, 300);
   const listRef = useRef<any>(null);
 
   useEffect(() => {

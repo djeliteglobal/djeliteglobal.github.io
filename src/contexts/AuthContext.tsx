@@ -27,39 +27,63 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   const signup = async (email: string, password: string, name: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          display_name: name,
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            display_name: name,
+          }
         }
+      });
+      if (error) {
+        throw new Error(error.message === 'User already registered' ? 'An account with this email already exists' : 'Failed to create account');
       }
-    });
-    if (error) throw error;
+    } catch (error: any) {
+      throw new Error(error.message || 'Failed to create account');
+    }
   };
 
   const login = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) throw error;
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) {
+        throw new Error(error.message === 'Invalid login credentials' ? 'Invalid email or password' : 'Failed to sign in');
+      }
+    } catch (error: any) {
+      throw new Error(error.message || 'Failed to sign in');
+    }
   };
 
   const loginWithOAuth = async (provider: 'google' | 'facebook' | 'spotify' | 'discord') => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo: `${window.location.origin}/`
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/`
+        }
+      });
+      if (error) {
+        throw new Error(`Failed to sign in with ${provider}`);
       }
-    });
-    if (error) throw error;
+    } catch (error: any) {
+      throw new Error(error.message || `Failed to sign in with ${provider}`);
+    }
   };
 
   const logout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        throw new Error('Failed to sign out');
+      }
+    } catch (error: any) {
+      throw new Error(error.message || 'Failed to sign out');
+    }
   };
 
   useEffect(() => {

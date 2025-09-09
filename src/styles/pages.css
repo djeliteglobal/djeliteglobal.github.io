@@ -1,0 +1,44 @@
+/* Shared page styles to prevent inline style performance issues */
+.page-container {
+  background-color: #0B0D10;
+  color: #FFFFFF;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+}
+
+.page-content {
+  max-width: 4rem;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+.page-header {
+  margin-bottom: 3rem;
+}
+
+.page-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.page-subtitle {
+  color: var(--text-secondary);
+  font-size: 1.125rem;
+}
+
+.content-section {
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--accent);
+}
+
+.section-content {
+  line-height: 1.75;
+  margin-bottom: 1rem;
+}

@@ -40,7 +40,7 @@ export const sendUltraFastMessage = async (matchId: string, content: string) => 
   await channel.publish('message', {
     content,
     timestamp: Date.now(),
-    id: `msg-${Date.now()}`
+    id: crypto.randomUUID()
   });
 };
 
