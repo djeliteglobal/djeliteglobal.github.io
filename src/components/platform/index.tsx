@@ -13,11 +13,11 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export const Button: React.FC<ButtonProps> = ({ variant = 'primary', children, className = '', ...props }) => {
-  const baseClasses = 'px-6 py-3 rounded-md font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0B0D10] focus:ring-[#40E0D0] disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseClasses = 'px-6 py-3 rounded-md font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[color:var(--bg)] focus:ring-[color:var(--accent)] disabled:opacity-50 disabled:cursor-not-allowed';
   const variantClasses = {
-    primary: 'bg-[#40E0D0] text-black hover:bg-[#20B2AA]',
-    secondary: 'bg-[#252A32] text-[#FFFFFF] hover:bg-[#2D3339] border border-[#3A4047]',
-    ghost: 'bg-transparent text-[#B8BCC8] hover:bg-[#252A32] hover:text-[#FFFFFF]',
+    primary: 'bg-[color:var(--accent)] text-black hover:bg-[color:var(--accent-muted)]',
+    secondary: 'bg-[color:var(--surface-alt)] text-[color:var(--text-primary)] hover:bg-[color:var(--surface)] border border-[color:var(--border)]',
+    ghost: 'bg-transparent text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-alt)] hover:text-[color:var(--text-primary)]',
   };
   return (
     <button className={`${baseClasses} ${variantClasses[variant]} ${className}`} {...props}>
@@ -56,7 +56,7 @@ export const TopBar: React.FC = () => {
                     <input
                         type="search"
                         placeholder="Search courses, opportunities..."
-                        className="w-full rounded-lg border border-[#3A4047] bg-[#252A32] py-2 pl-10 pr-4 text-[#FFFFFF] placeholder-[#6B7280] focus:border-[#40E0D0] focus:outline-none focus:ring-1 focus:ring-[#40E0D0]"
+                        className="w-full rounded-lg border border-[color:var(--border)] bg-[color:var(--surface-alt)] py-2 pl-10 pr-4 text-[color:var(--text-primary)] placeholder-[color:var(--muted)] focus:border-[color:var(--accent)] focus:outline-none focus:ring-1 focus:ring-[color:var(--accent)]"
                     />
                 </div>
                 <button onClick={toggleTheme} className="flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--surface-alt)] text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]">
@@ -101,8 +101,8 @@ export const SideNav: React.FC = () => {
                         onClick={() => navigate(item.page as any)}
                         className={`flex items-center gap-3 rounded-md px-4 py-3 text-sm font-medium transition-colors ${
                             appState.page === item.page
-                                ? 'bg-[#40E0D0] text-[#0B0D10]'
-                                : 'text-[#B8BCC8] hover:bg-[#252A32] hover:text-[#FFFFFF]'
+                                ? 'bg-[color:var(--accent)] text-black'
+                                : 'text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-alt)] hover:text-[color:var(--text-primary)]'
                         }`}
                     >
                         <item.icon className="h-5 w-5" />
@@ -155,12 +155,12 @@ export const CourseCard: React.FC<{ course: Course }> = ({ course }) => {
         </div>
       </div>
       <div className="p-4">
-        <p className="text-sm font-medium text-[#40E0D0]">{course.category.toUpperCase()}</p>
+        <p className="text-sm font-medium text-[color:var(--accent)]">{course.category.toUpperCase()}</p>
         <h3 className="mt-1 font-display text-lg font-bold text-[color:var(--text-primary)]">{course.title}</h3>
         <p className="mt-1 text-sm text-[color:var(--muted)] font-mono">by {course.instructor}</p>
         <div className="mt-4">
           <div className="h-2 w-full overflow-hidden rounded-full bg-[color:var(--surface-alt)]">
-            <div className="h-full rounded-full bg-[#40E0D0]" style={{ width: `${course.progress}%` }}></div>
+            <div className="h-full rounded-full bg-[color:var(--accent)]" style={{ width: `${course.progress}%` }}></div>
           </div>
           <div className="mt-2 flex justify-between text-xs text-[color:var(--muted)]">
             <span>{course.progress > 0 ? `${course.progress}% complete` : 'Not started'}</span>
@@ -174,9 +174,9 @@ export const CourseCard: React.FC<{ course: Course }> = ({ course }) => {
 
 export const PricingCard: React.FC<{ plan: PricingPlan }> = ({ plan }) => {
     return (
-        <div className={`flex flex-col rounded-xl p-8 transition-all duration-300 ${plan.isFeatured ? 'bg-[#2D3339] border-2 border-[#40E0D0] scale-105' : 'bg-[#1A1D23] border border-[#3A4047]'}`}>
+        <div className={`flex flex-col rounded-xl p-8 transition-all duration-300 ${plan.isFeatured ? 'bg-[color:var(--surface)] border-2 border-[color:var(--accent)] scale-105' : 'bg-[color:var(--surface-alt)] border border-[color:var(--border)]'}`}>
             {plan.isFeatured && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-[#40E0D0] px-4 py-1 text-sm font-semibold text-black">BEST VALUE</div>
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-[color:var(--accent)] px-4 py-1 text-sm font-semibold text-black">BEST VALUE</div>
             )}
             <h3 className="font-display text-2xl font-bold text-center text-[color:var(--text-primary)]">{plan.name}</h3>
             <div className="mt-4 flex items-baseline justify-center">
@@ -368,9 +368,9 @@ export const OpportunitySwipeCard: React.FC<{ opportunity: Opportunity; onSwipe:
                                     <span key={genre} className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold backdrop-blur-sm">{genre}</span>
                                 ))}
                                 {opportunity.skills?.map(skill => (
-                                    <span key={skill} className="rounded-full bg-blue-500/30 px-3 py-1 text-xs font-semibold text-blue-200 backdrop-blur-sm">{skill}</span>
+                                    <span key={skill} className="rounded-full bg-[color:var(--accent)]/30 px-3 py-1 text-xs font-semibold text-[color:var(--accent)] backdrop-blur-sm">{skill}</span>
                                 ))}
-                                <span className="rounded-full bg-[#40E0D0]/30 px-3 py-1 text-xs font-semibold text-[#40E0D0] backdrop-blur-sm">{opportunity.fee}</span>
+                                <span className="rounded-full bg-[color:var(--accent)]/30 px-3 py-1 text-xs font-semibold text-[color:var(--accent)] backdrop-blur-sm">{opportunity.fee}</span>
                             </div>
                         </div>
                         
