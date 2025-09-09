@@ -13,6 +13,7 @@ import { notificationService } from './services/notificationService';
 import { startPeriodicProfileSync } from './services/profileService';
 import './index.css';
 import './debug.css';
+import './styles/pages.css';
 
 function App() {
   // Initialize notifications and profile sync on app start
