@@ -261,8 +261,8 @@ export const Dashboard: React.FC = () => {
     
     const inProgressCourse = courses.find(c => c.progress > 0 && c.progress < 100);
     return (
-        <div className="p-4 sm:p-6 md:p-8">
-            <h1 className="font-display text-3xl font-bold">Welcome back, {currentUser?.name.split(' ')[0]}!</h1>
+        <div className="min-h-full bg-[color:var(--bg)] text-[color:var(--text-primary)] p-4 sm:p-6 md:p-8">
+            <h1 className="font-display text-3xl font-bold text-[color:var(--text-primary)]">Welcome back, {currentUser?.name.split(' ')[0]}!</h1>
             <p className="mt-1 text-[color:var(--text-secondary)]">Let's make some noise today.</p>
 
             <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -343,10 +343,9 @@ export const CoursesPage: React.FC = () => {
     }, []);
     
     return (
-         <div className="p-4 sm:p-6 md:p-8">
-            <h1 className="font-display text-3xl font-bold">All Courses</h1>
+        <div className="min-h-full bg-[color:var(--bg)] text-[color:var(--text-primary)] p-4 sm:p-6 md:p-8">
+            <h1 className="font-display text-3xl font-bold text-[color:var(--text-primary)]">All Courses</h1>
             <p className="mt-1 text-[color:var(--text-secondary)]">Expand your skills and master the craft.</p>
-            {/* Filters would go here */}
             <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {loading ? (
                     <div className="col-span-full text-center py-8">
