@@ -6,6 +6,7 @@ import { Button, CourseCard, FaqItemComponent, PricingCard } from '../platform';
 import { UltraFastSwipeCard } from '../swipe/UltraFastSwipeCard';
 import { ChatInterface } from '../messaging/ChatInterface';
 import { OptimizedImage } from '../OptimizedImage';
+import { ProfileThumbnail } from '../ProfileThumbnail';
 import { EventCreator } from '../events/EventCreator';
 import { DJApplicationModal } from '../events/DJApplicationModal';
 import { COURSES, FAQ_ITEMS, PRICING_PLANS, PlayCircleIcon, VideoIcon, FileTextIcon, HelpCircleIcon, XIcon, HeartIcon, StarIcon, UndoIcon, LockIcon, MOCK_OPPORTUNITIES } from '../../constants/platform';
@@ -932,12 +933,10 @@ const MatchesList: React.FC = () => {
                                 : 'bg-[color:var(--surface)] border-[color:var(--border)]'
                         }`}>
                             <div className="relative flex-shrink-0">
-                                <OptimizedImage 
+                                <ProfileThumbnail 
                             src={match.images?.[0] || match.imageUrl} 
                             alt={match.dj_name} 
-                            className="w-16 h-16 rounded-full"
-                            width={64}
-                            height={64}
+                            size="lg"
                         />
                                 {isUnread && (
                                     <div className="absolute -top-1 -right-1 w-6 h-6 bg-[color:var(--accent)] text-black rounded-full flex items-center justify-center text-xs font-bold animate-pulse">

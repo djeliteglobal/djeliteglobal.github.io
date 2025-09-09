@@ -5,6 +5,7 @@ import { sendMessage, fetchMessages, subscribeToMessages, Message } from '../../
 import { getCurrentProfile } from '../../services/profileService';
 import { subscribeToUltraFastMessages, sendUltraFastMessage, sendTypingIndicator } from '../../services/ablyService';
 import { notificationService } from '../../services/notificationService';
+import { ProfileThumbnail } from '../ProfileThumbnail';
 
 interface ChatInterfaceProps {
   matchId: string;
@@ -170,7 +171,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       >
         <div className="flex items-center justify-between p-4 border-b border-[color:var(--border)] bg-[color:var(--surface-alt)]">
           <div className="flex items-center gap-3">
-            <img src={matchAvatar} alt={matchName} className="w-10 h-10 rounded-full object-cover"/>
+            <ProfileThumbnail src={matchAvatar} alt={matchName} size="md" />
             <div>
               <h3 className="font-semibold text-[color:var(--text-primary)]">{matchName}</h3>
               <p className="text-xs text-green-500">● Online</p>
@@ -203,10 +204,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                     <div className={`flex items-end gap-2 max-w-[80%] ${
                       isOwn ? 'flex-row-reverse' : 'flex-row'
                     }`}>
-                      <img 
+                      <ProfileThumbnail 
                         src={isOwn ? (currentUserProfile?.images?.[0] || currentUserProfile?.profile_image_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100') : (msg.sender_avatar || matchAvatar)} 
                         alt={isOwn ? 'You' : (msg.sender_name || matchName)}
-                        className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                        size="sm"
                       />
                       <div className={`px-4 py-2 rounded-2xl ${
                         isOwn 
