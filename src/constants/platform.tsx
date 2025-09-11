@@ -92,7 +92,7 @@ export const NAV_ITEMS = [
     { name: 'Courses', icon: BookOpenIcon, page: 'courses' },
     { name: 'Events', icon: UsersIcon, page: 'events' },
     { name: 'Discover', icon: ZapIcon, page: 'opportunities' },
-    { name: 'Community', icon: HeartIcon, page: 'community' },
+    { name: 'Events', icon: HeartIcon, page: 'community' },
 ];
 
 export const MOCK_USER: User = {
