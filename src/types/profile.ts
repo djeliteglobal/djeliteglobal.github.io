@@ -12,6 +12,22 @@ export interface DJProfile {
   user_id?: string;
   created_at?: string;
   updated_at?: string;
+  // Premium features
+  website?: string;
+  social_links?: {
+    instagram?: string;
+    soundcloud?: string;
+    spotify?: string;
+    youtube?: string;
+  };
+  equipment?: string[];
+  achievements?: string[];
+  portfolio_tracks?: string[];
+  contact_info?: {
+    email?: string;
+    phone?: string;
+  };
+  premium_badge?: boolean;
 }
 
 export interface SwipeResult {

@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { useSpring, animated } from 'react-spring';
 import { useDrag } from '@use-gesture/react';
+import { useMatchStore } from '../../stores/matchStore';
 import type { Opportunity } from '../../types/platform';
 
 interface UltraFastSwipeCardProps {
@@ -19,6 +20,7 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
   const showMoreInfoRef = useRef(false);
   const images = opportunity.images || [opportunity.imageUrl];
   const totalImages = images.length;
+  const { connectionLimit, checkCanConnect } = useMatchStore();
 
   const [{ x, rotate, scale }, api] = useSpring(() => ({ 
     x: 0, 
@@ -26,7 +28,7 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
     scale: 1 
   }));
 
-  const bind = useDrag(useCallback(({ 
+  const bind = useDrag(useCallback(async ({ 
     down, 
     movement: [mx], 
     velocity: [vx], 
@@ -37,6 +39,21 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
     
     if (!down && trigger) {
       const direction = dir > 0 ? 'right' : 'left';
+      
+      // Check connection limit for right swipes (matches)
+      if (direction === 'right') {
+        const canConnect = await checkCanConnect();
+        if (!canConnect) {
+          // Bounce back if limit reached
+          api.start({ 
+            x: 0, 
+            rotate: 0, 
+            scale: 1
+          });
+          return;
+        }
+      }
+      
       onSwipe(direction);
       api.start({ 
         x: dir * 800, 
@@ -51,7 +68,7 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
         scale: down ? 1.02 : 1
       });
     }
-  }, [api, onSwipe, onCardLeftScreen, opportunity.id]));
+  }, [api, onSwipe, onCardLeftScreen, opportunity.id, checkCanConnect]));
 
   const handleImageTap = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -171,6 +188,19 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
           </div>
         </div>
 
+        {/* Connection limit warning */}
+        {connectionLimit && !connectionLimit.canConnect && (
+          <div className="absolute inset-0 bg-black/80 flex items-center justify-center z-40">
+            <div className="bg-red-500 text-white p-6 rounded-lg text-center max-w-sm mx-4">
+              <h3 className="text-xl font-bold mb-2">Connection Limit Reached</h3>
+              <p className="mb-4">You've reached your free plan limit of 5 connections.</p>
+              <button className="bg-white text-red-500 px-6 py-2 rounded-lg font-semibold hover:bg-gray-100">
+                Upgrade to Pro
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Swipe indicators */}
         <animated.div 
           className="absolute top-1/2 left-8 transform -translate-y-1/2 text-6xl font-bold text-green-500 opacity-0 pointer-events-none"
@@ -178,7 +208,7 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
             opacity: x.to(x => x > 50 ? (x - 50) / 100 : 0)
           }}
         >
-          LIKE
+          {connectionLimit?.canConnect ? 'LIKE' : 'LIMIT'}
         </animated.div>
         <animated.div 
           className="absolute top-1/2 right-8 transform -translate-y-1/2 text-6xl font-bold text-red-500 opacity-0 pointer-events-none"

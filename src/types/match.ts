@@ -18,8 +18,10 @@ export interface MatchStore {
   matches: Match[];
   unmatchedIds: Set<string>;
   isLoading: boolean;
+  connectionLimit: { canConnect: boolean; remaining: number } | null;
   
   loadMatches: () => Promise<void>;
   unmatch: (matchId: string) => Promise<void>;
   isUnmatched: (profileId: string) => boolean;
+  checkCanConnect: () => Promise<boolean>;
 }
