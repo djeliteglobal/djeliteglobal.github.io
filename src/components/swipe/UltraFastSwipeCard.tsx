@@ -44,12 +44,19 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
       if (direction === 'right') {
         const canConnect = await checkCanConnect();
         if (!canConnect) {
-          // Bounce back if limit reached
+          // Bounce back smoothly
           api.start({ 
             x: 0, 
             rotate: 0, 
-            scale: 1
+            scale: 1,
+            config: { tension: 300, friction: 30 }
           });
+          // Show popup after bounce
+          setTimeout(() => {
+            if (confirm('Connection limit reached! Upgrade to Pro for unlimited connections?')) {
+              window.open('/', '_blank');
+            }
+          }, 300);
           return;
         }
       }
@@ -58,14 +65,16 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
       api.start({ 
         x: dir * 800, 
         rotate: dir * 20, 
-        scale: 0.9
+        scale: 0.9,
+        config: { tension: 200, friction: 20 }
       });
       setTimeout(() => onCardLeftScreen(opportunity.id), 200);
     } else {
       api.start({ 
         x: down ? mx : 0, 
         rotate: down ? mx / 15 : 0,
-        scale: down ? 1.02 : 1
+        scale: down ? 1.02 : 1,
+        config: { tension: 300, friction: 30 }
       });
     }
   }, [api, onSwipe, onCardLeftScreen, opportunity.id, checkCanConnect]));
@@ -188,18 +197,7 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
           </div>
         </div>
 
-        {/* Connection limit warning */}
-        {connectionLimit && !connectionLimit.canConnect && (
-          <div className="absolute inset-0 bg-black/80 flex items-center justify-center z-40">
-            <div className="bg-red-500 text-white p-6 rounded-lg text-center max-w-sm mx-4">
-              <h3 className="text-xl font-bold mb-2">Connection Limit Reached</h3>
-              <p className="mb-4">You've reached your free plan limit of 5 connections.</p>
-              <button className="bg-white text-red-500 px-6 py-2 rounded-lg font-semibold hover:bg-gray-100">
-                Upgrade to Pro
-              </button>
-            </div>
-          </div>
-        )}
+
 
         {/* Swipe indicators */}
         <animated.div 
@@ -208,7 +206,7 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
             opacity: x.to(x => x > 50 ? (x - 50) / 100 : 0)
           }}
         >
-          {connectionLimit?.canConnect ? 'LIKE' : 'LIMIT'}
+          LIKE
         </animated.div>
         <animated.div 
           className="absolute top-1/2 right-8 transform -translate-y-1/2 text-6xl font-bold text-red-500 opacity-0 pointer-events-none"
