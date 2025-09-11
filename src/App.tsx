@@ -11,6 +11,7 @@ import { ThemeProvider } from './theme/ThemeProvider';
 import { QueryProvider } from './providers/QueryProvider';
 import { notificationService } from './services/notificationService';
 import { startPeriodicProfileSync } from './services/profileService';
+import { PremiumFeaturesDemo } from './components/platform/PremiumFeaturesDemo';
 import './index.css';
 import './debug.css';
 import './styles/pages.css';
@@ -40,6 +41,7 @@ function App() {
             <Route path="/success" element={<SuccessPage />} />
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/premium" element={<PremiumFeaturesDemo />} />
           </Routes>
         </Router>
       </ThemeProvider>
