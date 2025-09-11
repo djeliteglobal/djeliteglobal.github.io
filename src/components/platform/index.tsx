@@ -173,28 +173,68 @@ export const CourseCard: React.FC<{ course: Course }> = ({ course }) => {
 };
 
 export const PricingCard: React.FC<{ plan: PricingPlan }> = ({ plan }) => {
+    const [showCheckout, setShowCheckout] = useState(false);
+
+    const handleUpgrade = () => {
+        if (plan.name === 'Free') {
+            window.location.href = '/';
+        } else {
+            setShowCheckout(true);
+        }
+    };
+
     return (
-        <div className={`flex flex-col rounded-xl p-8 transition-all duration-300 ${plan.isFeatured ? 'bg-[color:var(--surface)] border-2 border-[color:var(--accent)] scale-105' : 'bg-[color:var(--surface-alt)] border border-[color:var(--border)]'}`}>
-            {plan.isFeatured && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-[color:var(--accent)] px-4 py-1 text-sm font-semibold text-black">BEST VALUE</div>
-            )}
-            <h3 className="font-display text-2xl font-bold text-center text-[color:var(--text-primary)]">{plan.name}</h3>
-            <div className="mt-4 flex items-baseline justify-center">
-                <span className="font-display text-5xl font-extrabold tracking-tight text-[color:var(--text-primary)]">{plan.price}</span>
-                <span className="ml-1 text-xl font-semibold text-[color:var(--muted)]">{plan.priceDetails}</span>
+        <>
+            <div className={`flex flex-col rounded-xl p-8 transition-all duration-300 ${plan.isFeatured ? 'bg-[color:var(--surface)] border-2 border-[color:var(--accent)] scale-105' : 'bg-[color:var(--surface-alt)] border border-[color:var(--border)]'}`}>
+                {plan.isFeatured && (
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-[color:var(--accent)] px-4 py-1 text-sm font-semibold text-black">BEST VALUE</div>
+                )}
+                <h3 className="font-display text-2xl font-bold text-center text-[color:var(--text-primary)]">{plan.name}</h3>
+                <div className="mt-4 flex items-baseline justify-center">
+                    <span className="font-display text-5xl font-extrabold tracking-tight text-[color:var(--text-primary)]">{plan.price}</span>
+                    <span className="ml-1 text-xl font-semibold text-[color:var(--muted)]">{plan.priceDetails}</span>
+                </div>
+                <ul className="mt-8 space-y-4">
+                    {plan.features.map((feature, index) => (
+                        <li key={index} className="flex items-start">
+                            <CheckCircleIcon className="h-6 w-6 flex-shrink-0 text-[color:var(--success)]" />
+                            <span className="ml-3 text-[color:var(--text-secondary)]">{feature}</span>
+                        </li>
+                    ))}
+                </ul>
+                <Button 
+                    variant={plan.isFeatured ? 'primary' : 'secondary'} 
+                    className="mt-10 w-full"
+                    onClick={handleUpgrade}
+                >
+                    {plan.cta}
+                </Button>
             </div>
-            <ul className="mt-8 space-y-4">
-                {plan.features.map((feature, index) => (
-                    <li key={index} className="flex items-start">
-                        <CheckCircleIcon className="h-6 w-6 flex-shrink-0 text-[color:var(--success)]" />
-                        <span className="ml-3 text-[color:var(--text-secondary)]">{feature}</span>
-                    </li>
-                ))}
-            </ul>
-            <Button variant={plan.isFeatured ? 'primary' : 'secondary'} className="mt-10 w-full">
-                {plan.cta}
-            </Button>
-        </div>
+
+            {showCheckout && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+                    <div className="bg-[color:var(--bg)] border border-[color:var(--border)] rounded-xl p-6 max-w-md w-full mx-4">
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-xl font-bold text-[color:var(--text-primary)]">
+                                Upgrade to {plan.name}
+                            </h2>
+                            <button
+                                onClick={() => setShowCheckout(false)}
+                                className="text-[color:var(--muted)] hover:text-[color:var(--text-primary)] transition-colors"
+                            >
+                                ×
+                            </button>
+                        </div>
+                        <div className="text-center py-8">
+                            <div className="text-6xl mb-4">🚀</div>
+                            <h3 className="text-xl font-bold text-[color:var(--accent)] mb-2">Coming Soon!</h3>
+                            <p className="text-[color:var(--text-secondary)] mb-4">Premium subscriptions will be available soon.</p>
+                            <Button onClick={() => setShowCheckout(false)}>Got it</Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
     );
 };
 
