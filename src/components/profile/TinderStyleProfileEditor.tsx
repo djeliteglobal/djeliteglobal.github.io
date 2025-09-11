@@ -12,18 +12,9 @@ interface TinderStyleProfileEditorProps {
 export const TinderStyleProfileEditor: React.FC<TinderStyleProfileEditorProps> = ({ isOpen, onClose }) => {
   const [profile, setProfile] = useState<Partial<DJProfile>>({});
   const [loading, setLoading] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
   const [additionalImages, setAdditionalImages] = useState<string[]>(['', '', '']);
   const [hasAdvanced, setHasAdvanced] = useState(false);
   const [hasContact, setHasContact] = useState(false);
-
-  const steps = [
-    { title: 'Profile Photo', key: 'photo' },
-    { title: 'Basic Info', key: 'basic' },
-    { title: 'Music Style', key: 'music' },
-    { title: 'Experience', key: 'experience' },
-    ...(hasAdvanced ? [{ title: 'Premium Features', key: 'premium' }] : [])
-  ];
 
   useEffect(() => {
     if (isOpen) {
@@ -92,7 +83,11 @@ export const TinderStyleProfileEditor: React.FC<TinderStyleProfileEditorProps> =
         genres: profile.genres || [],
         skills: profile.skills || [],
         venues: profile.venues || [],
-        fee: profile.fee
+        fee: profile.fee,
+        website: profile.website,
+        social_links: profile.social_links,
+        contact_info: profile.contact_info,
+        premium_badge: hasAdvanced
       });
       alert('Profile updated successfully!');
       onClose();
@@ -100,18 +95,6 @@ export const TinderStyleProfileEditor: React.FC<TinderStyleProfileEditorProps> =
       alert(`Failed to update profile: ${error.message}`);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const nextStep = () => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const prevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
     }
   };
 
@@ -131,252 +114,242 @@ export const TinderStyleProfileEditor: React.FC<TinderStyleProfileEditorProps> =
           </button>
         </div>
 
-        {/* Progress Bar */}
-        <div className="px-6 py-4">
-          <div className="flex justify-between mb-2">
-            {steps.map((step, index) => (
-              <div key={step.key} className={`w-full h-1 rounded-full mx-1 ${index <= currentStep ? 'bg-[color:var(--accent)]' : 'bg-[color:var(--border)]'}`} />
-            ))}
-          </div>
-          <p className="text-sm text-[color:var(--text-secondary)] text-center">{steps[currentStep].title}</p>
-        </div>
-
         {/* Content */}
-        <div className="px-6 pb-6 space-y-6 max-h-[60vh] overflow-y-auto">
-          {currentStep === 0 && (
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-lg font-semibold text-[color:var(--text-primary)] text-center mb-2">Add Photos</h3>
-                <p className="text-sm text-[color:var(--text-secondary)] text-center mb-6">Upload up to 4 photos to get more matches</p>
+        <div className="px-6 pb-6 space-y-8 max-h-[70vh] overflow-y-auto">
+          {/* Profile Photos */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-[color:var(--text-primary)] flex items-center gap-2">
+              📸 Profile Photos
+            </h3>
+            <p className="text-sm text-[color:var(--text-secondary)]">Upload up to 4 photos to get more matches</p>
+              
+            <div className="grid grid-cols-2 gap-4">
+              {/* Main profile picture */}
+              <div className="relative aspect-square">
+                {profile.profile_image_url ? (
+                  <img 
+                    src={profile.profile_image_url} 
+                    alt="Profile" 
+                    className="w-full h-full rounded-xl object-cover border-2 border-[color:var(--accent)]"
+                  />
+                ) : (
+                  <div className="w-full h-full rounded-xl bg-[color:var(--surface-alt)] border-2 border-[color:var(--accent)] flex items-center justify-center">
+                    <svg className="w-16 h-16 text-[color:var(--text-secondary)]" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                  </div>
+                )}
+                <label className="absolute bottom-2 right-2 w-8 h-8 bg-[color:var(--accent)] rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
+                  <span className="text-black font-bold text-sm">+</span>
+                  <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, 0)} className="hidden" />
+                </label>
+                <div className="absolute top-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full">1</div>
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
-                {/* Main profile picture */}
-                <div className="relative aspect-square">
-                  {profile.profile_image_url ? (
-                    <img 
-                      src={profile.profile_image_url} 
-                      alt="Profile" 
-                      className="w-full h-full rounded-xl object-cover border-2 border-[color:var(--accent)]"
-                    />
-                  ) : (
-                    <div className="w-full h-full rounded-xl bg-[color:var(--surface-alt)] border-2 border-[color:var(--accent)] flex items-center justify-center">
-                      <svg className="w-16 h-16 text-[color:var(--text-secondary)]" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                      </svg>
-                    </div>
-                  )}
+              {/* Additional 3 pictures */}
+              {[1, 2, 3].map((index) => (
+                <div key={index} className="relative aspect-square">
+                  <img 
+                    src={additionalImages[index - 1] || 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?blur=20'} 
+                    alt={`Photo ${index + 1}`} 
+                    className={`w-full h-full rounded-xl object-cover border-2 ${
+                      additionalImages[index - 1] ? 'border-[color:var(--accent)]' : 'border-dashed border-[color:var(--border)] opacity-50'
+                    }`}
+                  />
                   <label className="absolute bottom-2 right-2 w-8 h-8 bg-[color:var(--accent)] rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
                     <span className="text-black font-bold text-sm">+</span>
-                    <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, 0)} className="hidden" />
+                    <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, index)} className="hidden" />
                   </label>
-                  <div className="absolute top-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full">1</div>
+                  <div className="absolute top-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full">{index + 1}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Basic Info */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-[color:var(--text-primary)] flex items-center gap-2">
+              👤 Basic Info
+            </h3>
+            <div>
+              <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">DJ Name</label>
+              <input
+                type="text"
+                value={profile.dj_name || ''}
+                onChange={(e) => setProfile({...profile, dj_name: e.target.value})}
+                className="w-full px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
+                placeholder="DJ Awesome"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Age</label>
+              <input
+                type="number"
+                value={profile.age || ''}
+                onChange={(e) => setProfile({...profile, age: parseInt(e.target.value)})}
+                className="w-full px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
+                placeholder="25"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Location</label>
+              <input
+                type="text"
+                value={profile.location || ''}
+                onChange={(e) => setProfile({...profile, location: e.target.value})}
+                className="w-full px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
+                placeholder="New York, NY"
+              />
+            </div>
+          </div>
+
+          {/* Music Style */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-[color:var(--text-primary)] flex items-center gap-2">
+              🎵 Music Style
+            </h3>
+            <div>
+              <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Music Genres</label>
+              <input
+                type="text"
+                value={profile.genres?.join(', ') || ''}
+                onChange={(e) => setProfile({...profile, genres: e.target.value.split(',').map(g => g.trim()).filter(g => g)})}
+                className="w-full px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
+                placeholder="House, Techno, Deep House"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Skills</label>
+              <input
+                type="text"
+                value={profile.skills?.join(', ') || ''}
+                onChange={(e) => setProfile({...profile, skills: e.target.value.split(',').map(s => s.trim()).filter(s => s)})}
+                className="w-full px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
+                placeholder="Mixing, Production, Scratching"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Bio</label>
+              <textarea
+                value={profile.bio || ''}
+                onChange={(e) => setProfile({...profile, bio: e.target.value})}
+                className="w-full px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none resize-none"
+                rows={3}
+                placeholder="Tell other DJs about yourself..."
+              />
+            </div>
+          </div>
+
+          {/* Experience */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-[color:var(--text-primary)] flex items-center gap-2">
+              🎤 Experience
+            </h3>
+            <div>
+              <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Venues</label>
+              <input
+                type="text"
+                value={profile.venues?.join(', ') || ''}
+                onChange={(e) => setProfile({...profile, venues: e.target.value.split(',').map(v => v.trim()).filter(v => v)})}
+                className="w-full px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
+                placeholder="Club XYZ, Festival ABC"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Typical Fee</label>
+              <input
+                type="text"
+                value={profile.fee || ''}
+                onChange={(e) => setProfile({...profile, fee: e.target.value})}
+                className="w-full px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
+                placeholder="$500-1000 or Negotiable"
+              />
+            </div>
+          </div>
+
+          {/* Premium Features */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-[color:var(--text-primary)] flex items-center gap-2">
+              {hasAdvanced ? '✨' : '🔒'} Premium Features
+              {hasAdvanced ? (
+                <span className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+                  UNLOCKED
+                </span>
+              ) : (
+                <span className="bg-gray-400 text-white px-2 py-1 rounded-full text-xs font-bold">
+                  LOCKED
+                </span>
+              )}
+            </h3>
+            
+            {hasAdvanced ? (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Website</label>
+                  <input
+                    type="url"
+                    value={profile.website || ''}
+                    onChange={(e) => setProfile({...profile, website: e.target.value})}
+                    className="w-full px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
+                    placeholder="https://your-website.com"
+                  />
                 </div>
                 
-                {/* Additional 3 pictures */}
-                {[1, 2, 3].map((index) => (
-                  <div key={index} className="relative aspect-square">
-                    <img 
-                      src={additionalImages[index - 1] || 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?blur=20'} 
-                      alt={`Photo ${index + 1}`} 
-                      className={`w-full h-full rounded-xl object-cover border-2 ${
-                        additionalImages[index - 1] ? 'border-[color:var(--accent)]' : 'border-dashed border-[color:var(--border)] opacity-50'
-                      }`}
+                <div>
+                  <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Social Links</label>
+                  <div className="space-y-2">
+                    <input
+                      type="url"
+                      value={profile.social_links?.instagram || ''}
+                      onChange={(e) => setProfile({...profile, social_links: {...(profile.social_links || {}), instagram: e.target.value}})}
+                      className="w-full px-4 py-2 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-lg focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
+                      placeholder="Instagram URL"
                     />
-                    <label className="absolute bottom-2 right-2 w-8 h-8 bg-[color:var(--accent)] rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
-                      <span className="text-black font-bold text-sm">+</span>
-                      <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, index)} className="hidden" />
-                    </label>
-                    <div className="absolute top-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full">{index + 1}</div>
+                    <input
+                      type="url"
+                      value={profile.social_links?.soundcloud || ''}
+                      onChange={(e) => setProfile({...profile, social_links: {...(profile.social_links || {}), soundcloud: e.target.value}})}
+                      className="w-full px-4 py-2 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-lg focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
+                      placeholder="SoundCloud URL"
+                    />
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {currentStep === 1 && (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">DJ Name</label>
-                <input
-                  type="text"
-                  value={profile.dj_name || ''}
-                  onChange={(e) => setProfile({...profile, dj_name: e.target.value})}
-                  className="w-full px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
-                  placeholder="DJ Awesome"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Age</label>
-                <input
-                  type="number"
-                  value={profile.age || ''}
-                  onChange={(e) => setProfile({...profile, age: parseInt(e.target.value)})}
-                  className="w-full px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
-                  placeholder="25"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Location</label>
-                <div className="mb-2 flex flex-wrap gap-1">
-                  {['New York, NY', 'Los Angeles, CA', 'Miami, FL', 'Chicago, IL', 'Berlin, Germany', 'London, UK', 'Ibiza, Spain', 'Amsterdam, Netherlands'].map(city => {
-                    const isSelected = profile.location === city;
-                    return (
-                      <button
-                        key={city}
-                        type="button"
-                        onClick={() => setProfile({...profile, location: isSelected ? '' : city})}
-                        className={`px-2 py-1 text-xs rounded-full transition-colors ${
-                          isSelected 
-                            ? 'bg-green-500 text-white' 
-                            : 'bg-[color:var(--surface-alt)] text-[color:var(--text-secondary)] hover:bg-green-500/20'
-                        }`}
-                      >
-                        {city}
-                      </button>
-                    );
-                  })}
                 </div>
-                <input
-                  type="text"
-                  value={profile.location || ''}
-                  onChange={(e) => setProfile({...profile, location: e.target.value})}
-                  className="w-full px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
-                  placeholder="New York, NY"
-                />
+                
+                {hasContact && (
+                  <div>
+                    <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">
+                      Direct Contact <span className="text-xs text-purple-600">PRO FEATURE</span>
+                    </label>
+                    <div className="space-y-2">
+                      <input
+                        type="email"
+                        value={profile.contact_info?.email || ''}
+                        onChange={(e) => setProfile({...profile, contact_info: {...(profile.contact_info || {}), email: e.target.value}})}
+                        className="w-full px-4 py-2 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-lg focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
+                        placeholder="Contact Email"
+                      />
+                      <input
+                        type="tel"
+                        value={profile.contact_info?.phone || ''}
+                        onChange={(e) => setProfile({...profile, contact_info: {...(profile.contact_info || {}), phone: e.target.value}})}
+                        className="w-full px-4 py-2 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-lg focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
+                        placeholder="Phone Number"
+                      />
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="text-center py-6 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
+                <div className="text-4xl mb-2">🔒</div>
+                <h4 className="font-bold text-gray-700 mb-2">Premium Features Locked</h4>
+                <p className="text-sm text-gray-600 mb-4">Upgrade to Pro to unlock advanced profile features</p>
+                <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-lg font-semibold hover:opacity-90">
+                  Upgrade to Pro
+                </button>
               </div>
-            </div>
-          )}
-
-          {currentStep === 2 && (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Music Genres</label>
-                <div className="mb-2 flex flex-wrap gap-1">
-                  {['House', 'Techno', 'Deep House', 'Trance', 'Progressive', 'Minimal', 'Tech House', 'Drum & Bass'].map(genre => {
-                    const isSelected = profile.genres?.includes(genre);
-                    return (
-                      <button
-                        key={genre}
-                        type="button"
-                        onClick={() => {
-                          const current = profile.genres || [];
-                          if (isSelected) {
-                            setProfile({...profile, genres: current.filter(g => g !== genre)});
-                          } else {
-                            setProfile({...profile, genres: [...current, genre]});
-                          }
-                        }}
-                        className={`px-2 py-1 text-xs rounded-full transition-colors ${
-                          isSelected 
-                            ? 'bg-[color:var(--accent)] text-black' 
-                            : 'bg-[color:var(--surface-alt)] text-[color:var(--text-secondary)] hover:bg-[color:var(--accent)]/20'
-                        }`}
-                      >
-                        {genre}
-                      </button>
-                    );
-                  })}
-                </div>
-                <input
-                  type="text"
-                  value={profile.genres?.join(', ') || ''}
-                  onChange={(e) => setProfile({...profile, genres: e.target.value.split(',').map(g => g.trim()).filter(g => g)})}
-                  className="w-full px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
-                  placeholder="House, Techno, Deep House"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Skills</label>
-                <div className="mb-2 flex flex-wrap gap-1">
-                  {['Mixing', 'Production', 'Scratching', 'Beatmatching', 'Live Performance', 'Remixing', 'Sound Design', 'Mastering'].map(skill => {
-                    const isSelected = profile.skills?.includes(skill);
-                    return (
-                      <button
-                        key={skill}
-                        type="button"
-                        onClick={() => {
-                          const current = profile.skills || [];
-                          if (isSelected) {
-                            setProfile({...profile, skills: current.filter(s => s !== skill)});
-                          } else {
-                            setProfile({...profile, skills: [...current, skill]});
-                          }
-                        }}
-                        className={`px-2 py-1 text-xs rounded-full transition-colors ${
-                          isSelected 
-                            ? 'bg-blue-500 text-white' 
-                            : 'bg-[color:var(--surface-alt)] text-[color:var(--text-secondary)] hover:bg-blue-500/20'
-                        }`}
-                      >
-                        {skill}
-                      </button>
-                    );
-                  })}
-                </div>
-                <input
-                  type="text"
-                  value={profile.skills?.join(', ') || ''}
-                  onChange={(e) => setProfile({...profile, skills: e.target.value.split(',').map(s => s.trim()).filter(s => s)})}
-                  className="w-full px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
-                  placeholder="Mixing, Production, Scratching"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Bio</label>
-                <textarea
-                  value={profile.bio || ''}
-                  onChange={(e) => setProfile({...profile, bio: e.target.value})}
-                  className="w-full px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none resize-none"
-                  rows={3}
-                  placeholder="Tell other DJs about yourself..."
-                />
-              </div>
-            </div>
-          )}
-
-          {currentStep === 3 && (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Venues</label>
-                <input
-                  type="text"
-                  value={profile.venues?.join(', ') || ''}
-                  onChange={(e) => setProfile({...profile, venues: e.target.value.split(',').map(v => v.trim()).filter(v => v)})}
-                  className="w-full px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
-                  placeholder="Club XYZ, Festival ABC"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Typical Fee</label>
-                <input
-                  type="text"
-                  value={profile.fee || ''}
-                  onChange={(e) => setProfile({...profile, fee: e.target.value})}
-                  className="w-full px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
-                  placeholder="$500-1000 or Negotiable"
-                />
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Navigation */}
-        <div className="flex justify-between p-6 border-t border-[color:var(--border)]">
-          <button 
-            onClick={prevStep} 
-            disabled={currentStep === 0}
-            className="px-6 py-2 text-[color:var(--text-secondary)] disabled:opacity-50"
-          >
-            Back
-          </button>
-          <button 
-            onClick={nextStep} 
-            disabled={currentStep === steps.length - 1}
-            className="px-6 py-2 bg-[color:var(--accent)] text-black rounded-full font-semibold disabled:opacity-50"
-          >
-            {currentStep === steps.length - 1 ? 'Done' : 'Next'}
-          </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
