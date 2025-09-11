@@ -5,6 +5,7 @@ import { AdvancedProfileForm } from '../profile/AdvancedProfileForm';
 import { PremiumProfileDisplay } from '../profile/PremiumProfileDisplay';
 import { getCurrentProfile } from '../../services/profileService';
 import { DJProfile } from '../../types/profile';
+import '../../index.css';
 
 export const PremiumFeaturesDemo: React.FC = () => {
   const { connectionLimit, loadMatches } = useMatchStore();
@@ -21,6 +22,7 @@ export const PremiumFeaturesDemo: React.FC = () => {
   };
 
   return (
+    <div className="min-h-screen bg-gray-50 py-8">
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       <div className="text-center">
         <h1 className="text-3xl font-bold mb-2">Premium Features Demo</h1>
@@ -143,6 +145,7 @@ export const PremiumFeaturesDemo: React.FC = () => {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 };

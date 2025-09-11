@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../platform';
 import { getCurrentProfile, updateProfile, uploadProfileImage } from '../../services/profileService';
+import { hasAdvancedProfile, hasDirectContact } from '../../services/subscriptionService';
 import { DJProfile } from '../../types/profile';
 
 interface TinderStyleProfileEditorProps {
@@ -13,19 +14,32 @@ export const TinderStyleProfileEditor: React.FC<TinderStyleProfileEditorProps> =
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [additionalImages, setAdditionalImages] = useState<string[]>(['', '', '']);
+  const [hasAdvanced, setHasAdvanced] = useState(false);
+  const [hasContact, setHasContact] = useState(false);
 
   const steps = [
     { title: 'Profile Photo', key: 'photo' },
     { title: 'Basic Info', key: 'basic' },
     { title: 'Music Style', key: 'music' },
-    { title: 'Experience', key: 'experience' }
+    { title: 'Experience', key: 'experience' },
+    ...(hasAdvanced ? [{ title: 'Premium Features', key: 'premium' }] : [])
   ];
 
   useEffect(() => {
     if (isOpen) {
       loadProfile();
+      checkPremiumFeatures();
     }
   }, [isOpen]);
+  
+  const checkPremiumFeatures = async () => {
+    const [advanced, contact] = await Promise.all([
+      hasAdvancedProfile(),
+      hasDirectContact()
+    ]);
+    setHasAdvanced(advanced);
+    setHasContact(contact);
+  };
 
   const loadProfile = async () => {
     try {

@@ -3,6 +3,8 @@ import { AppContext } from '../../pages/HomePage';
 import { useAuth } from '../../contexts/AuthContext';
 import { LanguageSwitcher } from '../LanguageSwitcher';
 import { TinderStyleProfileEditor } from '../profile/TinderStyleProfileEditor';
+import { useMatchStore } from '../../stores/matchStore';
+import { getUserPlan } from '../../services/subscriptionService';
 import { NAV_ITEMS, SunIcon, MoonIcon, SearchIcon, MenuIcon, CheckCircleIcon, ChevronDownIcon, Logo, LockIcon } from '../../constants/platform';
 import type { Course, FaqItem, PricingPlan, Opportunity } from '../../types/platform';
 
@@ -87,6 +89,12 @@ export const SideNav: React.FC = () => {
     const { appState, navigate } = useContext(AppContext)!;
     const { currentUser, logout } = useAuth();
     const [showProfileEditor, setShowProfileEditor] = useState(false);
+    const [userPlan, setUserPlan] = useState('free');
+    const { connectionLimit } = useMatchStore();
+    
+    useEffect(() => {
+        getUserPlan().then(setUserPlan);
+    }, []);
     
     return (
         <>
@@ -124,8 +132,17 @@ export const SideNav: React.FC = () => {
                         </div>
                     )}
                     <div className="text-left">
-                        <p className="font-semibold text-[color:var(--text-primary)]">{currentUser?.name}</p>
-                        <p className="text-xs text-[color:var(--muted)]">{currentUser?.plan}</p>
+                        <div className="flex items-center gap-2">
+                            <p className="font-semibold text-[color:var(--text-primary)]">{currentUser?.name}</p>
+                            {userPlan !== 'free' && (
+                                <span className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-0.5 rounded-full text-xs font-bold">
+                                    ✨ {userPlan.toUpperCase()}
+                                </span>
+                            )}
+                        </div>
+                        <p className="text-xs text-[color:var(--muted)]">
+                            {connectionLimit?.remaining === -1 ? 'Unlimited connections' : `${connectionLimit?.remaining || 0} connections left`}
+                        </p>
                     </div>
                 </button>
                 <button 
@@ -267,6 +284,7 @@ export const OpportunitySwipeCard: React.FC<{ opportunity: Opportunity; onSwipe:
     const currentX = useRef(0);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [showDetails, setShowDetails] = useState(false);
+    const { connectionLimit, checkCanConnect } = useMatchStore();
 
     // Tinder-like: Multiple images support
     const images = opportunity.images || [opportunity.imageUrl];
@@ -293,13 +311,28 @@ export const OpportunitySwipeCard: React.FC<{ opportunity: Opportunity; onSwipe:
     };
 
     // ⚠️ PROTECTED: Drag end logic - DO NOT MODIFY
-    const handleDragEnd = () => {
+    const handleDragEnd = async () => {
         if (!isDragging.current || !isTop) return;
         isDragging.current = false;
         
         const swipeThreshold = 100;
         if (Math.abs(currentX.current) > swipeThreshold) {
             const direction = currentX.current > 0 ? 'right' : 'left';
+            
+            // Check connection limit for right swipes
+            if (direction === 'right') {
+                const canConnect = await checkCanConnect();
+                if (!canConnect) {
+                    // Bounce back if limit reached
+                    if (cardRef.current) {
+                        cardRef.current.style.transition = 'transform 0.3s ease';
+                        cardRef.current.style.transform = '';
+                    }
+                    currentX.current = 0;
+                    return;
+                }
+            }
+            
             if (cardRef.current) {
                 cardRef.current.classList.add(direction === 'right' ? 'swipe-out-right' : 'swipe-out-left');
                 cardRef.current.addEventListener('animationend', () => onSwipe(direction), { once: true });
@@ -388,6 +421,19 @@ export const OpportunitySwipeCard: React.FC<{ opportunity: Opportunity; onSwipe:
                 </div>
                 
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent pointer-events-none"></div>
+                
+                {/* Connection limit warning */}
+                {connectionLimit && !connectionLimit.canConnect && (
+                    <div className="absolute inset-0 bg-black/80 flex items-center justify-center z-10">
+                        <div className="bg-red-500 text-white p-6 rounded-lg text-center max-w-sm mx-4">
+                            <h3 className="text-xl font-bold mb-2">🚫 Connection Limit Reached</h3>
+                            <p className="mb-4">You've reached your free plan limit of 5 connections.</p>
+                            <button className="bg-white text-red-500 px-6 py-2 rounded-lg font-semibold hover:bg-gray-100">
+                                Upgrade to Pro
+                            </button>
+                        </div>
+                    </div>
+                )}
                 
                 {/* Profile info */}
                 <div className="absolute bottom-0 left-0 p-6 text-white w-full">
