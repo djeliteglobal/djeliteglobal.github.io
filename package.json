@@ -26,7 +26,8 @@
     "use-debounce": "^9.0.4",
     "zustand": "^4.4.0",
     "zod": "^3.22.0",
-    "yup": "^1.4.0"
+    "yup": "^1.4.0",
+    "stripe": "^14.0.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.27",
