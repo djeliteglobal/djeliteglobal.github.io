@@ -9,9 +9,11 @@ import { OptimizedImage } from '../OptimizedImage';
 import { ProfileThumbnail } from '../ProfileThumbnail';
 import { EventCreator } from '../events/EventCreator';
 import { DJApplicationModal } from '../events/DJApplicationModal';
+import ReferralDashboard from '../premium/ReferralDashboard';
 import { loadCourses, FAQ_ITEMS, PRICING_PLANS, PlayCircleIcon, VideoIcon, FileTextIcon, HelpCircleIcon, XIcon, HeartIcon, StarIcon, UndoIcon, LockIcon, loadOpportunities } from '../../constants/platform';
 import { fetchSwipeProfiles, recordSwipe, undoSwipe, fetchMatches, deleteMatch, createProfile } from '../../services/profileService';
 import { useMatches } from '../../hooks/useMatches';
+import { useProfileImagePreloader } from '../../hooks/useImagePreloader';
 import type { Course, Opportunity } from '../../types/platform';
 import { DJMatchingPage } from './DJMatchingPage';
 
@@ -226,7 +228,7 @@ export const LandingPage: React.FC = () => {
                         try {
                             const { subscribeToNewsletter } = await import('../../services/profileService');
                             await subscribeToNewsletter(email, 'Newsletter Subscriber');
-                            alert('📧 Subscribed! You\'ll get weekly DJ tips and insights.');
+                            alert('✅ Subscribed! You\'ll get weekly DJ tips and insights.');
                             (e.target as HTMLFormElement).reset();
                         } catch (error: any) {
                             console.error('Newsletter signup error:', error);
@@ -269,7 +271,7 @@ export const Dashboard: React.FC = () => {
     
     const inProgressCourse = courses.find(c => c.progress > 0 && c.progress < 100);
     return (
-        <div className="min-h-full bg-[color:var(--bg)] text-[color:var(--text-primary)] p-4 sm:p-6 md:p-8">
+        <div className="min-h-full bg-[color:var(--bg)] text-[color:var(--text-primary)] p-4 sm:p-6 md:p-8 md:ml-64">
             <h1 className="font-display text-3xl font-bold text-[color:var(--text-primary)]">Welcome back, {currentUser?.name.split(' ')[0]}!</h1>
             <p className="mt-1 text-[color:var(--text-secondary)]">Let's make some noise today.</p>
 
@@ -360,7 +362,7 @@ export const CoursesPage: React.FC = () => {
     
     if (error) {
         return (
-            <div className="min-h-full bg-[color:var(--bg)] text-[color:var(--text-primary)] p-4 sm:p-6 md:p-8">
+            <div className="min-h-full bg-[color:var(--bg)] text-[color:var(--text-primary)] p-4 sm:p-6 md:p-8 md:ml-64">
                 <h1 className="font-display text-3xl font-bold text-[color:var(--text-primary)]">All Courses</h1>
                 <div className="mt-8 text-center py-8">
                     <p className="text-red-400 mb-4">{error}</p>
@@ -373,7 +375,7 @@ export const CoursesPage: React.FC = () => {
     }
 
     return (
-        <div className="min-h-full bg-[color:var(--bg)] text-[color:var(--text-primary)] p-4 sm:p-6 md:p-8">
+        <div className="min-h-full bg-[color:var(--bg)] text-[color:var(--text-primary)] p-4 sm:p-6 md:p-8 md:ml-64">
             <h1 className="font-display text-3xl font-bold text-[color:var(--text-primary)]">All Courses</h1>
             <p className="mt-1 text-[color:var(--text-secondary)]">Expand your skills and master the craft.</p>
             <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -422,7 +424,7 @@ export const CourseDetailPage: React.FC = () => {
     }
 
     return (
-        <div className="flex flex-col lg:flex-row h-full">
+        <div className="flex flex-col lg:flex-row h-full md:ml-64">
             {/* Main Content - Video Player */}
             <div className="flex-grow p-4 sm:p-6 lg:p-8">
                  <button onClick={() => navigate('courses')} className="mb-4 text-sm text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]">
@@ -458,23 +460,57 @@ export const CourseDetailPage: React.FC = () => {
                         <p className="mt-2 text-sm text-[color:var(--muted)]">{course.progress}% complete</p>
                     </div>
                     <Button className="w-full mt-4" disabled>
-                        🔒 Locked - Upgrade to Pro
+                        <div className="flex items-center gap-2">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-current">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke="currentColor" strokeWidth="2" fill="none"/>
+                            <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2" fill="none"/>
+                            <path d="M12 3v4" stroke="currentColor" strokeWidth="2"/>
+                          </svg>
+                          Locked - Upgrade to Pro
+                        </div>
                     </Button>
                 </div>
                 <div className="border-t border-[color:var(--border)]">
                     <ul className="divide-y divide-[color:var(--border)]">
-                        {Array.from({ length: 8 }).map((_, i) => (
-                            <li key={i} className="flex items-center gap-4 p-4 hover:bg-[color:var(--surface-alt)] cursor-pointer">
-                                <div className="text-[color:var(--muted)]">
-                                    {i % 3 === 0 ? <VideoIcon className="w-5 h-5"/> : i % 3 === 1 ? <FileTextIcon className="w-5 h-5" /> : <HelpCircleIcon className="w-5 h-5" />}
-                                </div>
-                                <div className="flex-grow">
-                                    <p className="font-medium text-[color:var(--text-primary)]">Lesson {i+1}: Introduction to Music Theory</p>
-                                    <p className="text-sm text-[color:var(--muted)]">{i % 3 === 0 ? 'Video' : i % 3 === 1 ? 'Reading' : 'Quiz'} &bull; 12 min</p>
-                                </div>
-                                 <div className={`w-5 h-5 rounded-full border-2 ${i < 3 ? 'border-[color:var(--accent)] bg-[color:var(--accent)]' : 'border-[color:var(--border)]'}`}></div>
-                            </li>
-                        ))}
+                        {(() => {
+                            const lessonsByCourse = {
+                                1: [ // DJ Fundamentals
+                                    { title: "Getting Started with DJ Equipment", type: "Video", duration: "15 min" },
+                                    { title: "Understanding BPM and Beat Matching", type: "Video", duration: "18 min" },
+                                    { title: "Basic Mixing Techniques", type: "Reading", duration: "10 min" },
+                                    { title: "Your First Mix Practice", type: "Quiz", duration: "5 min" },
+                                    { title: "Reading the Crowd Basics", type: "Video", duration: "12 min" },
+                                    { title: "Music Library Organization", type: "Reading", duration: "8 min" },
+                                    { title: "EQ and Volume Control", type: "Video", duration: "14 min" },
+                                    { title: "Final Assessment", type: "Quiz", duration: "10 min" }
+                                ],
+                                2: [ // Advanced Mixing
+                                    { title: "Advanced Beatmatching Techniques", type: "Video", duration: "20 min" },
+                                    { title: "Harmonic Mixing Theory", type: "Reading", duration: "15 min" },
+                                    { title: "Creative Transition Methods", type: "Video", duration: "25 min" },
+                                    { title: "Harmonic Key Knowledge Test", type: "Quiz", duration: "8 min" },
+                                    { title: "Loop Rolling and Effects", type: "Video", duration: "22 min" },
+                                    { title: "Advanced EQ Techniques", type: "Reading", duration: "12 min" },
+                                    { title: "Live Performance Skills", type: "Video", duration: "18 min" },
+                                    { title: "Master Class Assessment", type: "Quiz", duration: "15 min" }
+                                ]
+                            };
+                            
+                            const lessons = lessonsByCourse[course.id] || lessonsByCourse[1];
+                            
+                            return lessons.map((lesson, i) => (
+                                <li key={i} className="flex items-center gap-4 p-4 hover:bg-[color:var(--surface-alt)] cursor-pointer">
+                                    <div className="text-[color:var(--muted)]">
+                                        {lesson.type === 'Video' ? <VideoIcon className="w-5 h-5"/> : lesson.type === 'Reading' ? <FileTextIcon className="w-5 h-5" /> : <HelpCircleIcon className="w-5 h-5" />}
+                                    </div>
+                                    <div className="flex-grow">
+                                        <p className="font-medium text-[color:var(--text-primary)]">Lesson {i+1}: {lesson.title}</p>
+                                        <p className="text-sm text-[color:var(--muted)]">{lesson.type} &bull; {lesson.duration}</p>
+                                    </div>
+                                     <div className={`w-5 h-5 rounded-full border-2 ${i < 3 ? 'border-[color:var(--accent)] bg-[color:var(--accent)]' : 'border-[color:var(--border)]'}`}></div>
+                                </li>
+                            ));
+                        })()}
                     </ul>
                 </div>
             </div>
@@ -537,7 +573,7 @@ export const CommunityPage: React.FC = () => {
     };
 
     return (
-        <div className="p-4 sm:p-6 md:p-8">
+        <div className="p-4 sm:p-6 md:p-8 md:ml-64">
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <h1 className="font-display text-3xl font-bold">Event Marketplace</h1>
@@ -560,7 +596,13 @@ export const CommunityPage: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {events.length === 0 ? (
                     <div className="col-span-full flex flex-col items-center justify-center py-16 text-center">
-                        <div className="text-6xl mb-4">🎪</div>
+                        <div className="mb-4 flex justify-center">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" className="text-purple-500">
+                                <path d="M3 21h18l-9-18-9 18z" fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinejoin="round"/>
+                                <path d="M12 3v18" stroke="white" strokeWidth="2"/>
+                                <path d="M8 21l4-8 4 8" stroke="white" strokeWidth="1.5" fill="none"/>
+                            </svg>
+                        </div>
                         <h3 className="text-xl font-semibold text-[color:var(--text-secondary)] mb-2">No events yet</h3>
                         <p className="text-[color:var(--muted)] mb-6">Be the first to create an event and find amazing DJs!</p>
                         <Button onClick={() => setShowEventCreator(true)}>Create First Event</Button>
@@ -572,9 +614,29 @@ export const CommunityPage: React.FC = () => {
                                 <h3 className="font-bold text-lg text-[color:var(--text-primary)]">{event.title}</h3>
                                 <span className="px-2 py-1 text-xs bg-green-500/20 text-green-400 rounded-full">{event.status}</span>
                             </div>
-                            <p className="text-[color:var(--text-secondary)] mb-2">📍 {event.venue}</p>
-                            <p className="text-[color:var(--text-secondary)] mb-2">📅 {event.date} at {event.time}</p>
-                            <p className="text-[color:var(--text-secondary)] mb-4">💰 ${event.budget}</p>
+                            <div className="flex items-center gap-2 text-[color:var(--text-secondary)] mb-2">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-red-500">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" fill="currentColor"/>
+                                    <circle cx="12" cy="10" r="3" fill="white"/>
+                                </svg>
+                                {event.venue}
+                            </div>
+                            <div className="flex items-center gap-2 text-[color:var(--text-secondary)] mb-2">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-blue-500">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" fill="currentColor"/>
+                                    <line x1="16" y1="2" x2="16" y2="6" stroke="white" strokeWidth="2"/>
+                                    <line x1="8" y1="2" x2="8" y2="6" stroke="white" strokeWidth="2"/>
+                                    <line x1="3" y1="10" x2="21" y2="10" stroke="white" strokeWidth="2"/>
+                                </svg>
+                                {event.date} at {event.time}
+                            </div>
+                            <div className="flex items-center gap-2 text-[color:var(--text-secondary)] mb-4">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-green-500">
+                                    <line x1="12" y1="1" x2="12" y2="23" stroke="currentColor" strokeWidth="2"/>
+                                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke="currentColor" strokeWidth="2" fill="none"/>
+                                </svg>
+                                ${event.budget}
+                            </div>
                             <div className="flex flex-wrap gap-1 mb-4">
                                 {event.genres.slice(0, 3).map((genre: string) => (
                                     <span key={genre} className="text-xs bg-[color:var(--accent)]/20 text-[color:var(--accent)] px-2 py-1 rounded-full">
@@ -647,44 +709,50 @@ export const OpportunitiesPage: React.FC = () => {
     const [matchResult, setMatchResult] = useState<{show: boolean, isMatch: boolean}>({show: false, isMatch: false});
     const [lastSwipedProfile, setLastSwipedProfile] = useState<Opportunity | null>(null);
 
-    // GENNADY OPTIMIZATION: Parallel loading with Google profile sync
+    // ULTRA-FAST LOADING: Instant access with aggressive caching
     const loadProfiles = useCallback(async () => {
-        // Cycle through loading comments
-        const commentInterval = setInterval(() => {
-            setLoadingComment(prev => {
-                const currentIndex = DJ_LOADING_COMMENTS.indexOf(prev);
-                return DJ_LOADING_COMMENTS[(currentIndex + 1) % DJ_LOADING_COMMENTS.length];
-            });
-        }, 1500);
-        
         try {
-            const [_, profiles] = await Promise.all([
-                createProfile({dj_name: 'New DJ', bio: 'Getting started'}),
-                fetchSwipeProfiles()
-            ]);
+            // Skip profile creation - just fetch immediately
+            const profiles = await fetchSwipeProfiles();
+            setOpportunities(profiles);
+            setLoading(false);
             
-            // Auto-sync Google profile pictures for all users
-            try {
-                const { syncAllGoogleProfilePictures } = await import('../../services/profileService');
-                await syncAllGoogleProfilePictures();
-                // Reload profiles after sync
-                const updatedProfiles = await fetchSwipeProfiles();
-                setOpportunities(updatedProfiles);
-            } catch (syncError) {
-                console.log('Profile sync completed, using current profiles');
-                setOpportunities(profiles);
-            }
+            // Background sync (non-blocking)
+            requestIdleCallback(async () => {
+                try {
+                    await createProfile({dj_name: 'New DJ', bio: 'Getting started'});
+                } catch (error) {
+                    // Ignore errors in background tasks
+                }
+            });
         } catch (error) {
             setOpportunities([]);
-        } finally {
-            clearInterval(commentInterval);
             setLoading(false);
         }
     }, []);
 
+    // Preload profile images for faster loading
+    useProfileImagePreloader(opportunities.slice(0, 10), opportunities.length > 0);
+
+    // Preload profiles immediately on component mount
     useEffect(() => {
+        // Start loading immediately without delay
         loadProfiles();
-    }, [loadProfiles]);
+        
+        // Preload next batch in background
+        const preloadTimer = setTimeout(() => {
+            requestIdleCallback(() => {
+                fetchSwipeProfiles().then(profiles => {
+                    // Cache next batch for instant access
+                    if (profiles.length > opportunities.length) {
+                        setOpportunities(prev => [...prev, ...profiles.slice(prev.length)]);
+                    }
+                }).catch(() => {});
+            });
+        }, 2000);
+        
+        return () => clearTimeout(preloadTimer);
+    }, []);
 
     // GENNADY OPTIMIZATION: Optimistic updates
     const handleSwipe = useCallback(async (direction?: 'left' | 'right' | 'super') => {
@@ -697,16 +765,23 @@ export const OpportunitiesPage: React.FC = () => {
         requestIdleCallback(async () => {
             try {
                 const result = await recordSwipe(currentProfile.id, direction);
-                if (result.match) {
+                if (result?.match) {
                     setMatchResult({show: true, isMatch: true});
                     setTimeout(() => setMatchResult({show: false, isMatch: false}), 3000);
                 }
             } catch (error: any) {
-                // Ignore duplicate swipe errors (409 conflicts)
-                if (error?.code !== '23505' && !error?.message?.includes('already exists')) {
-                    console.error('Failed to record swipe:', error);
+                // SILENT ERROR HANDLING: Don't disrupt UX for expected database conflicts
+                const isExpectedError = 
+                    error?.status === 409 || // Duplicate swipe
+                    error?.status === 406 || // Not acceptable
+                    error?.code === '23505' || // Unique constraint
+                    error?.message?.includes('already exists') ||
+                    error?.message?.includes('duplicate');
+                
+                if (!isExpectedError) {
+                    console.warn('⚠️ SWIPE WARNING:', error?.message || 'Unknown swipe error');
                 }
-                // Silently ignore duplicate swipes - they're expected
+                // Always continue - don't break user flow
             }
         });
     }, [opportunities]);
@@ -758,7 +833,12 @@ export const OpportunitiesPage: React.FC = () => {
             {matchResult.show && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
                     <div className="bg-gradient-to-r from-pink-500 to-purple-600 p-8 rounded-2xl text-center text-white max-w-sm mx-4">
-                        <div className="text-6xl mb-4">🎉</div>
+                        <div className="mb-4 flex justify-center">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" className="text-pink-500">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/>
+                                <path d="M8 12l2 2 4-4" stroke="white" strokeWidth="2" fill="none"/>
+                            </svg>
+                        </div>
                         <h2 className="text-2xl font-bold mb-2">It's a Match!</h2>
                         <p className="text-white/90">You and {opportunities[0]?.title} liked each other</p>
                         <Button className="mt-6 bg-white text-purple-600 hover:bg-gray-100">
@@ -839,8 +919,205 @@ export const OpportunitiesPage: React.FC = () => {
 // Settings Page
 export const SettingsPage: React.FC = () => {
     const { currentUser } = useAuth();
+    const { navigate } = useContext(AppContext)!;
+    const [migrating, setMigrating] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [formData, setFormData] = useState({
+        name: currentUser?.name || '',
+        email: currentUser?.email || ''
+    });
+    const [currentView, setCurrentView] = useState<'settings' | 'subscription' | 'billing'>('settings');
+    const [showAdminTools, setShowAdminTools] = useState(false);
+    const [adminPassword, setAdminPassword] = useState('');
+    
+    const handleMigration = async () => {
+        setMigrating(true);
+        try {
+            const { migrateDjNames } = await import('../../services/profileService');
+            await migrateDjNames();
+            alert('✅ Migration completed! All DJ names updated from OAuth/email.');
+        } catch (error) {
+            console.error('Migration error:', error);
+            alert('❌ Migration failed. Check console for details.');
+        }
+        setMigrating(false);
+    };
+
+    const handleAdminAccess = () => {
+        if (adminPassword === 'djelite999') {
+            setShowAdminTools(true);
+            setAdminPassword('');
+        } else {
+            alert('❌ Incorrect password');
+            setAdminPassword('');
+        }
+    };
+
+    const handleSaveProfile = async () => {
+        setSaving(true);
+        try {
+            const { supabase } = await import('../../services/profileService');
+            const { data: { user } } = await supabase.auth.getUser();
+            
+            if (user) {
+                const { error } = await supabase.auth.updateUser({
+                    data: { name: formData.name }
+                });
+                
+                if (error) throw error;
+                alert('✅ Profile updated successfully!');
+            }
+        } catch (error: any) {
+            console.error('Profile update error:', error);
+            alert(`❌ Failed to update profile: ${error.message}`);
+        }
+        setSaving(false);
+    };
+
+    if (currentView === 'subscription') {
+        return (
+            <div className="min-h-full bg-[color:var(--bg)] text-[color:var(--text-primary)] p-4 sm:p-6 md:p-8 md:ml-64">
+                <div className="flex items-center gap-4 mb-6">
+                    <button 
+                        onClick={() => setCurrentView('settings')}
+                        className="flex items-center gap-2 text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)] transition-colors"
+                    >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="m15 18-6-6 6-6"/>
+                        </svg>
+                        Back to Settings
+                    </button>
+                </div>
+                <h1 className="font-display text-3xl font-bold">Manage Subscription</h1>
+                <p className="mt-1 text-[color:var(--text-secondary)]">Manage your subscription and billing preferences.</p>
+
+                <div className="mt-8 max-w-2xl space-y-6">
+                    <div className="rounded-xl bg-[color:var(--surface)] p-6 shadow-soft border border-[color:var(--border)]">
+                        <h2 className="font-display text-xl font-bold mb-4">Current Plan</h2>
+                        <div className="flex items-center justify-between p-4 bg-[color:var(--surface-alt)] rounded-lg">
+                            <div>
+                                <h3 className="font-semibold text-lg">{currentUser?.plan || 'Free Plan'}</h3>
+                                <p className="text-[color:var(--text-secondary)]">Active since January 2024</p>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-2xl font-bold">$19</p>
+                                <p className="text-[color:var(--text-secondary)]">per month</p>
+                            </div>
+                        </div>
+                        <div className="mt-6 flex gap-4">
+                            <Button>Upgrade Plan</Button>
+                            <Button variant="secondary">Cancel Subscription</Button>
+                        </div>
+                    </div>
+
+                    <div className="rounded-xl bg-[color:var(--surface)] p-6 shadow-soft border border-[color:var(--border)]">
+                        <h2 className="font-display text-xl font-bold mb-4">Payment Method</h2>
+                        <div className="flex items-center gap-4 p-4 bg-[color:var(--surface-alt)] rounded-lg">
+                            <div className="w-12 h-8 bg-blue-600 rounded flex items-center justify-center text-white text-xs font-bold">
+                                VISA
+                            </div>
+                            <div>
+                                <p className="font-medium">•••• •••• •••• 4242</p>
+                                <p className="text-[color:var(--text-secondary)] text-sm">Expires 12/25</p>
+                            </div>
+                        </div>
+                        <div className="mt-4">
+                            <Button variant="secondary">Update Payment Method</Button>
+                        </div>
+                    </div>
+
+                    <div className="rounded-xl bg-[color:var(--surface)] p-6 shadow-soft border border-[color:var(--border)]">
+                        <h2 className="font-display text-xl font-bold mb-4">Billing History</h2>
+                        <div className="space-y-3">
+                            {[
+                                { date: 'Jan 15, 2024', amount: '$19.00', status: 'Paid' },
+                                { date: 'Dec 15, 2023', amount: '$19.00', status: 'Paid' },
+                                { date: 'Nov 15, 2023', amount: '$19.00', status: 'Paid' }
+                            ].map((invoice, i) => (
+                                <div key={i} className="flex items-center justify-between p-3 bg-[color:var(--surface-alt)] rounded-lg">
+                                    <div>
+                                        <p className="font-medium">{invoice.date}</p>
+                                        <p className="text-[color:var(--text-secondary)] text-sm">Monthly subscription</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="font-medium">{invoice.amount}</p>
+                                        <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded-full">{invoice.status}</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="mt-4">
+                            <Button 
+                                variant="secondary" 
+                                onClick={() => setCurrentView('billing')}
+                            >
+                                View All Invoices
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (currentView === 'billing') {
+        return (
+            <div className="min-h-full bg-[color:var(--bg)] text-[color:var(--text-primary)] p-4 sm:p-6 md:p-8 md:ml-64">
+                <div className="flex items-center gap-4 mb-6">
+                    <button 
+                        onClick={() => setCurrentView('subscription')}
+                        className="flex items-center gap-2 text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)] transition-colors"
+                    >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="m15 18-6-6 6-6"/>
+                        </svg>
+                        Back to Subscription
+                    </button>
+                </div>
+                <h1 className="font-display text-3xl font-bold">Billing History</h1>
+                <p className="mt-1 text-[color:var(--text-secondary)]">View and download your invoices.</p>
+
+                <div className="mt-8 max-w-4xl">
+                    <div className="rounded-xl bg-[color:var(--surface)] border border-[color:var(--border)] overflow-hidden">
+                        <div className="p-6 border-b border-[color:var(--border)]">
+                            <h2 className="font-display text-xl font-bold">All Invoices</h2>
+                        </div>
+                        <div className="divide-y divide-[color:var(--border)]">
+                            {[
+                                { id: 'INV-2024-001', date: 'Jan 15, 2024', amount: '$19.00', status: 'Paid', description: 'Pro Monthly Subscription' },
+                                { id: 'INV-2023-012', date: 'Dec 15, 2023', amount: '$19.00', status: 'Paid', description: 'Pro Monthly Subscription' },
+                                { id: 'INV-2023-011', date: 'Nov 15, 2023', amount: '$19.00', status: 'Paid', description: 'Pro Monthly Subscription' },
+                                { id: 'INV-2023-010', date: 'Oct 15, 2023', amount: '$19.00', status: 'Paid', description: 'Pro Monthly Subscription' },
+                                { id: 'INV-2023-009', date: 'Sep 15, 2023', amount: '$19.00', status: 'Paid', description: 'Pro Monthly Subscription' }
+                            ].map((invoice) => (
+                                <div key={invoice.id} className="p-6 hover:bg-[color:var(--surface-alt)] transition-colors">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <h3 className="font-medium">{invoice.id}</h3>
+                                            <p className="text-[color:var(--text-secondary)] text-sm">{invoice.description}</p>
+                                            <p className="text-[color:var(--muted)] text-sm">{invoice.date}</p>
+                                        </div>
+                                        <div className="flex items-center gap-4">
+                                            <div className="text-right">
+                                                <p className="font-medium">{invoice.amount}</p>
+                                                <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded-full">{invoice.status}</span>
+                                            </div>
+                                            <Button variant="secondary" className="text-sm px-3 py-1">
+                                                Download
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className="p-4 sm:p-6 md:p-8">
+        <div className="min-h-full bg-[color:var(--bg)] text-[color:var(--text-primary)] p-4 sm:p-6 md:p-8 md:ml-64">
             <h1 className="font-display text-3xl font-bold">Settings</h1>
             <p className="mt-1 text-[color:var(--text-secondary)]">Manage your account and preferences.</p>
 
@@ -850,26 +1127,94 @@ export const SettingsPage: React.FC = () => {
                     <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
                         <div>
                             <label className="text-sm font-medium text-[color:var(--text-secondary)]">Full Name</label>
-                            <input type="text" defaultValue={currentUser?.name} className="mt-1 block w-full rounded-md border-[color:var(--border)] bg-[color:var(--surface-alt)] p-2 focus:border-[color:var(--accent)] focus:ring-[color:var(--accent)]" />
+                            <input 
+                                type="text" 
+                                value={formData.name}
+                                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                                className="mt-1 block w-full rounded-md border border-[color:var(--border)] bg-[color:var(--surface-alt)] p-3 focus:border-[color:var(--accent)] focus:ring-2 focus:ring-[color:var(--accent)] outline-none" 
+                            />
                         </div>
                          <div>
                             <label className="text-sm font-medium text-[color:var(--text-secondary)]">Email Address</label>
-                            <input type="email" defaultValue={currentUser?.email} className="mt-1 block w-full rounded-md border-[color:var(--border)] bg-[color:var(--surface-alt)] p-2 focus:border-[color:var(--accent)] focus:ring-[color:var(--accent)]" />
+                            <input 
+                                type="email" 
+                                value={formData.email}
+                                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                                className="mt-1 block w-full rounded-md border border-[color:var(--border)] bg-[color:var(--surface-alt)] p-3 focus:border-[color:var(--accent)] focus:ring-2 focus:ring-[color:var(--accent)] outline-none" 
+                            />
                         </div>
                     </div>
                      <div className="mt-6">
-                        <Button>Save Changes</Button>
+                        <Button 
+                            onClick={handleSaveProfile}
+                            disabled={saving}
+                        >
+                            {saving ? 'Saving...' : 'Save Changes'}
+                        </Button>
                     </div>
                 </div>
 
                 <div className="rounded-xl bg-[color:var(--surface)] p-6 shadow-soft border border-[color:var(--border)]">
                     <h2 className="font-display text-xl font-bold">Subscription</h2>
-                     <p className="mt-4 text-[color:var(--text-secondary)]">You are currently on the <span className="font-semibold text-[color:var(--text-primary)]">{currentUser?.plan}</span> plan.</p>
+                     <p className="mt-4 text-[color:var(--text-secondary)]">You are currently on the <span className="font-semibold text-[color:var(--text-primary)]">{currentUser?.plan || 'Free'}</span> plan.</p>
                      <div className="mt-6 flex gap-4">
-                         <Button>Manage Subscription</Button>
-                         <Button variant="secondary">View Billing History</Button>
+                         <Button onClick={() => setCurrentView('subscription')}>Manage Subscription</Button>
+                         <Button 
+                             variant="secondary" 
+                             onClick={async () => {
+                                 try {
+                                     const { createPortalSession } = await import('../../services/stripeService');
+                                     const portalUrl = await createPortalSession('cus_example');
+                                     window.location.href = portalUrl;
+                                 } catch (error) {
+                                     setCurrentView('billing');
+                                 }
+                             }}
+                         >
+                             View Billing History
+                         </Button>
                      </div>
                 </div>
+                
+                {!showAdminTools ? (
+                    <div className="rounded-xl bg-[color:var(--surface)] p-6 shadow-soft border border-[color:var(--border)]">
+                        <h2 className="font-display text-xl font-bold">Admin Access</h2>
+                        <p className="mt-4 text-[color:var(--text-secondary)]">Enter admin password to access advanced tools.</p>
+                        <div className="mt-6 flex gap-4">
+                            <input
+                                type="password"
+                                value={adminPassword}
+                                onChange={(e) => setAdminPassword(e.target.value)}
+                                onKeyPress={(e) => e.key === 'Enter' && handleAdminAccess()}
+                                placeholder="Admin password"
+                                className="flex-1 px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:border-[color:var(--accent)] focus:ring-2 focus:ring-[color:var(--accent)] outline-none"
+                            />
+                            <Button onClick={handleAdminAccess}>Access</Button>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="rounded-xl bg-[color:var(--surface)] p-6 shadow-soft border border-[color:var(--border)]">
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="font-display text-xl font-bold">Admin Tools</h2>
+                            <button 
+                                onClick={() => setShowAdminTools(false)}
+                                className="text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]"
+                            >
+                                Hide
+                            </button>
+                        </div>
+                        <p className="mt-4 text-[color:var(--text-secondary)]">Update all user DJ names from their OAuth providers or email addresses.</p>
+                        <div className="mt-6">
+                            <Button 
+                                onClick={handleMigration}
+                                disabled={migrating}
+                                className={`${migrating ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            >
+                                {migrating ? '⏳ Updating Names...' : '⚙️ Update All DJ Names'}
+                            </Button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
@@ -1096,6 +1441,446 @@ const MatchesList: React.FC = () => {
     );
 };
 
+// Profile Page - Inline Profile Editor
+export const ProfilePage: React.FC = () => {
+    return (
+        <div className="min-h-full bg-[color:var(--bg)] text-[color:var(--text-primary)] p-4 sm:p-6 md:p-8 md:ml-64">
+            <h1 className="font-display text-3xl font-bold mb-6">Edit Profile</h1>
+            <div className="max-w-4xl">
+                <InlineProfileEditor />
+            </div>
+        </div>
+    );
+};
+
+// Profile cache for instant loading
+let profileCache: any = null;
+let cacheTimestamp = 0;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+// Inline Profile Editor Component
+const InlineProfileEditor: React.FC = () => {
+    const [profile, setProfile] = useState<any>(profileCache || {});
+    const [loading, setLoading] = useState(false);
+    const [initialLoading, setInitialLoading] = useState(!profileCache);
+    const [additionalImages, setAdditionalImages] = useState<string[]>(['', '', '']);
+    const [hasAdvanced, setHasAdvanced] = useState(false);
+    const [hasContact, setHasContact] = useState(false);
+
+    useEffect(() => {
+        // Load data in parallel for maximum speed
+        Promise.all([
+            loadProfile(),
+            checkPremiumFeatures()
+        ]).finally(() => setInitialLoading(false));
+    }, []);
+    
+    const checkPremiumFeatures = async () => {
+        try {
+            // Use cached result if available
+            const cacheKey = 'premium_features';
+            const cached = sessionStorage.getItem(cacheKey);
+            if (cached) {
+                const { advanced, contact } = JSON.parse(cached);
+                setHasAdvanced(advanced);
+                setHasContact(contact);
+                return;
+            }
+
+            const { hasAdvancedProfile, hasDirectContact } = await import('../../services/subscriptionService');
+            const [advanced, contact] = await Promise.all([
+                hasAdvancedProfile(),
+                hasDirectContact()
+            ]);
+            
+            // Cache the result
+            sessionStorage.setItem(cacheKey, JSON.stringify({ advanced, contact }));
+            setHasAdvanced(advanced);
+            setHasContact(contact);
+        } catch (error) {
+            console.error('Failed to check premium features:', error);
+            // Set defaults on error
+            setHasAdvanced(false);
+            setHasContact(false);
+        }
+    };
+
+    const loadProfile = async () => {
+        try {
+            // Check cache first
+            const now = Date.now();
+            if (profileCache && (now - cacheTimestamp) < CACHE_DURATION) {
+                setProfile(profileCache);
+                if (profileCache.images) {
+                    setAdditionalImages(profileCache.images.slice(1, 4).concat(['', '', '']).slice(0, 3));
+                }
+                return;
+            }
+
+            const { getCurrentProfile } = await import('../../services/profileService');
+            const currentProfile = await getCurrentProfile();
+            if (currentProfile) {
+                // Update cache
+                profileCache = currentProfile;
+                cacheTimestamp = now;
+                
+                setProfile(currentProfile);
+                if (currentProfile.images) {
+                    setAdditionalImages(currentProfile.images.slice(1, 4).concat(['', '', '']).slice(0, 3));
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load profile:', error);
+            setInitialLoading(false);
+        }
+    };
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number = 0) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (file.size > 2 * 1024 * 1024) {
+            alert('File size must be less than 2MB');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const { uploadProfileImage } = await import('../../services/profileService');
+            const imageUrl = await uploadProfileImage(file);
+            
+            if (index === 0) {
+                setProfile({...profile, profile_image_url: imageUrl});
+            } else {
+                const newImages = [...additionalImages];
+                newImages[index - 1] = imageUrl;
+                setAdditionalImages(newImages);
+            }
+        } catch (error: any) {
+            alert(`Failed to upload image: ${error.message}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSave = async () => {
+        setLoading(true);
+        try {
+            const updatedProfile = {
+                dj_name: profile.dj_name,
+                age: profile.age,
+                location: profile.location,
+                bio: profile.bio,
+                profile_image_url: profile.profile_image_url,
+                images: [profile.profile_image_url, ...additionalImages].filter(img => img && img.trim()),
+                genres: profile.genres || [],
+                skills: profile.skills || [],
+                venues: profile.venues || [],
+                fee: profile.fee,
+                website: profile.website,
+                social_links: profile.social_links,
+                contact_info: profile.contact_info,
+                premium_badge: hasAdvanced
+            };
+
+            // Update cache immediately for instant feedback
+            profileCache = { ...profile, ...updatedProfile };
+            cacheTimestamp = Date.now();
+
+            const { updateProfile } = await import('../../services/profileService');
+            await updateProfile(updatedProfile);
+            alert('Profile updated successfully!');
+        } catch (error: any) {
+            alert(`Failed to update profile: ${error.message}`);
+            // Invalidate cache on error
+            profileCache = null;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Skeleton loading component
+    const SkeletonInput = ({ width = "w-full" }: { width?: string }) => (
+        <div className={`${width} h-12 bg-[color:var(--surface-alt)] rounded-xl animate-pulse flex items-center px-4`}>
+            <div className="w-4 h-4 bg-[color:var(--muted)] rounded-full animate-spin mr-2"></div>
+            <div className="h-2 bg-[color:var(--muted)] rounded flex-1 opacity-50"></div>
+        </div>
+    );
+
+    const SkeletonTextarea = () => (
+        <div className="w-full h-24 bg-[color:var(--surface-alt)] rounded-xl animate-pulse flex items-center px-4">
+            <div className="w-4 h-4 bg-[color:var(--muted)] rounded-full animate-spin mr-2"></div>
+            <div className="flex-1 space-y-2">
+                <div className="h-2 bg-[color:var(--muted)] rounded opacity-50"></div>
+                <div className="h-2 bg-[color:var(--muted)] rounded w-3/4 opacity-30"></div>
+            </div>
+        </div>
+    );
+
+    return (
+        <div className="space-y-8">
+            {/* Save Button */}
+            <div className="flex justify-end">
+                <Button onClick={handleSave} disabled={loading}>
+                    {loading ? 'Saving...' : 'Save Profile'}
+                </Button>
+            </div>
+
+            {/* Profile Photos */}
+            <div className="bg-[color:var(--surface)] rounded-xl p-6 border border-[color:var(--border)]">
+                <div className="flex items-center gap-2 mb-4">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-blue-500">
+                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" fill="currentColor"/>
+                        <circle cx="12" cy="13" r="4" stroke="white" strokeWidth="2" fill="none"/>
+                    </svg>
+                    <h3 className="text-lg font-semibold">Profile Photos</h3>
+                </div>
+                <p className="text-sm text-[color:var(--text-secondary)] mb-4">Upload up to 4 photos to get more matches</p>
+                  
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {/* Main profile picture */}
+                    <div className="relative aspect-square">
+                        {profile.profile_image_url ? (
+                            <img 
+                                src={profile.profile_image_url} 
+                                alt="Profile" 
+                                className="w-full h-full rounded-xl object-cover border-2 border-[color:var(--accent)]"
+                            />
+                        ) : (
+                            <div className="w-full h-full rounded-xl bg-[color:var(--surface-alt)] border-2 border-[color:var(--accent)] flex items-center justify-center">
+                                <svg className="w-16 h-16 text-[color:var(--text-secondary)]" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                </svg>
+                            </div>
+                        )}
+                        <label className="absolute bottom-2 right-2 w-8 h-8 bg-[color:var(--accent)] rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
+                            <span className="text-black font-bold text-sm">+</span>
+                            <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, 0)} className="hidden" />
+                        </label>
+                        <div className="absolute top-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full">1</div>
+                    </div>
+                    
+                    {/* Additional 3 pictures */}
+                    {[1, 2, 3].map((index) => (
+                        <div key={index} className="relative aspect-square">
+                            <img 
+                                src={additionalImages[index - 1] || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDQwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMDAgMTAwQzIyNy42MTQgMTAwIDI1MCA4Ny42MTQyIDI1MCA2MEMyNTAgMzIuMzg1OCAyMjcuNjE0IDEwIDIwMCAxMEMxNzIuMzg2IDEwIDE1MCAzMi4zODU4IDE1MCA2MEMxNTAgODcuNjE0MiAxNzIuMzg2IDEwMCAyMDAgMTAwWiIgZmlsbD0iIzlDQTNBRiIvPgo8cGF0aCBkPSJNMzAwIDM5MEgxMDBDMTAwIDMzMC4yIDEzOS44IDI4MCAyMDAgMjgwQzI2MC4yIDI4MCAzMDAgMzMwLjIgMzAwIDM5MFoiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+'} 
+                                alt={`Photo ${index + 1}`} 
+                                className={`w-full h-full rounded-xl object-cover border-2 ${
+                                    additionalImages[index - 1] ? 'border-[color:var(--accent)]' : 'border-dashed border-[color:var(--border)] opacity-50'
+                                }`}
+                            />
+                            <label className="absolute bottom-2 right-2 w-8 h-8 bg-[color:var(--accent)] rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
+                                <span className="text-black font-bold text-sm">+</span>
+                                <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, index)} className="hidden" />
+                            </label>
+                            <div className="absolute top-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full">{index + 1}</div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Basic Info */}
+            <div className="bg-[color:var(--surface)] rounded-xl p-6 border border-[color:var(--border)]">
+                <div className="flex items-center gap-2 mb-4">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-green-500">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="2" fill="none"/>
+                        <circle cx="12" cy="7" r="4" fill="currentColor"/>
+                    </svg>
+                    <h3 className="text-lg font-semibold">Basic Info</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">DJ Name</label>
+                        {initialLoading ? (
+                            <SkeletonInput />
+                        ) : (
+                            <input
+                                type="text"
+                                value={profile.dj_name || ''}
+                                onChange={(e) => setProfile({...profile, dj_name: e.target.value})}
+                                className="w-full px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
+                                placeholder="DJ Awesome"
+                            />
+                        )}
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Age</label>
+                        {initialLoading ? (
+                            <SkeletonInput />
+                        ) : (
+                            <input
+                                type="number"
+                                value={profile.age || ''}
+                                onChange={(e) => setProfile({...profile, age: parseInt(e.target.value)})}
+                                className="w-full px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
+                                placeholder="25"
+                            />
+                        )}
+                    </div>
+                    <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Location</label>
+                        {initialLoading ? (
+                            <SkeletonInput />
+                        ) : (
+                            <input
+                                type="text"
+                                value={profile.location || ''}
+                                onChange={(e) => setProfile({...profile, location: e.target.value})}
+                                className="w-full px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
+                                placeholder="New York, NY"
+                            />
+                        )}
+                    </div>
+                    <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Bio</label>
+                        {initialLoading ? (
+                            <SkeletonTextarea />
+                        ) : (
+                            <textarea
+                                value={profile.bio || ''}
+                                onChange={(e) => setProfile({...profile, bio: e.target.value})}
+                                className="w-full px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none resize-none"
+                                rows={3}
+                                placeholder="Tell other DJs about yourself..."
+                            />
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Music Style */}
+            <div className="bg-[color:var(--surface)] rounded-xl p-6 border border-[color:var(--border)]">
+                <div className="flex items-center gap-2 mb-4">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-purple-500">
+                        <path d="M9 18V5l12-2v13" stroke="currentColor" strokeWidth="2" fill="none"/>
+                        <circle cx="6" cy="18" r="3" fill="currentColor"/>
+                        <circle cx="18" cy="16" r="3" fill="currentColor"/>
+                    </svg>
+                    <h3 className="text-lg font-semibold">Music Style</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Music Genres</label>
+                        {initialLoading ? (
+                            <SkeletonInput />
+                        ) : (
+                            <input
+                                type="text"
+                                value={profile.genres?.join(', ') || ''}
+                                onChange={(e) => setProfile({...profile, genres: e.target.value.split(',').map(g => g.trim()).filter(g => g)})}
+                                className="w-full px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
+                                placeholder="House, Techno, Deep House"
+                            />
+                        )}
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Skills</label>
+                        {initialLoading ? (
+                            <SkeletonInput />
+                        ) : (
+                            <input
+                                type="text"
+                                value={profile.skills?.join(', ') || ''}
+                                onChange={(e) => setProfile({...profile, skills: e.target.value.split(',').map(s => s.trim()).filter(s => s)})}
+                                className="w-full px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
+                                placeholder="Mixing, Production, Scratching"
+                            />
+                        )}
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Venues</label>
+                        <input
+                            type="text"
+                            value={profile.venues?.join(', ') || ''}
+                            onChange={(e) => setProfile({...profile, venues: e.target.value.split(',').map(v => v.trim()).filter(v => v)})}
+                            className="w-full px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
+                            placeholder="Club XYZ, Festival ABC"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Typical Fee</label>
+                        <input
+                            type="text"
+                            value={profile.fee || ''}
+                            onChange={(e) => setProfile({...profile, fee: e.target.value})}
+                            className="w-full px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
+                            placeholder="$500-1000 or Negotiable"
+                        />
+                    </div>
+                </div>
+            </div>
+
+            {/* Premium Features */}
+            {hasAdvanced && (
+                <div className="bg-[color:var(--surface)] rounded-xl p-6 border border-[color:var(--border)]">
+                    <div className="flex items-center gap-2 mb-4">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-yellow-500">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/>
+                        </svg>
+                        <h3 className="text-lg font-semibold">Premium Features</h3>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Website</label>
+                            <input
+                                type="url"
+                                value={profile.website || ''}
+                                onChange={(e) => setProfile({...profile, website: e.target.value})}
+                                className="w-full px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
+                                placeholder="https://your-website.com"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Instagram</label>
+                            <input
+                                type="url"
+                                value={profile.social_links?.instagram || ''}
+                                onChange={(e) => setProfile({...profile, social_links: {...(profile.social_links || {}), instagram: e.target.value}})}
+                                className="w-full px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
+                                placeholder="Instagram URL"
+                            />
+                        </div>
+                        {hasContact && (
+                            <>
+                                <div>
+                                    <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Contact Email</label>
+                                    <input
+                                        type="email"
+                                        value={profile.contact_info?.email || ''}
+                                        onChange={(e) => setProfile({...profile, contact_info: {...(profile.contact_info || {}), email: e.target.value}})}
+                                        className="w-full px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
+                                        placeholder="Contact Email"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">Phone Number</label>
+                                    <input
+                                        type="tel"
+                                        value={profile.contact_info?.phone || ''}
+                                        onChange={(e) => setProfile({...profile, contact_info: {...(profile.contact_info || {}), phone: e.target.value}})}
+                                        className="w-full px-4 py-3 bg-[color:var(--surface-alt)] border border-[color:var(--border)] rounded-xl focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none"
+                                        placeholder="Phone Number"
+                                    />
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+// Referrals Page
+export const ReferralsPage: React.FC = () => {
+    return (
+        <div className="min-h-full bg-[color:var(--bg)] text-[color:var(--text-primary)] p-4 sm:p-6 md:p-8 md:ml-64">
+            <ReferralDashboard />
+        </div>
+    );
+};
+
 // Events Page (Locked)
 export const EventsPage: React.FC = () => {
     return (
@@ -1112,12 +1897,15 @@ export const EventsPage: React.FC = () => {
 
             <div className="flex-grow flex items-center justify-center py-1">
                 <div className="flex flex-col items-center justify-center h-full w-full max-w-md mx-auto rounded-xl bg-[color:var(--surface)] border-2 border-dashed border-[color:var(--border)] p-8">
-                    <LockIcon className="w-16 h-16 text-[color:var(--muted)] mb-4" />
-                    <h3 className="text-xl font-bold text-[color:var(--text-secondary)] mb-2">Events Coming Soon</h3>
-                    <p className="text-[color:var(--muted)] text-center mb-6">Discover exclusive DJ events, club bookings, and festival opportunities.</p>
-                    <Button className="px-6 py-3">
-                        🚀 Upgrade to Pro
-                    </Button>
+                    <div className="mb-4 flex justify-center">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" className="text-purple-500">
+                            <path d="M3 21h18l-9-18-9 18z" fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinejoin="round"/>
+                            <path d="M12 3v18" stroke="white" strokeWidth="2"/>
+                            <path d="M8 21l4-8 4 8" stroke="white" strokeWidth="1.5" fill="none"/>
+                        </svg>
+                    </div>
+                    <h3 className="text-xl font-bold text-[color:var(--text-secondary)] mb-2">Events Dashboard</h3>
+                    <p className="text-[color:var(--muted)] text-center mb-6">Manage your DJ events and bookings.</p>
                 </div>
             </div>
         </div>

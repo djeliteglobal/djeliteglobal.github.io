@@ -1,4 +1,5 @@
 import React from 'react';
+import { OptimizedImage } from './OptimizedImage';
 
 interface ProfileThumbnailProps {
   src: string;
@@ -44,14 +45,14 @@ export const ProfileThumbnail: React.FC<ProfileThumbnailProps> = ({
   };
 
   return (
-    <img
+    <OptimizedImage
       src={getThumbnailSrc(src)}
       alt={alt}
-      className={`${sizeClasses[size]} rounded-full object-cover ${className}`}
       width={dimensions[size].width}
       height={dimensions[size].height}
-      loading="lazy"
-      decoding="async"
+      quality={0.85}
+      className={`${sizeClasses[size]} rounded-full ${className}`}
+      lazy={true}
     />
   );
 };

@@ -5,6 +5,8 @@ import { getCurrentProfile } from '../../services/profileService';
 import { subscribeToUltraFastMessages, sendUltraFastMessage, sendTypingIndicator } from '../../services/ablyService';
 import { notificationService } from '../../services/notificationService';
 import { ProfileThumbnail } from '../ProfileThumbnail';
+import { VoiceMessage, VoiceMessagePlayer } from './VoiceMessage';
+import { MessageReactions, ReadReceipt } from './MessageReactions';
 
 interface ChatInterfaceProps {
   matchId: string;
@@ -16,7 +18,7 @@ interface ChatInterfaceProps {
 export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   matchId,
   matchName = "DJ Match",
-  matchAvatar = "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=100",
+  matchAvatar = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik01MCAyNUM1Ni45MDM1IDI1IDYyLjUgMjEuOTAzNSA2Mi41IDE1QzYyLjUgOC4wOTY0OSA1Ni45MDM1IDUgNTAgNUM0My4wOTY1IDUgMzcuNSA4LjA5NjQ5IDM3LjUgMTVDMzcuNSAyMS45MDM1IDQzLjA5NjUgMjUgNTAgMjVaIiBmaWxsPSIjOUNBM0FGIi8+CjxwYXRoIGQ9Ik03NS41IDk3LjVIMjQuNUMyNC41IDgyLjU1IDM0Ljk1IDcwIDUwIDcwQzY1LjA1IDcwIDc1LjUgODIuNTUgNzUuNSA5Ny41WiIgZmlsbD0iIzlDQTNBRiIvPgo8L3N2Zz4=",
   onClose
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -26,6 +28,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [showReactionPicker, setShowReactionPicker] = useState<string | null>(null);
   const listRef = useRef<any>(null);
 
   useEffect(() => {
@@ -203,7 +206,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                       isOwn ? 'flex-row-reverse' : 'flex-row'
                     }`}>
                       <ProfileThumbnail 
-                        src={isOwn ? (currentUserProfile?.images?.[0] || currentUserProfile?.profile_image_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100') : (msg.sender_avatar || matchAvatar)} 
+                        src={isOwn ? (currentUserProfile?.images?.[0] || currentUserProfile?.profile_image_url || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik01MCAyNUM1Ni45MDM1IDI1IDYyLjUgMjEuOTAzNSA2Mi41IDE1QzYyLjUgOC4wOTY0OSA1Ni45MDM1IDUgNTAgNUM0My4wOTY1IDUgMzcuNSA4LjA5NjQ5IDM3LjUgMTVDMzcuNSAyMS45MDM1IDQzLjA5NjUgMjUgNTAgMjVaIiBmaWxsPSIjOUNBM0FGIi8+CjxwYXRoIGQ9Ik03NS41IDk3LjVIMjQuNUMyNC41IDgyLjU1IDM0Ljk1IDcwIDUwIDcwQzY1LjA1IDcwIDc1LjUgODIuNTUgNzUuNSA5Ny41WiIgZmlsbD0iIzlDQTNBRiIvPgo8L3N2Zz4=') : (msg.sender_avatar || matchAvatar)} 
                         alt={isOwn ? 'You' : (msg.sender_name || matchName)}
                         size="sm"
                       />
@@ -212,10 +215,37 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                           ? 'bg-[color:var(--accent)] text-black rounded-br-sm' 
                           : 'bg-[color:var(--surface)] text-[color:var(--text-primary)] rounded-bl-sm'
                       }`}>
-                        <p className={`text-sm ${isOwn ? 'text-black' : 'text-[color:var(--text-primary)]'}`}>{msg.content}</p>
-                        <p className={`text-xs opacity-70 mt-1 ${isOwn ? 'text-black' : 'text-[color:var(--text-secondary)]'}`}>
-                          {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </p>
+                        {msg.message_type === 'audio' ? (
+                          <VoiceMessagePlayer 
+                            audioUrl={msg.content}
+                            duration={60}
+                            isOwn={isOwn}
+                          />
+                        ) : (
+                          <p className={`text-sm ${isOwn ? 'text-black' : 'text-[color:var(--text-primary)]'}`}>{msg.content}</p>
+                        )}
+                        
+                        <div className="flex items-center justify-between mt-1">
+                          <p className={`text-xs opacity-70 ${isOwn ? 'text-black' : 'text-[color:var(--text-secondary)]'}`}>
+                            {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </p>
+                          {isOwn && (
+                            <ReadReceipt 
+                              isRead={!!msg.read_at}
+                              readAt={msg.read_at}
+                            />
+                          )}
+                        </div>
+                        
+                        <MessageReactions 
+                          messageId={msg.id}
+                          reactions={{}}
+                          onReact={(msgId, emoji) => console.log('React:', msgId, emoji)}
+                          showReactionPicker={showReactionPicker === msg.id}
+                          onToggleReactionPicker={() => 
+                            setShowReactionPicker(prev => prev === msg.id ? null : msg.id)
+                          }
+                        />
                       </div>
                     </div>
                   </motion.div>
@@ -231,13 +261,19 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         </div>
 
         <div className="p-4 border-t border-[color:var(--border)] bg-[color:var(--surface)]">
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-end">
+            <VoiceMessage 
+              onSend={async (audioBlob, duration) => {
+                // TODO: Upload audio and send voice message
+                console.log('Voice message:', audioBlob, duration);
+              }}
+              disabled={sending}
+            />
             <input
               type="text"
               value={newMessage}
               onChange={(e) => {
                 setNewMessage(e.target.value);
-                // Send typing indicator
                 sendTypingIndicator(matchId, e.target.value.length > 0);
               }}
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}

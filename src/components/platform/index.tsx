@@ -29,9 +29,8 @@ export const Button: React.FC<ButtonProps> = ({ variant = 'primary', children, c
 };
 
 export const TopBar: React.FC = () => {
-    const { appState, setAppState } = useContext(AppContext)!;
+    const { appState, setAppState, navigate } = useContext(AppContext)!;
     const { currentUser } = useAuth();
-    const [showProfileEditor, setShowProfileEditor] = useState(false);
     
     const toggleTheme = () => {
         setAppState(prev => ({...prev, theme: prev.theme === 'dark' ? 'light' : 'dark' }));
@@ -65,7 +64,7 @@ export const TopBar: React.FC = () => {
                     {appState.theme === 'dark' ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
                 </button>
                 <LanguageSwitcher inline={true} />
-                <button onClick={() => setShowProfileEditor(true)} className="h-10 w-10 rounded-full hover:ring-2 hover:ring-[color:var(--accent)] transition-all overflow-hidden">
+                <button onClick={() => navigate('profile')} className="h-10 w-10 rounded-full hover:ring-2 hover:ring-[color:var(--accent)] transition-all overflow-hidden">
                     {currentUser?.profile_image_url ? (
                         <img src={currentUser.profile_image_url} alt={currentUser?.name} className="h-full w-full rounded-full object-cover" />
                     ) : (
@@ -78,9 +77,6 @@ export const TopBar: React.FC = () => {
                 </button>
             </div>
         </header>
-        {showProfileEditor && (
-            <TinderStyleProfileEditor isOpen={showProfileEditor} onClose={() => setShowProfileEditor(false)} />
-        )}
         </>
     );
 };
@@ -88,7 +84,7 @@ export const TopBar: React.FC = () => {
 export const SideNav: React.FC = () => {
     const { appState, navigate } = useContext(AppContext)!;
     const { currentUser, logout } = useAuth();
-    const [showProfileEditor, setShowProfileEditor] = useState(false);
+
     const [userPlan, setUserPlan] = useState('free');
     const { connectionLimit } = useMatchStore();
     
@@ -98,7 +94,7 @@ export const SideNav: React.FC = () => {
     
     return (
         <>
-        <nav className={`fixed z-40 md:z-auto md:relative inset-y-0 left-0 w-64 border-r border-[color:var(--border)] bg-[color:var(--surface)] transition-transform duration-300 ease-in-out ${appState.isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
+        <nav className={`fixed z-40 md:z-auto md:relative inset-y-0 left-0 w-64 border-r border-[color:var(--border)] bg-[color:var(--surface)] transition-transform duration-300 ease-in-out md:translate-x-0 ${appState.isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
             <div className="flex h-16 items-center border-b border-[color:var(--border)] px-6 md:hidden">
                  <Logo />
             </div>
@@ -120,7 +116,7 @@ export const SideNav: React.FC = () => {
             </div>
              <div className="absolute bottom-0 left-0 w-full p-4 space-y-2">
                 <button 
-                  onClick={() => setShowProfileEditor(true)}
+                  onClick={() => navigate('profile')}
                   className={`flex w-full items-center gap-3 rounded-md px-4 py-3 text-sm font-medium transition-colors hover:bg-[color:var(--surface-alt)] hover:text-[color:var(--text-primary)] text-[color:var(--text-secondary)]`}>
                     {currentUser?.profile_image_url ? (
                         <img src={currentUser.profile_image_url} alt={currentUser?.name} className="h-8 w-8 rounded-full object-cover" />
@@ -135,8 +131,8 @@ export const SideNav: React.FC = () => {
                         <div className="flex items-center gap-2">
                             <p className="font-semibold text-[color:var(--text-primary)]">{currentUser?.name}</p>
                             {userPlan !== 'free' && (
-                                <span className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-0.5 rounded-full text-xs font-bold">
-                                    ✨ {userPlan.toUpperCase()}
+                                <span className="bg-gray-500 text-white px-2 py-0.5 rounded-full text-xs font-bold">
+                                    {userPlan.toUpperCase()}
                                 </span>
                             )}
                         </div>
@@ -152,9 +148,6 @@ export const SideNav: React.FC = () => {
                 </button>
              </div>
         </nav>
-        {showProfileEditor && (
-            <TinderStyleProfileEditor isOpen={showProfileEditor} onClose={() => setShowProfileEditor(false)} />
-        )}
         </>
     );
 };
@@ -172,7 +165,7 @@ export const CourseCard: React.FC<{ course: Course }> = ({ course }) => {
         </div>
       </div>
       <div className="p-4">
-        <p className="text-sm font-medium text-[color:var(--accent)]">{course.category.toUpperCase()}</p>
+        <p className="text-sm font-medium text-[color:var(--accent)]">{(course.category || 'COURSE').toUpperCase()}</p>
         <h3 className="mt-1 font-display text-lg font-bold text-[color:var(--text-primary)]">{course.title}</h3>
         <p className="mt-1 text-sm text-[color:var(--muted)] font-mono">by {course.instructor}</p>
         <div className="mt-4">

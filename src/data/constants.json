@@ -3,16 +3,26 @@
     {
       "id": 1,
       "title": "DJ Fundamentals",
-      "description": "Master the basics of DJing",
+      "description": "Master the basics of DJing, from equipment setup to your first mix",
       "duration": "4 weeks",
-      "level": "Beginner"
+      "level": "Beginner",
+      "instructor": "DJ Elite Team",
+      "imageUrl": "/Courses Images/dj fundamentals.jpg",
+      "progress": 0,
+      "isLocked": false,
+      "category": "Fundamentals"
     },
     {
       "id": 2,
       "title": "Advanced Mixing",
-      "description": "Professional mixing techniques",
+      "description": "Professional mixing techniques for seamless transitions and creative effects",
       "duration": "6 weeks", 
-      "level": "Advanced"
+      "level": "Advanced",
+      "instructor": "DJ Elite Team",
+      "imageUrl": "/Courses Images/advanced mixing.jpg",
+      "progress": 25,
+      "isLocked": true,
+      "category": "Techniques"
     }
   ],
   "mockOpportunities": [

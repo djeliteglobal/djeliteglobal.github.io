@@ -14,8 +14,6 @@ export const ProfessionalSwipeCard: React.FC<ProfessionalSwipeCardProps> = ({
   onCardLeftScreen 
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [showDetails, setShowDetails] = useState(false);
-
   const images = opportunity.images || [opportunity.imageUrl];
   const totalImages = images.length;
 
@@ -44,33 +42,19 @@ export const ProfessionalSwipeCard: React.FC<ProfessionalSwipeCardProps> = ({
   return (
       <motion.div
         className="absolute w-full h-full select-none overflow-hidden rounded-xl bg-[color:var(--surface)] shadow-2xl border border-[color:var(--border)] cursor-grab active:cursor-grabbing"
-        initial={{ scale: 1, opacity: 1 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0 }}
         drag="x"
         dragConstraints={{ left: -200, right: 200 }}
         dragElastic={0}
-        dragTransition={{ power: 0, timeConstant: 0 }}
         onDragEnd={handleDragEnd}
         whileDrag={{ scale: 1.01, rotate: 2 }}
-        style={{ 
-          touchAction: 'none', 
-          userSelect: 'none',
-          WebkitUserSelect: 'none',
-          MozUserSelect: 'none',
-          msUserSelect: 'none'
-        }}
+        style={{ touchAction: 'none' }}
       >
         <div className="relative h-full w-full" onClick={handleImageTap}>
-          <motion.img 
-            key={currentImageIndex}
+          <img 
             src={images[currentImageIndex]} 
             alt={`${opportunity.title} - ${currentImageIndex + 1}`} 
             className="h-full w-full object-cover pointer-events-none select-none"
             draggable={false}
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0 }}
           />
           
           {totalImages > 1 && (

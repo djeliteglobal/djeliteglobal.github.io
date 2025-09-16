@@ -3,10 +3,13 @@ import { Link } from 'react-router-dom';
 import type { AppState, AppContextType, Page } from '../types/platform';
 import { TopBar, SideNav } from '../components/platform';
 import { ProfileEditor } from '../components/profile/ProfileEditor';
-import { LandingPage, Dashboard, CoursesPage, CourseDetailPage, CommunityPage, OpportunitiesPage, SettingsPage, EventsPage } from '../components/pages';
+import { LandingPage, Dashboard, CoursesPage, CourseDetailPage, CommunityPage, OpportunitiesPage, SettingsPage, EventsPage, ProfilePage, ReferralsPage } from '../components/pages';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { AuthModal } from '../components/auth/AuthModal';
 import { useTranslation } from '../i18n/useTranslation';
+import { PremiumFeaturesDemo } from '../components/platform/PremiumFeaturesDemo';
+import { useReferral } from '../contexts/ReferralContext';
+import { supabase } from '../config/supabase';
 
 // Add bounce animation styles for sticky button
 const bounceInStyles = `
@@ -65,6 +68,7 @@ export const AppContext = createContext<AppContextType | null>(null);
 
 const HomePageContent: React.FC = () => {
     const { currentUser } = useAuth();
+    const { processReferralSignup } = useReferral();
     const { t } = useTranslation();
     const [showProfileEditor, setShowProfileEditor] = useState(false);
     const [appState, setAppState] = useState<AppState>({
@@ -72,15 +76,54 @@ const HomePageContent: React.FC = () => {
         isLoggedIn: !!currentUser,
         page: currentUser ? 'opportunities' : 'landing',
         courseId: null,
-        isSidebarOpen: false,
+        isSidebarOpen: true,
     });
+
     const [showAuthModal, setShowAuthModal] = useState(false);
 
+    // Process referral when new user authenticates - FIXED TIMING ISSUE
     useEffect(() => {
-        setAppState(prev => ({ 
-            ...prev, 
+        const processNewUserReferral = async () => {
+            if (currentUser) {
+                console.log('🎯 REFERRAL SIGNUP DETECTED for user:', currentUser.name);
+                console.log('🔍 Checking for referral data...');
+
+                // Get user ID from Supabase
+                const { data: user } = await supabase.auth.getUser();
+                const userId = user.user?.id;
+
+                if (userId) {
+                    // Check if user has referral data in URL or session
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const referralCode = urlParams.get('ref') || sessionStorage.getItem('referral_code');
+
+                    if (referralCode) {
+                        console.log('✅ Referral code found:', referralCode);
+
+                        // Wait a moment for profile to be fully created
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+
+                        // Process referral
+                        console.log('🚀 Processing referral conversion...');
+                        await processReferralSignup(userId);
+
+                        console.log('✅ Referral processing initiated');
+                    } else {
+                        console.log('⚠️ No referral code found for new user');
+                    }
+                }
+            }
+        };
+
+        processNewUserReferral();
+    }, [currentUser, processReferralSignup]);
+
+    useEffect(() => {
+        setAppState(prev => ({
+            ...prev,
             isLoggedIn: !!currentUser,
-            page: currentUser ? 'opportunities' : 'landing'
+            // Only set page on initial load, don't change it when user state changes
+            page: prev.page === 'landing' && currentUser ? 'opportunities' : prev.page
         }));
     }, [currentUser]);
 
@@ -99,7 +142,6 @@ const HomePageContent: React.FC = () => {
             ...prev,
             page,
             courseId,
-            isSidebarOpen: false,
         }));
     }, [currentUser]);
     
@@ -122,6 +164,12 @@ const HomePageContent: React.FC = () => {
                 return <OpportunitiesPage />;
             case 'events':
                 return <EventsPage />;
+            case 'profile':
+                return <ProfilePage />;
+            case 'referrals':
+                return <ReferralsPage />;
+            case 'premium_features':
+                return <PremiumFeaturesDemo />;
             case 'settings':
                 return <SettingsPage />;
             default:
@@ -134,7 +182,7 @@ const HomePageContent: React.FC = () => {
             {currentUser ? (
                 <div className="flex h-screen w-full bg-[color:var(--bg)]">
                     <SideNav />
-                    <div className="flex flex-1 flex-col overflow-hidden">
+                    <div className="flex flex-1 flex-col overflow-hidden min-w-0">
                         <TopBar />
                         <main className="flex-1 overflow-y-auto">
                             {renderPage()}
@@ -169,7 +217,7 @@ const HomePageContent: React.FC = () => {
 
 export const HomePage: React.FC = () => {
     return (
-        <div style={{ backgroundColor: '#0B0D10', color: '#FFFFFF', minHeight: '100vh' }}>
+        <div className="bg-[color:var(--bg)] text-[color:var(--text-primary)] min-h-screen">
             <AuthProvider>
                 <HomePageContent />
             </AuthProvider>

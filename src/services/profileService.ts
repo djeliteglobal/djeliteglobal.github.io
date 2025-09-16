@@ -1,43 +1,98 @@
-import { supabase, checkConfig } from '../config/supabase';
+import { supabase } from '../config/supabase';
 import { sanitizeForLog, validateInput } from '../utils/sanitizer';
+import { migrateDjNames } from '../utils/migrateDjNames';
+import { matchingEngine } from './matchingEngine';
 
 // Export supabase for other services
 export { supabase };
+
+// Export migration function for admin use
+export { migrateDjNames };
 import { DJProfile, SwipeResult } from '../types/profile';
 
 // Default profile image constant
 const DEFAULT_PROFILE_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDQwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjMTExMTExIi8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE0MCIgcj0iNjAiIGZpbGw9IiMzMzMzMzMiLz4KPHBhdGggZD0iTTEwMCAzMDBDMTAwIDI1MCA0NSAyMDAgMjAwIDIwMFMzMDAgMjUwIDMwMCAzMDBWNDAwSDEwMFYzMDBaIiBmaWxsPSIjMzMzMzMzIi8+Cjwvc3ZnPgo=';
 
+// ULTRA-FAST CACHE: Store profiles in memory for instant access
+let profileCache: DJProfile[] = [];
+let cacheTimestamp = 0;
+const CACHE_DURATION = 30000; // 30 seconds
+
 export const fetchSwipeProfiles = async (): Promise<DJProfile[]> => {
+  // INSTANT CACHE CHECK: Return cached data immediately if fresh
+  const now = Date.now();
+  if (profileCache.length > 0 && (now - cacheTimestamp) < CACHE_DURATION) {
+    console.log('⚡ INSTANT CACHE HIT: Returning cached profiles');
+    return [...profileCache]; // Return copy to prevent mutations
+  }
+
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
-  // Get current user's profile
-  const { data: userProfile } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('user_id', user.id)
-    .single();
-
-  if (!userProfile) {
-    // Create profile if doesn't exist
-    await createProfile({ dj_name: 'New DJ', bio: 'Getting started' });
-    return [];
+  try {
+    // AI-POWERED MATCHING: Get optimally matched profiles with timeout
+    console.log('🧠 AI MATCHING: Computing optimal matches...');
+    
+    const matchingPromise = matchingEngine.getOptimalMatches(user.id, {}, 20);
+    const timeoutPromise = new Promise<never>((_, reject) => 
+      setTimeout(() => reject(new Error('AI matching timeout')), 2000)
+    );
+    
+    const smartMatches = await Promise.race([matchingPromise, timeoutPromise]);
+    
+    if (smartMatches && smartMatches.length > 0) {
+      // Transform smart matches to expected format
+      const profiles = smartMatches.map(profile => {
+        const profileImage = profile.profile_image_url || profile.images?.[0] || DEFAULT_PROFILE_IMAGE;
+        return {
+          id: profile.id,
+          title: profile.dj_name || 'DJ',
+          venue: profile.venues?.[0] || 'Local Venues',
+          location: profile.location || 'Unknown Location',
+          date: 'Available Now',
+          fee: profile.fee || 'Negotiable',
+          genres: profile.genres || ['House', 'Techno'],
+          skills: profile.skills || ['Mixing'],
+          bio: profile.bio || 'Passionate DJ ready to connect!',
+          imageUrl: profileImage,
+          images: profile.images || [profileImage],
+          // AI Enhancement: Add match insights
+          matchScore: profile.matchScore,
+          matchReasons: profile.matchReasons,
+          compatibility: profile.compatibility
+        };
+      });
+      
+      // Update cache
+      profileCache = profiles;
+      cacheTimestamp = now;
+      
+      console.log('✨ AI MATCHING: Returning', profiles.length, 'optimized matches');
+      return profiles;
+    }
+  } catch (error) {
+    console.warn('⚠️ AI MATCHING FALLBACK: Using standard fetch', error?.message || 'Unknown error');
+    // Clear any corrupted cache
+    profileCache = [];
+    cacheTimestamp = 0;
   }
 
-  // TESTING MODE: Show all profiles (no filtering)
+  // FALLBACK: Standard query if AI matching fails
   const { data, error } = await supabase
     .from('profiles')
     .select('*')
     .neq('user_id', user.id)
-    .limit(10);
+    .limit(20);
     
-  console.log('🔍 PROFILES DEBUG (TESTING MODE):', { data, error, userProfile });
+  console.log('🚀 STANDARD FETCH: Loaded', data?.length || 0, 'profiles');
 
-  if (error) throw error;
+  if (error) {
+    console.error('Profile fetch error:', error);
+    return profileCache;
+  }
   
-  // Transform to match expected format
-  return (data || []).map(profile => {
+  // Transform and cache
+  const profiles = (data || []).map(profile => {
     const profileImage = profile.profile_image_url || profile.images?.[0] || DEFAULT_PROFILE_IMAGE;
     return {
       id: profile.id,
@@ -53,6 +108,12 @@ export const fetchSwipeProfiles = async (): Promise<DJProfile[]> => {
       images: profile.images || [profileImage]
     };
   });
+  
+  // Update cache
+  profileCache = profiles;
+  cacheTimestamp = now;
+  
+  return profiles;
 };
 
 // Debug function to check Supabase connection
@@ -91,9 +152,22 @@ export const createProfile = async (profileData: {
     
     const updates: any = { updated_at: new Date().toISOString() };
     
-    // Update name if it's "New DJ" or empty
-    if (googleName && (existing.dj_name === 'New DJ' || !existing.dj_name || existing.dj_name.trim() === '')) {
-      updates.dj_name = googleName;
+    // Auto-update name from OAuth or email
+    const getUpdatedName = () => {
+      // Try OAuth provider names first
+      if (googleName) return googleName;
+      
+      // Fallback to email username if name is generic
+      if (user.email && (existing.dj_name === 'New DJ' || !existing.dj_name || existing.dj_name.trim() === '')) {
+        return user.email.split('@')[0];
+      }
+      
+      return null;
+    };
+    
+    const updatedName = getUpdatedName();
+    if (updatedName) {
+      updates.dj_name = updatedName;
     }
     
     // Smart profile picture logic: Only auto-update if user hasn't uploaded their own image
@@ -131,8 +205,21 @@ export const createProfile = async (profileData: {
   const authProfilePic = user.user_metadata?.avatar_url || user.user_metadata?.picture;
   const defaultImage = authProfilePic || DEFAULT_PROFILE_IMAGE;
   
-  // Use user's actual name from Google if available
-  const displayName = user.user_metadata?.full_name || user.user_metadata?.name || profileData.dj_name;
+  // Auto-generate DJ name from OAuth or email
+  const getDisplayName = () => {
+    // Try OAuth provider names first
+    const oauthName = user.user_metadata?.full_name || user.user_metadata?.name;
+    if (oauthName) return oauthName;
+    
+    // Fallback to email username (before @)
+    if (user.email) {
+      return user.email.split('@')[0];
+    }
+    
+    return profileData.dj_name || 'DJ';
+  };
+  
+  const displayName = getDisplayName();
 
   const { data: profile, error } = await supabase
     .from('profiles')
@@ -245,12 +332,9 @@ export const getCurrentProfile = async (): Promise<DJProfile | null> => {
 
 export const syncCurrentUserGoogleProfile = async (): Promise<void> => {
   try {
-    console.log('🔄 SYNC: Starting Google profile picture sync for all users...');
-    
     // Get current user only for efficiency
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      console.log('⚠️ SYNC: No authenticated user');
       return;
     }
     
@@ -324,9 +408,8 @@ export const syncCurrentUserGoogleProfile = async (): Promise<void> => {
       }
     }
     
-    console.log('🎉 SYNC: Google profile picture sync completed!');
   } catch (error) {
-    console.error('💥 SYNC FATAL ERROR:', sanitizeForLog(error));
+    // Silent sync - don't spam console
   }
 };
 
@@ -533,9 +616,6 @@ export const deleteMatch = async (matchId: string): Promise<void> => {
 export const subscribeToCareerAccelerator = async (email: string, firstName?: string): Promise<void> => {
   console.log('Attempting Career Accelerator signup:', { email, firstName });
   
-  // Vitalik's config check - fail fast with clear error
-  checkConfig();
-  
   try {
     const { data, error } = await supabase
       .from('career_accelerator_leads')
@@ -590,9 +670,6 @@ export const subscribeToCareerAccelerator = async (email: string, firstName?: st
 
 export const subscribeToNewsletter = async (email: string, firstName?: string): Promise<void> => {
   console.log('Attempting to subscribe:', { email, firstName });
-  
-  // Vitalik's config check - fail fast with clear error
-  checkConfig();
   
   try {
     const { data, error } = await supabase

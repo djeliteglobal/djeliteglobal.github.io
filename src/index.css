@@ -6,6 +6,7 @@
   --bg: #0B0D10;
   --surface: #1A1D23;
   --surface-alt: #151821;
+  --elevated: #252A32;
   --border: #2A2D35;
   --text-primary: #FFFFFF;
   --text-secondary: #B8BCC8;
@@ -13,6 +14,22 @@
   --accent: #00F57A;
   --accent-muted: #00C766;
   --danger: #EF4444;
+  --success: #10B981;
+}
+
+.light {
+  --bg: #FFFFFF;
+  --surface: #FFFFFF;
+  --surface-alt: #F8FAFC;
+  --elevated: #FFFFFF;
+  --border: #E2E8F0;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --muted: #64748B;
+  --accent: #059669;
+  --accent-muted: #047857;
+  --danger: #DC2626;
+  --success: #059669;
 }
 
 * {
@@ -26,6 +43,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--bg);
   color: var(--text-primary);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+html {
+  background-color: var(--bg);
+  transition: background-color 0.2s ease;
 }
 
 .font-display {

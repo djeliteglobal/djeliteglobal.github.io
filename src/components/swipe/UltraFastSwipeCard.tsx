@@ -2,37 +2,39 @@ import React, { useState, useCallback, useRef } from 'react';
 import { useSpring, animated } from 'react-spring';
 import { useDrag } from '@use-gesture/react';
 import { useMatchStore } from '../../stores/matchStore';
+import { UpgradeModal } from '../premium/UpgradeModal';
 import type { Opportunity } from '../../types/platform';
 
 interface UltraFastSwipeCardProps {
   opportunity: Opportunity;
-  onSwipe: (direction: 'left' | 'right') => void;
+  onSwipe: (direction: 'left' | 'right' | 'super') => void;
   onCardLeftScreen: (id: string) => void;
+  onOpenProfile?: () => void;
 }
 
 export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({ 
   opportunity, 
   onSwipe, 
-  onCardLeftScreen 
+  onCardLeftScreen,
+  onOpenProfile
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showMoreInfo, setShowMoreInfo] = useState(false);
-  const showMoreInfoRef = useRef(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const images = opportunity.images || [opportunity.imageUrl];
   const totalImages = images.length;
-  const { connectionLimit, checkCanConnect } = useMatchStore();
+  const { checkCanConnect } = useMatchStore();
 
-  const [{ x, rotate, scale }, api] = useSpring(() => ({ 
+  const [{ x, y, rotate, scale }, api] = useSpring(() => ({ 
     x: 0, 
+    y: 0,
     rotate: 0, 
     scale: 1 
   }));
 
-  const bind = useDrag(useCallback(async ({ 
+  const bind = useDrag(useCallback(({ 
     down, 
-    movement: [mx], 
-    velocity: [vx], 
-    direction: [xDir]
+    movement: [mx, my]
   }) => {
     const trigger = Math.abs(mx) > 80;
     const dir = mx > 0 ? 1 : -1;
@@ -40,27 +42,7 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
     if (!down && trigger) {
       const direction = dir > 0 ? 'right' : 'left';
       
-      // Check connection limit for right swipes (matches)
-      if (direction === 'right') {
-        const canConnect = await checkCanConnect();
-        if (!canConnect) {
-          // Bounce back smoothly
-          api.start({ 
-            x: 0, 
-            rotate: 0, 
-            scale: 1,
-            config: { tension: 300, friction: 30 }
-          });
-          // Show popup after bounce
-          setTimeout(() => {
-            if (confirm('Connection limit reached! Upgrade to Pro for unlimited connections?')) {
-              window.open('/', '_blank');
-            }
-          }, 300);
-          return;
-        }
-      }
-      
+      // Immediate swipe without waiting for API
       onSwipe(direction);
       api.start({ 
         x: dir * 800, 
@@ -69,9 +51,32 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
         config: { tension: 200, friction: 20 }
       });
       setTimeout(() => onCardLeftScreen(opportunity.id), 200);
+      
+      // Check connection limit in background (non-blocking)
+      if (direction === 'right') {
+        checkCanConnect().then(canConnect => {
+          if (!canConnect) {
+            setTimeout(() => {
+              setShowUpgradeModal(true);
+            }, 500);
+          }
+        }).catch(() => {});
+      }
+    } else if (!down && my < -80) {
+      // Super like gesture (upward swipe)
+      onSwipe('super');
+      api.start({ 
+        y: -400, 
+        x: 0,
+        rotate: 0, 
+        scale: 0.8,
+        config: { tension: 200, friction: 20 }
+      });
+      setTimeout(() => onCardLeftScreen(opportunity.id), 200);
     } else {
       api.start({ 
-        x: down ? mx : 0, 
+        x: down ? mx : 0,
+        y: down ? my : 0, 
         rotate: down ? mx / 15 : 0,
         scale: down ? 1.02 : 1,
         config: { tension: 300, friction: 30 }
@@ -144,6 +149,28 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
                 {opportunity.venue} - {opportunity.location}
               </p>
               
+              {/* AI Match Insights */}
+              {opportunity.matchReasons && opportunity.matchReasons.length > 0 && (
+                <div className="mt-3 p-3 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-lg backdrop-blur-sm border border-purple-500/30">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xs font-bold text-purple-300">✨ AI MATCH</span>
+                    {opportunity.matchScore && (
+                      <span className="text-xs bg-purple-500/30 text-purple-200 px-2 py-0.5 rounded-full">
+                        {opportunity.matchScore}% compatible
+                      </span>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    {opportunity.matchReasons.slice(0, 2).map((reason, idx) => (
+                      <p key={idx} className="text-xs text-purple-100 flex items-center gap-1">
+                        <span className="w-1 h-1 bg-purple-300 rounded-full"></span>
+                        {reason}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
               <div className="mt-4 flex flex-wrap gap-2">
                 {opportunity.genres.map((genre) => (
                   <span 
@@ -178,26 +205,28 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
               )}
             </div>
             
-            {/* More Info Button - BACK INSIDE where it belongs */}
-            <button 
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                const newValue = !showMoreInfoRef.current;
-                showMoreInfoRef.current = newValue;
-                setShowMoreInfo(newValue);
-              }}
-              onMouseDown={(e) => e.stopPropagation()}
-              onTouchStart={(e) => e.stopPropagation()}
-              className="ml-4 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors z-50 relative"
-              style={{ pointerEvents: 'auto' }}
-            >
-              <span className="text-sm font-bold">{showMoreInfo ? '\u2212' : 'i'}</span>
-            </button>
+            <div className="ml-4 flex gap-2">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowMoreInfo(!showMoreInfo);
+                }}
+                className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors"
+              >
+                <span className="text-sm font-bold">{showMoreInfo ? '−' : 'i'}</span>
+              </button>
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpenProfile?.();
+                }}
+                className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors"
+              >
+                <span className="text-sm font-bold">↗</span>
+              </button>
+            </div>
           </div>
         </div>
-
-
 
         {/* Swipe indicators */}
         <animated.div 
@@ -216,9 +245,24 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
         >
           NOPE
         </animated.div>
+        <animated.div 
+          className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-6xl font-bold text-yellow-500 opacity-0 pointer-events-none"
+          style={{
+            opacity: y.to(y => y < -50 ? Math.abs(y - (-50)) / 100 : 0)
+          }}
+        >
+          ⭐ SUPER LIKE
+        </animated.div>
       </animated.div>
       
-
+      <UpgradeModal 
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        onUpgrade={() => {
+          setShowUpgradeModal(false);
+          window.open('/', '_blank');
+        }}
+      />
     </div>
   );
 };

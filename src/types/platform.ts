@@ -1,4 +1,4 @@
-export type Page = 'dashboard' | 'courses' | 'course_detail' | 'community' | 'opportunities' | 'events' | 'settings' | 'landing';
+export type Page = 'dashboard' | 'courses' | 'course_detail' | 'community' | 'opportunities' | 'events' | 'premium_features' | 'settings' | 'landing';
 
 export interface AppState {
   theme: 'light' | 'dark';

@@ -1,167 +1,213 @@
 import React, { useState, useEffect } from 'react';
-import { loadStripe, StripeElementsOptions } from '@stripe/stripe-js';
-import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { Logo } from '../constants';
-import { Button } from '../components';
-import '../animations.css';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+interface PlanDetails {
+  name: string;
+  price: number;
+  interval: string;
+  features: string[];
+}
 
-const CheckoutForm = () => {
-  const stripe = useStripe();
-  const elements = useElements();
-  const [email, setEmail] = useState('');
-  const [message, setMessage] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+const PLANS: Record<string, PlanDetails> = {
+  pro: {
+    name: 'DJ Elite Pro',
+    price: 19,
+    interval: 'month',
+    features: [
+      'Unlimited DJ connections',
+      'Premium swipe features', 
+      'Priority gig matching',
+      'Enhanced profile visibility',
+      'Direct promoter contact'
+    ]
+  },
+  elite: {
+    name: 'DJ Elite Premium',
+    price: 49,
+    interval: 'month',
+    features: [
+      'Everything in Pro',
+      'VIP gig opportunities',
+      'Personal booking agent',
+      'Advanced performance analytics',
+      'Custom DJ brand tools'
+    ]
+  }
+};
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+export const CheckoutPage: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { currentUser } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [cardElement, setCardElement] = useState<any>(null);
+  const [stripe, setStripe] = useState<any>(null);
+  const [elements, setElements] = useState<any>(null);
+  const [error, setError] = useState<string>('');
 
-    if (!stripe || !elements) {
+  const planType = searchParams.get('plan') || 'pro';
+  const plan = PLANS[planType];
+
+  useEffect(() => {
+    if (!currentUser) {
+      navigate('/');
       return;
     }
 
-    setIsLoading(true);
+    const loadStripe = async () => {
+      const stripeJs = await import('@stripe/stripe-js');
+      const stripeInstance = await stripeJs.loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_51234567890abcdef');
+      setStripe(stripeInstance);
 
-    const { error } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        return_url: `${window.location.origin}/success`,
-        receipt_email: email,
-      },
-    });
-
-    if (error) {
-      if (error.type === "card_error" || error.type === "validation_error") {
-        setMessage(error.message);
-      } else {
-        setMessage("Payment failed. Please try again.");
-      }
-    }
-
-    setIsLoading(false);
-  };
-
-  return (
-    <form id="payment-form" onSubmit={handleSubmit} className="space-y-6">
-        <input 
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email address"
-            required
-            className="w-full px-4 py-3 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none transition-all"
-        />
-        <PaymentElement id="payment-element" />
-        <Button variant="purchase" disabled={isLoading || !stripe || !elements} id="submit" className="w-full btn-animate">
-            <span id="button-text">
-                {isLoading ? (
-                    <div className="flex items-center justify-center">
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
-                        Processing...
-                    </div>
-                ) : "Pay $497 Now"}
-            </span>
-        </Button>
-        {message && <div id="payment-message" className="text-red-500 text-center mt-2">{message}</div>}
-    </form>
-  );
-};
-
-const CheckoutPage = () => {
-  const [clientSecret, setClientSecret] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const createPaymentIntent = async () => {
-      try {
-        const response = await fetch("/.netlify/functions/create-payment-intent", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ amount: 497 }),
+      if (stripeInstance) {
+        const elementsInstance = stripeInstance.elements();
+        setElements(elementsInstance);
+        
+        const card = elementsInstance.create('card', {
+          style: {
+            base: {
+              fontSize: '16px',
+              color: '#424770',
+              '::placeholder': { color: '#aab7c4' },
+            },
+          },
         });
         
-        if (!response.ok) {
-          throw new Error(`Payment setup failed: ${response.status}`);
+        const cardElement = document.getElementById('card-element');
+        if (cardElement) {
+          cardElement.innerHTML = '';
+          card.mount('#card-element');
         }
-        
-        const data = await response.json();
-        if (data.clientSecret) {
-          setClientSecret(data.clientSecret);
-        } else {
-          throw new Error('Invalid response from payment service');
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to initialize payment');
-      } finally {
-        setLoading(false);
+        setCardElement(card);
       }
     };
-    
-    createPaymentIntent();
-  }, []);
 
-  const options: StripeElementsOptions = {
-    clientSecret,
-    appearance: {
-        theme: 'night',
-        variables: {
-            colorPrimary: '#00F57A',
-            colorBackground: '#111111',
-            colorText: '#F5F5F5',
-            colorDanger: '#EF4444',
-            fontFamily: 'Inter, sans-serif',
-            spacingUnit: '4px',
-            borderRadius: '8px',
+    loadStripe();
+  }, [currentUser, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!stripe || !cardElement || !currentUser) return;
+
+    setLoading(true);
+    setError('');
+
+    try {
+      // Create payment method
+      const { error: pmError, paymentMethod } = await stripe.createPaymentMethod({
+        type: 'card',
+        card: cardElement,
+        billing_details: {
+          name: currentUser.name,
+          email: currentUser.email,
+        },
+      });
+
+      if (pmError) {
+        setError(pmError.message);
+        setLoading(false);
+        return;
+      }
+
+      // Create subscription
+      const response = await fetch('/.netlify/functions/create-subscription', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          paymentMethodId: paymentMethod.id,
+          planType,
+          userId: currentUser.id,
+          customerEmail: currentUser.email,
+          customerName: currentUser.name,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.error) {
+        setError(result.error);
+        setLoading(false);
+        return;
+      }
+
+      // Handle 3D Secure if needed
+      if (result.status === 'requires_action') {
+        const { error: confirmError } = await stripe.confirmCardPayment(result.client_secret);
+        if (confirmError) {
+          setError(confirmError.message);
+          setLoading(false);
+          return;
         }
-    },
+      }
+
+      // Success - redirect to success page
+      navigate('/success?subscription=true');
+    } catch (err: any) {
+      setError(err.message || 'Payment failed');
+      setLoading(false);
+    }
   };
 
+  if (!plan) {
+    return <div>Invalid plan selected</div>;
+  }
+
   return (
-    <div className="bg-[color:var(--bg)] text-[color:var(--text-primary)] min-h-screen flex flex-col">
-        <header className="py-6 border-b border-[color:var(--border)]">
-            <div className="container mx-auto px-4">
-                <Logo className="text-2xl" />
+    <div className="min-h-screen bg-[color:var(--bg)] flex items-center justify-center p-4">
+      <div className="max-w-md w-full bg-[color:var(--surface)] rounded-xl border border-[color:var(--border)] p-8">
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-bold text-[color:var(--text-primary)] mb-2">Complete Your Subscription</h1>
+          <p className="text-[color:var(--text-secondary)]">Join thousands of DJs growing their careers</p>
+        </div>
+
+        <div className="bg-[color:var(--surface-alt)] rounded-lg p-6 mb-6">
+          <h2 className="text-lg font-semibold text-[color:var(--text-primary)] mb-2">{plan.name}</h2>
+          <div className="text-3xl font-bold text-[color:var(--accent)] mb-4">
+            ${plan.price}<span className="text-sm text-[color:var(--text-secondary)]">/{plan.interval}</span>
+          </div>
+          <ul className="space-y-2">
+            {plan.features.map((feature, i) => (
+              <li key={i} className="flex items-center text-sm text-[color:var(--text-secondary)]">
+                <span className="text-green-500 mr-2">✓</span>
+                {feature}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">
+              Card Information
+            </label>
+            <div 
+              id="card-element"
+              className="p-3 border border-[color:var(--border)] rounded-lg bg-white"
+            />
+          </div>
+
+          {error && (
+            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+              <p className="text-red-400 text-sm">{error}</p>
             </div>
-        </header>
-        <main className="flex-grow container mx-auto px-4 py-12 flex items-center justify-center">
-            <div className="w-full max-w-md bg-[color:var(--surface)] p-8 rounded-2xl border border-[color:var(--border)]">
-                <h1 className="text-3xl font-display font-bold text-center mb-2">Complete Your Enrollment</h1>
-                <p className="text-center text-[color:var(--text-secondary)] mb-4">You're one step away from becoming a DJ Elite.</p>
-                <div className="text-center mb-8 p-4 bg-[color:var(--surface-alt)] rounded-lg border border-[color:var(--accent)]/20">
-                    <p className="text-sm text-[color:var(--muted)]">DJ Elite Complete Course</p>
-                    <p className="text-3xl font-bold text-[color:var(--accent)]">$497</p>
-                    <p className="text-xs text-[color:var(--muted)]">One-time payment • 90-day guarantee</p>
-                </div>
-                {error ? (
-                    <div className="text-center">
-                        <div className="text-red-500 mb-4">{error}</div>
-                        <Button onClick={() => window.location.reload()} variant="secondary">
-                            Try Again
-                        </Button>
-                    </div>
-                ) : clientSecret ? (
-                    <Elements options={options} stripe={stripePromise}>
-                        <CheckoutForm />
-                    </Elements>
-                ) : loading ? (
-                    <div className="space-y-6">
-                        <div className="w-full h-12 bg-[color:var(--surface-alt)] rounded-lg animate-pulse"></div>
-                        <div className="w-full h-32 bg-[color:var(--surface-alt)] rounded-lg animate-pulse"></div>
-                        <div className="w-full h-12 bg-[color:var(--surface-alt)] rounded-lg animate-pulse"></div>
-                        <div className="text-center text-[color:var(--text-secondary)] flex items-center justify-center">
-                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[color:var(--accent)] mr-3"></div>
-                            Loading secure payment form...
-                        </div>
-                    </div>
-                ) : null}
-            </div>
-        </main>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading || !stripe}
+            className="w-full py-3 bg-[color:var(--accent)] text-black font-semibold rounded-lg hover:bg-opacity-90 transition-colors disabled:opacity-50"
+          >
+            {loading ? 'Processing...' : `Subscribe for $${plan.price}/${plan.interval}`}
+          </button>
+        </form>
+
+        <div className="mt-6 text-center">
+          <p className="text-xs text-[color:var(--muted)]">
+            Secure payment powered by Stripe. Cancel anytime.
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
-
-export { CheckoutPage };
-export default CheckoutPage;

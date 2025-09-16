@@ -9,21 +9,32 @@ import { PrivacyPage } from './pages/PrivacyPage';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { ThemeProvider } from './theme/ThemeProvider';
 import { QueryProvider } from './providers/QueryProvider';
+import { AuthProvider } from './contexts/AuthContext';
+import { ReferralProvider } from './contexts/ReferralContext';
+import ReferralDashboard from './components/premium/ReferralDashboard';
 import { notificationService } from './services/notificationService';
 import { startPeriodicProfileSync } from './services/profileService';
+import { referralHandler } from './utils/referralHandler';
 import { PremiumFeaturesDemo } from './components/platform/PremiumFeaturesDemo';
+import { SimpleDJMatchingPage } from './components/pages/SimpleDJMatchingPage';
 import './index.css';
 import './debug.css';
 import './styles/pages.css';
 
 function App() {
-  // Initialize notifications and profile sync on app start
+  // Simple test logging to verify app starts
+  console.log('🎯 App component loaded successfully!');
+  // Initialize notifications, profile sync, and referral tracking on app start
   React.useEffect(() => {
-    notificationService.initialize();
+    console.log('⚡ App component mounted!');
     
+    // Initialize core services
+    notificationService.initialize();
+    referralHandler.initialize();
+
     // Start automatic Google profile picture sync
     const stopSync = startPeriodicProfileSync();
-    
+
     // Cleanup on unmount
     return () => {
       stopSync();
@@ -33,17 +44,25 @@ function App() {
   return (
     <QueryProvider>
       <ThemeProvider>
-        <Router>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/funnel" element={<DJElitePage />} />
-            <Route path="/checkout" element={<CheckoutPage />} />
-            <Route path="/success" element={<SuccessPage />} />
-            <Route path="/terms" element={<TermsPage />} />
-            <Route path="/privacy" element={<PrivacyPage />} />
-            <Route path="/premium" element={<PremiumFeaturesDemo />} />
-          </Routes>
-        </Router>
+        <AuthProvider>
+          <ReferralProvider>
+            <Router>
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/funnel" element={<DJElitePage />} />
+                <Route path="/swipe" element={<SimpleDJMatchingPage />} />
+                <Route path="/checkout" element={<CheckoutPage />} />
+                <Route path="/success" element={<SuccessPage />} />
+                <Route path="/terms" element={<TermsPage />} />
+                <Route path="/privacy" element={<PrivacyPage />} />
+                <Route path="/premium" element={<PremiumFeaturesDemo />} />
+                <Route path="/referrals" element={<ReferralDashboard />} />
+
+
+              </Routes>
+            </Router>
+          </ReferralProvider>
+        </AuthProvider>
       </ThemeProvider>
     </QueryProvider>
   );

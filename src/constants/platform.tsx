@@ -86,13 +86,27 @@ export const UndoIcon = memo((props: React.SVGProps<SVGSVGElement>) => (
 export const LockIcon = memo((props: React.SVGProps<SVGSVGElement>) => (
     <svg {...baseSVGProps} {...props}><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><circle cx="12" cy="7" r="4" /><path d="M12 3v4" /></svg>
 ));
+export const GiftIcon = memo((props: React.SVGProps<SVGSVGElement>) => (
+    <svg {...baseSVGProps} {...props}><polygon points="20 12 18 9 15 7.5 18 6 20 3 22 6 25 7.5 22 9 20 12"/><rect x="5.5" y="13.5" width="13" height="7" rx="1" ry="1"/><path d="M12 13.5V16.5"/></svg>
+));
+export const CalendarIcon = memo((props: React.SVGProps<SVGSVGElement>) => (
+    <svg {...baseSVGProps} {...props}><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+));
+export const UserPlusIcon = memo((props: React.SVGProps<SVGSVGElement>) => (
+    <svg {...baseSVGProps} {...props}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><line x1="19" y1="8" x2="19" y2="14" /><line x1="22" y1="11" x2="16" y2="11" /></svg>
+));
+export const CrownIcon = memo((props: React.SVGProps<SVGSVGElement>) => (
+    <svg {...baseSVGProps} {...props}><path d="m2 20 8-8 3 3 8-8" /><path d="M2 4h20v16H2z" /><path d="M6 4v16" /><path d="M18 4v16" /><path d="M10 4v16" /><path d="M14 4v16" /></svg>
+));
 
 export const NAV_ITEMS = [
     { name: 'Dashboard', icon: HomeIcon, page: 'dashboard' },
     { name: 'Courses', icon: BookOpenIcon, page: 'courses' },
-    { name: 'Events', icon: UsersIcon, page: 'events' },
     { name: 'Discover', icon: ZapIcon, page: 'opportunities' },
-    { name: 'Events', icon: HeartIcon, page: 'community' },
+    { name: 'Events', icon: CalendarIcon, page: 'community' },
+    { name: 'Referrals', icon: UserPlusIcon, page: 'referrals' },
+    { name: 'Premium', icon: CrownIcon, page: 'premium_features' },
+    { name: 'Settings', icon: SettingsIcon, page: 'settings' },
 ];
 
 export const MOCK_USER: User = {
@@ -113,7 +127,7 @@ export const loadCourses = async (): Promise<Course[]> => {
       duration: course.duration || '1 week',
       level: course.level || 'Beginner',
       instructor: course.instructor || 'DJ Elite Team',
-      imageUrl: course.imageUrl || 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400',
+      imageUrl: course.imageUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDQwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMDAgMTAwQzIyNy42MTQgMTAwIDI1MCA4Ny42MTQyIDI1MCA2MEMyNTAgMzIuMzg1OCAyMjcuNjE0IDEwIDIwMCAxMEMxNzIuMzg2IDEwIDE1MCAzMi4zODU4IDE1MCA2MEMxNTAgODcuNjE0MiAxNzIuMzg2IDEwMCAyMDAgMTAwWiIgZmlsbD0iIzlDQTNBRiIvPgo8cGF0aCBkPSJNMzAwIDM5MEgxMDBDMTAwIDMzMC4yIDEzOS44IDI4MCAyMDAgMjgwQzI2MC4yIDI4MCAzMDAgMzMwLjIgMzAwIDM5MFoiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+',
       progress: course.progress || 0,
       isLocked: course.isLocked !== false
     }));
@@ -134,7 +148,7 @@ export const loadOpportunities = async (): Promise<Opportunity[]> => {
       location: opp.location || 'Unknown Location',
       fee: opp.fee || '$0',
       type: opp.type || 'Gig',
-      imageUrl: opp.imageUrl || 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400',
+      imageUrl: opp.imageUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDQwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMDAgMTAwQzIyNy42MTQgMTAwIDI1MCA4Ny42MTQyIDI1MCA2MEMyNTAgMzIuMzg1OCAyMjcuNjE0IDEwIDIwMCAxMEMxNzIuMzg2IDEwIDE1MCAzMi4zODU4IDE1MCA2MEMxNTAgODcuNjE0MiAxNzIuMzg2IDEwMCAyMDAgMTAwWiIgZmlsbD0iIzlDQTNBRiIvPgo8cGF0aCBkPSJNMzAwIDM5MEgxMDBDMTAwIDMzMC4yIDEzOS44IDI4MCAyMDAgMjgwQzI2MC4yIDI4MCAzMDAgMzMwLjIgMzAwIDM5MFoiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+',
       description: opp.description || 'No description available'
     }));
   } catch (error) {
