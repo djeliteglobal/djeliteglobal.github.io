@@ -4,6 +4,7 @@ import type { AppState, AppContextType, Page } from '../types/platform';
 import { TopBar, SideNav } from '../components/platform';
 import { ProfileEditor } from '../components/profile/ProfileEditor';
 import { LandingPage, Dashboard, CoursesPage, CourseDetailPage, CommunityPage, OpportunitiesPage, SettingsPage, EventsPage, ProfilePage, ReferralsPage, PremiumPage, FreeCoursePage } from '../components/pages';
+import { FreeCourseAccess } from '../components/FreeCourseAccess';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { AuthModal } from '../components/auth/AuthModal';
 import { useTranslation } from '../i18n/useTranslation';
@@ -149,7 +150,7 @@ const HomePageContent: React.FC = () => {
     }, [appState.theme]);
 
     const navigate = useCallback((page: Page, courseId: number | null = null) => {
-        if (page !== 'landing' && !currentUser) {
+        if (page !== 'landing' && page !== 'free_course_access' && !currentUser) {
             setShowAuthModal(true);
             return;
         }
@@ -199,6 +200,8 @@ const HomePageContent: React.FC = () => {
                 return currentUser ? <Dashboard /> : <LandingPage />;
             case 'free_course':
                 return <FreeCoursePage />;
+            case 'free_course_access':
+                return <FreeCourseAccess />;
             case 'courses':
                 return <CoursesPage />;
             case 'course_detail':

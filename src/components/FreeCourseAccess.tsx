@@ -174,10 +174,13 @@ export const FreeCourseAccess: React.FC<{ preview?: boolean }> = ({ preview = fa
     if (!currentUser) return;
 
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
       const { data: profile } = await supabase
         .from('profiles')
         .select('id')
-        .eq('user_id', currentUser.email) // Using email as identifier
+        .eq('user_id', user.id)
         .single();
 
       if (profile) {
@@ -215,32 +218,439 @@ export const FreeCourseAccess: React.FC<{ preview?: boolean }> = ({ preview = fa
     }
   };
 
+  const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({});
+  const [showQuiz, setShowQuiz] = useState<string | null>(null);
+
+  const generateCertificateHTML = () => {
+    const certificateHTML = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap');
+          body {
+            margin: 0;
+            padding: 40px;
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(135deg, #0B0D10 0%, #1A1D23 100%);
+            color: #FFFFFF;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .certificate {
+            width: 800px;
+            padding: 60px;
+            background: #1A1D23;
+            border: 3px solid #00F57A;
+            border-radius: 20px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 245, 122, 0.2);
+          }
+          .certificate::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            border: 1px solid #00F57A;
+            border-radius: 15px;
+            opacity: 0.3;
+          }
+          .logo {
+            font-size: 32px;
+            font-weight: 700;
+            color: #00F57A;
+            margin-bottom: 30px;
+          }
+          .title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #00F57A;
+          }
+          .subtitle {
+            font-size: 24px;
+            color: #B8BCC8;
+            margin-bottom: 40px;
+          }
+          .recipient {
+            font-size: 36px;
+            font-weight: 600;
+            margin: 30px 0;
+            color: #FFFFFF;
+          }
+          .course-name {
+            font-size: 28px;
+            font-weight: 600;
+            color: #00F57A;
+            margin: 30px 0;
+          }
+          .completion-text {
+            font-size: 18px;
+            color: #B8BCC8;
+            margin: 20px 0;
+          }
+          .date {
+            font-size: 16px;
+            color: #6B7280;
+            margin-top: 40px;
+          }
+          .signature-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid #2A2D35;
+          }
+          .signature {
+            text-align: center;
+          }
+          .signature-line {
+            width: 200px;
+            height: 1px;
+            background: #2A2D35;
+            margin: 20px auto 10px;
+          }
+          .signature-title {
+            font-size: 14px;
+            color: #6B7280;
+          }
+          .badge {
+            position: absolute;
+            top: -15px;
+            right: 60px;
+            background: #00F57A;
+            color: #0B0D10;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 14px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="certificate">
+          <div class="badge">CERTIFIED</div>
+          <div class="logo">DJ ELITE</div>
+          <div class="title">CERTIFICATE OF COMPLETION</div>
+          <div class="subtitle">This certifies that</div>
+          <div class="recipient">${currentUser?.name || 'DJ Student'}</div>
+          <div class="completion-text">has successfully completed</div>
+          <div class="course-name">DJ Bookings Blueprint - Complete Course</div>
+          <div class="completion-text">
+            Demonstrating mastery of professional DJ booking strategies,<br>
+            venue research, networking, and business development skills
+          </div>
+          <div class="date">Completed on ${new Date().toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          })}</div>
+          <div class="signature-section">
+            <div class="signature">
+              <div class="signature-line"></div>
+              <div class="signature-title">DJ Elite Team</div>
+            </div>
+            <div class="signature">
+              <div class="signature-line"></div>
+              <div class="signature-title">Certificate ID: ${Date.now()}</div>
+            </div>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+    
+    const blob = new Blob([certificateHTML], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `DJ-Elite-Certificate-${currentUser?.name?.replace(/\s+/g, '-') || 'Student'}.html`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    alert('🎉 HTML Certificate downloaded! Open in browser and print as PDF.');
+  };
+
+  const generateCertificatePNG = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1200;
+    canvas.height = 800;
+    const ctx = canvas.getContext('2d');
+    
+    // Background
+    const gradient = ctx.createLinearGradient(0, 0, 1200, 800);
+    gradient.addColorStop(0, '#0B0D10');
+    gradient.addColorStop(1, '#1A1D23');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 1200, 800);
+    
+    // Certificate border
+    ctx.strokeStyle = '#00F57A';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(50, 50, 1100, 700);
+    
+    // Inner border
+    ctx.strokeStyle = '#00F57A';
+    ctx.lineWidth = 1;
+    ctx.globalAlpha = 0.3;
+    ctx.strokeRect(80, 80, 1040, 640);
+    ctx.globalAlpha = 1;
+    
+    // Badge
+    ctx.fillStyle = '#00F57A';
+    ctx.fillRect(950, 30, 120, 40);
+    ctx.fillStyle = '#0B0D10';
+    ctx.font = 'bold 14px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('CERTIFIED', 1010, 52);
+    
+    // Logo
+    ctx.fillStyle = '#00F57A';
+    ctx.font = 'bold 32px Arial';
+    ctx.fillText('DJ ELITE', 600, 150);
+    
+    // Title
+    ctx.fillStyle = '#00F57A';
+    ctx.font = 'bold 48px Arial';
+    ctx.fillText('CERTIFICATE OF COMPLETION', 600, 220);
+    
+    // Subtitle
+    ctx.fillStyle = '#B8BCC8';
+    ctx.font = '24px Arial';
+    ctx.fillText('This certifies that', 600, 280);
+    
+    // Name
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 36px Arial';
+    ctx.fillText(currentUser?.name || 'DJ Student', 600, 340);
+    
+    // Completion text
+    ctx.fillStyle = '#B8BCC8';
+    ctx.font = '18px Arial';
+    ctx.fillText('has successfully completed', 600, 380);
+    
+    // Course name
+    ctx.fillStyle = '#00F57A';
+    ctx.font = 'bold 28px Arial';
+    ctx.fillText('DJ Bookings Blueprint - Complete Course', 600, 430);
+    
+    // Description
+    ctx.fillStyle = '#B8BCC8';
+    ctx.font = '16px Arial';
+    ctx.fillText('Demonstrating mastery of professional DJ booking strategies,', 600, 470);
+    ctx.fillText('venue research, networking, and business development skills', 600, 495);
+    
+    // Date
+    ctx.fillStyle = '#6B7280';
+    ctx.font = '16px Arial';
+    const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    ctx.fillText(`Completed on ${date}`, 600, 550);
+    
+    // Signature lines
+    ctx.strokeStyle = '#2A2D35';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(250, 650);
+    ctx.lineTo(450, 650);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(750, 650);
+    ctx.lineTo(950, 650);
+    ctx.stroke();
+    
+    // Signature labels
+    ctx.fillStyle = '#6B7280';
+    ctx.font = '14px Arial';
+    ctx.fillText('DJ Elite Team', 350, 680);
+    ctx.fillText(`Certificate ID: ${Date.now()}`, 850, 680);
+    
+    // Convert to PDF
+    canvas.toBlob((blob) => {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `DJ-Elite-Certificate-${currentUser?.name?.replace(/\s+/g, '-') || 'Student'}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    });
+    
+    alert('🎉 Certificate downloaded as PNG! You can convert to PDF if needed.');
+  };
+
+  const moduleQuizzes = {
+    'professional-email-formula': {
+      question: 'What is the most important part of a professional DJ email?',
+      options: [
+        'Talking about your passion for music',
+        'Showing you researched their venue specifically', 
+        'Listing all your equipment',
+        'Asking for any available dates'
+      ],
+      correct: 1
+    },
+    'email-templates-system': {
+      question: 'What should you include in your email subject line?',
+      options: [
+        'Just your DJ name',
+        'Available [DATE] - [DJ NAME] - [GENRE] Specialist',
+        'Looking for gigs',
+        'Professional DJ available'
+      ],
+      correct: 1
+    },
+    'promo-pack-system': {
+      question: 'How many components should your promo pack have?',
+      options: ['3 components', '5 components', '7 components', '10 components'],
+      correct: 1
+    },
+    'power-bio-formula': {
+      question: 'What should your DJ bio focus on?',
+      options: [
+        'Your musical journey since childhood',
+        'Business case for why they should book you',
+        'Your favorite DJs and influences', 
+        'How much you love music'
+      ],
+      correct: 1
+    },
+    'peak-hour-proof-mix': {
+      question: 'How long should your promotional mix be?',
+      options: ['5-8 minutes', '10-15 minutes', '30-45 minutes', '60+ minutes'],
+      correct: 1
+    },
+    'venue-research-method': {
+      question: 'What is the strategic venue hierarchy approach?',
+      options: [
+        'Contact all venues equally',
+        'Start with the biggest venues first',
+        'Build through tiers from foundation to elite',
+        'Only focus on one type of venue'
+      ],
+      correct: 2
+    },
+    'venue-opportunity-scorecard': {
+      question: 'What score range indicates a priority target venue?',
+      options: ['50-64 points', '65-80 points', '90-120 points', 'Above 120 points'],
+      correct: 2
+    },
+    'networking-multiplication': {
+      question: 'Who should be your top networking priority?',
+      options: [
+        'Other DJs only',
+        'Venue owners and managers',
+        'Photographers and videographers',
+        'Music producers'
+      ],
+      correct: 1
+    },
+    'rate-negotiation-mastery': {
+      question: 'What is the key to premium pricing psychology?',
+      options: [
+        'Always be the cheapest option',
+        'Never negotiate your rates',
+        'Being 20% higher increases perceived value',
+        'Only work for free to build experience'
+      ],
+      correct: 2
+    },
+    'club-scene-domination': {
+      question: 'What is the first tier in the club hierarchy system?',
+      options: [
+        'Elite venues',
+        'Regional venues', 
+        'Local clubs',
+        'International venues'
+      ],
+      correct: 2
+    },
+    'social-media-booking-machine': {
+      question: 'What percentage of content should be performance-focused?',
+      options: ['25%', '40%', '60%', '80%'],
+      correct: 2
+    },
+    'dj-business-empire': {
+      question: 'How many revenue streams are recommended in the model?',
+      options: ['3 streams', '5 streams', '7 streams', '10 streams'],
+      correct: 2
+    }
+  };
+
+  const handleQuizSubmit = async (moduleId: string) => {
+    const quiz = moduleQuizzes[moduleId];
+    const userAnswer = parseInt(quizAnswers[moduleId] || '0');
+    
+    if (userAnswer === quiz.correct) {
+      await markModuleComplete(moduleId);
+      setShowQuiz(null);
+      setQuizAnswers({});
+      alert('✅ Correct! Module completed!');
+    } else {
+      alert('❌ Incorrect answer. Please try again!');
+    }
+  };
+
   const markModuleComplete = async (moduleId: string) => {
-    if (!currentUser) return;
+    if (!currentUser) {
+      console.log('❌ No current user');
+      return;
+    }
 
     try {
-      const { data: profile } = await supabase
+      console.log('🔍 DEBUG: Starting markModuleComplete for:', moduleId);
+      
+      const { data: { user } } = await supabase.auth.getUser();
+      console.log('🔍 DEBUG: Supabase user:', user?.id);
+      if (!user) return;
+
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('id')
-        .eq('user_id', currentUser.email)
+        .eq('user_id', user.id)
         .single();
+      
+      console.log('🔍 DEBUG: Profile lookup:', { profile, profileError });
 
       if (profile) {
-        await supabase
+        const progressData = {
+          user_id: profile.id,
+          module_id: moduleId,
+          completed: true,
+          completed_at: new Date().toISOString(),
+          progress_percentage: 100
+        };
+        
+        console.log('🔍 DEBUG: Inserting progress:', progressData);
+        
+        const { data: result, error: upsertError } = await supabase
           .from('course_progress')
-          .upsert({
-            user_id: profile.id,
-            module_id: moduleId,
-            completed: true,
-            completed_at: new Date().toISOString(),
-            progress_percentage: 100
-          }, { onConflict: 'user_id,module_id' });
+          .upsert(progressData, { onConflict: 'user_id,module_id' });
+        
+        console.log('🔍 DEBUG: Upsert result:', { result, upsertError });
 
-        // Reload progress
-        loadUserProgress();
+        // Force reload progress
+        await loadUserProgress();
+        
+        console.log('🔍 DEBUG: Current progress after reload:', userProgress.length);
+        console.log('🔍 DEBUG: Completion percentage:', getCompletionPercentage());
+        
+        alert(`✅ Module completed! Progress: ${getCompletionPercentage()}%`);
+      } else {
+        console.log('❌ No profile found');
+        alert('❌ Profile not found');
       }
     } catch (error) {
-      console.error('Failed to mark module complete:', error);
+      console.error('❌ Failed to mark module complete:', error);
+      alert('❌ Error: ' + error.message);
     }
   };
 
@@ -254,8 +664,18 @@ export const FreeCourseAccess: React.FC<{ preview?: boolean }> = ({ preview = fa
   };
 
   const canAccessModule = (module: CourseModule): boolean => {
-    // All modules are now accessible (open course)
-    return true;
+    // First module is always accessible
+    if (module.order === 1) return true;
+    
+    // Check if previous module quiz is completed
+    const previousModuleIndex = FREE_COURSE_MODULES.findIndex(m => m.order === module.order - 1);
+    if (previousModuleIndex === -1) return true;
+    
+    const previousModule = FREE_COURSE_MODULES[previousModuleIndex];
+    const previousProgress = getModuleProgress(previousModule.id);
+    
+    // Module is accessible if previous module quiz is completed
+    return previousProgress?.completed === true;
   };
 
   const getCompletionPercentage = (): number => {
@@ -565,7 +985,7 @@ export const FreeCourseAccess: React.FC<{ preview?: boolean }> = ({ preview = fa
             <img 
               src="/DJ Elite Free Course/6.jpg" 
               alt="Nightclub venue research" 
-              className="w-full h-48 object-cover rounded-lg mb-4"
+              className="w-full h-48 object-cover object-center rounded-lg mb-4"
             />
           </div>
           <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
@@ -607,7 +1027,7 @@ export const FreeCourseAccess: React.FC<{ preview?: boolean }> = ({ preview = fa
           </div>
         </div>
       ),
-      'opportunity-scorecard': (
+      'venue-opportunity-scorecard': (
         <div className="space-y-6">
           <div className="mb-6">
             <img 
@@ -616,40 +1036,149 @@ export const FreeCourseAccess: React.FC<{ preview?: boolean }> = ({ preview = fa
               className="w-full h-48 object-cover rounded-lg mb-4"
             />
           </div>
+          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
+            <h4 className="text-lg font-bold text-blue-400 mb-2">📊 The $50,000 Mistake Most DJs Make</h4>
+            <p className="text-gray-300 mb-3">Jake spent 2 years sending emails to every venue in his city. 200+ emails, 3 responses, zero bookings. He was targeting the wrong venues.</p>
+            <p className="text-gray-300">Meanwhile, Emma used this scorecard system to identify 12 perfect-fit venues. She got booked at 8 of them within 6 months, earning $50,000+ in her first year.</p>
+          </div>
+          
+          <div>
+            <h4 className="text-lg font-bold mb-3">Why Most DJs Waste Time on Wrong Venues</h4>
+            <p className="mb-4">The biggest mistake DJs make is treating all venues equally. Not all venues are worth your time. Some will never book you, no matter how good you are.</p>
+            <ul className="space-y-2">
+              <li className="flex items-start gap-2"><span className="text-red-400 mt-1">❌</span> <strong>Genre Mismatch:</strong> Sending house music to country bars</li>
+              <li className="flex items-start gap-2"><span className="text-red-400 mt-1">❌</span> <strong>Budget Mismatch:</strong> Targeting venues that can't afford your rates</li>
+              <li className="flex items-start gap-2"><span className="text-red-400 mt-1">❌</span> <strong>Timing Issues:</strong> Venues that only book 6 months in advance</li>
+              <li className="flex items-start gap-2"><span className="text-red-400 mt-1">❌</span> <strong>Reputation Problems:</strong> Venues known for not paying DJs</li>
+            </ul>
+          </div>
+
           <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-6">
-            <h4 className="text-lg font-bold text-green-500 mb-4">🎯 The Venue Opportunity Scorecard</h4>
-            <p className="mb-4">Rate each potential venue on these factors (1-10 scale):</p>
+            <h4 className="text-lg font-bold text-green-500 mb-4">🎯 The 12-Factor Venue Opportunity Scorecard</h4>
+            <p className="mb-4">Rate each venue on these 12 factors (1-10 scale). Total possible score: 120 points.</p>
             
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div>
-                <h5 className="font-semibold mb-2">Alignment Factors:</h5>
-                <ul className="text-sm space-y-1 ml-4">
-                  <li>• <strong>Genre Match</strong> - How well does their music match your style?</li>
-                  <li>• <strong>Crowd Fit</strong> - Does their demographic match your target audience?</li>
-                  <li>• <strong>Brand Alignment</strong> - Does their venue image match your DJ persona?</li>
-                  <li>• <strong>Time Slots</strong> - Do they have openings during your preferred times?</li>
-                </ul>
+                <h5 className="font-semibold text-green-500 mb-3">MUSICAL ALIGNMENT (40 points max)</h5>
+                <div className="space-y-2 ml-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm"><strong>Genre Match:</strong> How well does their music match your style?</span>
+                    <span className="text-xs bg-green-500/20 px-2 py-1 rounded">1-10</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm"><strong>Energy Level:</strong> Do they play high-energy or chill music?</span>
+                    <span className="text-xs bg-green-500/20 px-2 py-1 rounded">1-10</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm"><strong>Crowd Response:</strong> Does their audience dance to your genre?</span>
+                    <span className="text-xs bg-green-500/20 px-2 py-1 rounded">1-10</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm"><strong>Time Slot Fit:</strong> Do they need DJs during your preferred hours?</span>
+                    <span className="text-xs bg-green-500/20 px-2 py-1 rounded">1-10</span>
+                  </div>
+                </div>
               </div>
               
               <div>
-                <h5 className="font-semibold mb-2">Business Factors:</h5>
-                <ul className="text-sm space-y-1 ml-4">
-                  <li>• <strong>Pay Range</strong> - Do they offer rates that meet your current tier?</li>
-                  <li>• <strong>Professionalism</strong> - Do they treat DJs well and pay on time?</li>
-                  <li>• <strong>Growth Potential</strong> - Could this lead to better opportunities?</li>
-                  <li>• <strong>Network Value</strong> - Will this connect you with other industry contacts?</li>
-                </ul>
+                <h5 className="font-semibold text-green-500 mb-3">BUSINESS VIABILITY (40 points max)</h5>
+                <div className="space-y-2 ml-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm"><strong>Pay Range:</strong> Do they offer rates that meet your tier?</span>
+                    <span className="text-xs bg-blue-500/20 px-2 py-1 rounded">1-10</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm"><strong>Payment Reliability:</strong> Do they pay DJs on time?</span>
+                    <span className="text-xs bg-blue-500/20 px-2 py-1 rounded">1-10</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm"><strong>Booking Frequency:</strong> How often do they book new DJs?</span>
+                    <span className="text-xs bg-blue-500/20 px-2 py-1 rounded">1-10</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm"><strong>Professional Treatment:</strong> Do they treat DJs professionally?</span>
+                    <span className="text-xs bg-blue-500/20 px-2 py-1 rounded">1-10</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <h5 className="font-semibold text-green-500 mb-3">STRATEGIC VALUE (40 points max)</h5>
+                <div className="space-y-2 ml-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm"><strong>Network Value:</strong> Will this connect you with industry contacts?</span>
+                    <span className="text-xs bg-purple-500/20 px-2 py-1 rounded">1-10</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm"><strong>Growth Potential:</strong> Could this lead to better opportunities?</span>
+                    <span className="text-xs bg-purple-500/20 px-2 py-1 rounded">1-10</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm"><strong>Brand Alignment:</strong> Does their image match your DJ persona?</span>
+                    <span className="text-xs bg-purple-500/20 px-2 py-1 rounded">1-10</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm"><strong>Content Opportunity:</strong> Can you create good social content here?</span>
+                    <span className="text-xs bg-purple-500/20 px-2 py-1 rounded">1-10</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="bg-gray-700 border border-gray-700 rounded-lg p-4">
-            <h4 className="text-lg font-bold mb-3">Scoring Guidelines</h4>
+          <div className="bg-gray-700 border border-gray-700 rounded-lg p-6">
+            <h4 className="text-lg font-bold mb-4">📈 Scoring System & Action Plan</h4>
+            <div className="space-y-4">
+              <div className="bg-green-900/20 border-l-4 border-green-500 p-4">
+                <h5 className="font-semibold text-green-400 mb-2">🎯 90-120 Points: PRIORITY TARGETS</h5>
+                <p className="text-sm mb-2"><strong>Action:</strong> Pursue aggressively with personalized outreach</p>
+                <ul className="text-sm space-y-1">
+                  <li>• Research their recent events and DJs</li>
+                  <li>• Create venue-specific mix</li>
+                  <li>• Follow up every 3-4 weeks</li>
+                  <li>• Attend their events to network</li>
+                </ul>
+              </div>
+              
+              <div className="bg-blue-900/20 border-l-4 border-blue-500 p-4">
+                <h5 className="font-semibold text-blue-400 mb-2">✅ 70-89 Points: GOOD OPPORTUNITIES</h5>
+                <p className="text-sm mb-2"><strong>Action:</strong> Include in regular outreach rotation</p>
+                <ul className="text-sm space-y-1">
+                  <li>• Send professional email with standard promo pack</li>
+                  <li>• Follow up every 6-8 weeks</li>
+                  <li>• Monitor their social media for opportunities</li>
+                </ul>
+              </div>
+              
+              <div className="bg-yellow-900/20 border-l-4 border-yellow-500 p-4">
+                <h5 className="font-semibold text-yellow-400 mb-2">⚠️ 50-69 Points: LOW PRIORITY</h5>
+                <p className="text-sm mb-2"><strong>Action:</strong> Contact only when you have extra time</p>
+                <ul className="text-sm space-y-1">
+                  <li>• Send basic email if convenient</li>
+                  <li>• No follow-up unless they respond</li>
+                  <li>• Re-evaluate in 6 months</li>
+                </ul>
+              </div>
+              
+              <div className="bg-red-900/20 border-l-4 border-red-500 p-4">
+                <h5 className="font-semibold text-red-400 mb-2">❌ Below 50 Points: SKIP ENTIRELY</h5>
+                <p className="text-sm mb-2"><strong>Action:</strong> Don't waste your time</p>
+                <ul className="text-sm space-y-1">
+                  <li>• Focus energy on higher-scoring venues</li>
+                  <li>• Remove from contact list</li>
+                  <li>• Only reconsider if they change significantly</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
+            <h4 className="text-lg font-bold text-yellow-400 mb-3">💡 Pro Scoring Tips</h4>
             <ul className="space-y-2 text-sm">
-              <li className="flex items-start gap-2"><span className="text-green-400 mt-1">✅</span> <strong>65-80:</strong> Priority target, pursue aggressively</li>
-              <li className="flex items-start gap-2"><span className="text-blue-400 mt-1">ℹ️</span> <strong>50-64:</strong> Good opportunity, include in regular outreach</li>
-              <li className="flex items-start gap-2"><span className="text-yellow-400 mt-1">⚠️</span> <strong>35-49:</strong> Low priority, contact only if time allows</li>
-              <li className="flex items-start gap-2"><span className="text-red-400 mt-1">❌</span> <strong>Below 35:</strong> Skip entirely</li>
+              <li className="flex items-start gap-2"><span className="text-yellow-400 mt-1">•</span> <strong>Be Honest:</strong> Don't inflate scores because you want to play there</li>
+              <li className="flex items-start gap-2"><span className="text-yellow-400 mt-1">•</span> <strong>Research First:</strong> Visit their social media, read reviews, talk to other DJs</li>
+              <li className="flex items-start gap-2"><span className="text-yellow-400 mt-1">•</span> <strong>Update Regularly:</strong> Venues change - re-score every 6 months</li>
+              <li className="flex items-start gap-2"><span className="text-yellow-400 mt-1">•</span> <strong>Track Results:</strong> Note which score ranges actually book you</li>
             </ul>
           </div>
         </div>
@@ -939,7 +1468,7 @@ export const FreeCourseAccess: React.FC<{ preview?: boolean }> = ({ preview = fa
     
     return content[moduleId] || (
       <div className="text-center py-8">
-        <p className="text-gray-300">Content for this module is being prepared. Check back soon!</p>
+        <p style={{ color: 'var(--text-secondary)' }}>Content for this module is being prepared. Check back soon!</p>
       </div>
     );
   };
@@ -966,11 +1495,10 @@ export const FreeCourseAccess: React.FC<{ preview?: boolean }> = ({ preview = fa
       return (
         <div className="text-center py-12">
           <LockIcon className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-          <h3 className="text-xl font-semibold text-white mb-2">Premium Content</h3>
+          <h3 className="text-xl font-semibold text-white mb-2">Module Locked</h3>
           <p className="text-gray-300 mb-6">
-            Upgrade to access advanced DJ techniques and business strategies.
+            Complete the previous module's quiz to unlock this content.
           </p>
-          <Button>Upgrade to Premium</Button>
         </div>
       );
     }
@@ -999,20 +1527,16 @@ export const FreeCourseAccess: React.FC<{ preview?: boolean }> = ({ preview = fa
                 <h3 className="text-lg font-semibold text-white">{module.title}</h3>
                 <p className="text-gray-300">{module.description}</p>
               </div>
-              <Button
-                onClick={() => markModuleComplete(module.id)}
-                disabled={isModuleCompleted(module.id)}
-                className={isModuleCompleted(module.id) ? 'bg-green-500' : ''}
-              >
-                {isModuleCompleted(module.id) ? (
-                  <>
-                    <CheckIcon className="w-4 h-4 mr-2" />
-                    Completed
-                  </>
-                ) : (
-                  'Mark Complete'
-                )}
-              </Button>
+              {isModuleCompleted(module.id) ? (
+                <Button disabled className="bg-green-500">
+                  <CheckIcon className="w-4 h-4 mr-2" />
+                  Completed
+                </Button>
+              ) : (
+                <Button onClick={() => setShowQuiz(module.id)}>
+                  Take Quiz
+                </Button>
+              )}
             </div>
           </div>
         );
@@ -1022,26 +1546,22 @@ export const FreeCourseAccess: React.FC<{ preview?: boolean }> = ({ preview = fa
           <div className="space-y-4">
             <div className="prose prose-invert max-w-none">
               <h3 className="text-xl font-bold text-white">{module.title}</h3>
-              <div className="bg-gray-800 p-6 rounded-lg">
-                <div className="space-y-6 text-white">
+              <div className="bg-[color:var(--surface)] p-6 rounded-lg">
+                <div className="space-y-6 text-[color:var(--text-primary)] [&_p]:text-[color:var(--text-primary)] [&_h4]:text-[color:var(--text-primary)] [&_h5]:text-[color:var(--text-primary)] [&_li]:text-[color:var(--text-primary)] [&_.bg-gray-700]:bg-[color:var(--surface-alt)] [&_.text-gray-300]:text-[color:var(--text-secondary)] [&_.border-gray-700]:border-[color:var(--border)]">
                   {renderModuleArticleContent(module.id)}
                 </div>
               </div>
             </div>
-            <Button
-              onClick={() => markModuleComplete(module.id)}
-              disabled={isModuleCompleted(module.id)}
-              className={isModuleCompleted(module.id) ? 'bg-green-500' : ''}
-            >
-              {isModuleCompleted(module.id) ? (
-                <>
-                  <CheckIcon className="w-4 h-4 mr-2" />
-                  Completed
-                </>
-              ) : (
-                'Mark Complete'
-              )}
-            </Button>
+            {isModuleCompleted(module.id) ? (
+              <Button disabled className="bg-green-500">
+                <CheckIcon className="w-4 h-4 mr-2" />
+                Completed
+              </Button>
+            ) : (
+              <Button onClick={() => setShowQuiz(module.id)}>
+                Take Quiz
+              </Button>
+            )}
           </div>
         );
 
@@ -1208,26 +1728,26 @@ export const FreeCourseAccess: React.FC<{ preview?: boolean }> = ({ preview = fa
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-gray-900 text-white min-h-screen">
+    <div className="max-w-6xl mx-auto p-6" style={{ backgroundColor: 'var(--bg)', color: 'var(--text-primary)', minHeight: '100vh' }}>
       {/* Course Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">
+        <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
           DJ Bookings Blueprint - Complete Course
         </h1>
-        <p className="text-gray-300 mb-4">
+        <p className="mb-4" style={{ color: 'var(--text-secondary)' }}>
           The complete system for landing high-paying DJ gigs. Master professional communication, promo pack creation, venue research, networking strategies, rate negotiation, and business building that generate consistent bookings and build your DJ empire.
         </p>
         
         {/* Progress Bar */}
-        <div className="bg-gray-800 rounded-lg p-4">
+        <div className="bg-[color:var(--surface)] rounded-lg p-4">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-white">Course Progress</span>
-            <span className="text-sm text-gray-300">{getCompletionPercentage()}% Complete</span>
+            <span className="text-sm font-medium text-[color:var(--text-primary)]">Course Progress</span>
+            <span className="text-sm text-[color:var(--text-secondary)]">{getCompletionPercentage()}% Complete</span>
           </div>
           <div className="w-full bg-gray-700 rounded-full h-2">
             <div 
               className="bg-green-500 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${getCompletionPercentage()}%` }}
+              style={{ width: `${getCompletionPercentage()}%`, backgroundColor: '#10B981' }}
             ></div>
           </div>
         </div>
@@ -1241,9 +1761,12 @@ export const FreeCourseAccess: React.FC<{ preview?: boolean }> = ({ preview = fa
             {FREE_COURSE_MODULES.map((module) => (
               <button
                 key={module.id}
-                onClick={() => setSelectedModule(module)}
+                onClick={() => canAccessModule(module) && setSelectedModule(module)}
+                disabled={!canAccessModule(module)}
                 className={`w-full text-left p-4 rounded-lg border transition-all ${
-                  selectedModule?.id === module.id
+                  !canAccessModule(module)
+                    ? 'border-gray-600 bg-gray-800 opacity-50 cursor-not-allowed'
+                    : selectedModule?.id === module.id
                     ? 'border-green-500 bg-green-500/10'
                     : 'border-gray-700 bg-gray-800 hover:border-green-500/50'
                 }`}
@@ -1256,6 +1779,7 @@ export const FreeCourseAccess: React.FC<{ preview?: boolean }> = ({ preview = fa
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
+                    {!canAccessModule(module) && <LockIcon className="w-4 h-4 text-gray-500" />}
                     {isModuleCompleted(module.id) && <CheckIcon className="w-4 h-4 text-green-500" />}
                   </div>
                 </div>
@@ -1286,6 +1810,38 @@ export const FreeCourseAccess: React.FC<{ preview?: boolean }> = ({ preview = fa
         </div>
       </div>
 
+      {/* Quiz Modal */}
+      {showQuiz && moduleQuizzes[showQuiz] && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-gray-800 rounded-xl p-8 max-w-md mx-4 border border-gray-700">
+            <h3 className="text-xl font-bold text-white mb-4">Module Quiz</h3>
+            <p className="text-gray-300 mb-6">{moduleQuizzes[showQuiz].question}</p>
+            <div className="space-y-3 mb-6">
+              {moduleQuizzes[showQuiz].options.map((option, index) => (
+                <label key={index} className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name={showQuiz}
+                    value={index}
+                    onChange={(e) => setQuizAnswers({...quizAnswers, [showQuiz]: e.target.value})}
+                    className="text-green-500"
+                  />
+                  <span className="text-gray-300">{option}</span>
+                </label>
+              ))}
+            </div>
+            <div className="flex gap-3">
+              <Button onClick={() => handleQuizSubmit(showQuiz)} disabled={!quizAnswers[showQuiz]}>
+                Submit Answer
+              </Button>
+              <Button variant="secondary" onClick={() => setShowQuiz(null)}>
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Course Completion Certificate */}
       {getCompletionPercentage() === 100 && (
         <div className="mt-8 bg-gradient-to-r from-[color:var(--accent)]/20 to-purple-500/20 rounded-lg p-6 text-center">
@@ -1296,7 +1852,10 @@ export const FreeCourseAccess: React.FC<{ preview?: boolean }> = ({ preview = fa
           <p className="text-gray-300 mb-4">
             You've completed the DJ Fundamentals course. You're ready to start your DJ journey!
           </p>
-          <Button>Download Certificate</Button>
+          <div className="flex gap-4 justify-center">
+            <Button onClick={generateCertificatePNG}>Download PNG</Button>
+            <Button onClick={generateCertificateHTML} variant="secondary">Download HTML (Print as PDF)</Button>
+          </div>
         </div>
       )}
     </div>

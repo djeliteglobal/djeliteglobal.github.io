@@ -5,7 +5,7 @@ import { LanguageSwitcher } from '../LanguageSwitcher';
 import { TinderStyleProfileEditor } from '../profile/TinderStyleProfileEditor';
 import { useMatchStore } from '../../stores/matchStore';
 import { getUserPlan } from '../../services/subscriptionService';
-import { NAV_ITEMS, SunIcon, MoonIcon, SearchIcon, MenuIcon, CheckCircleIcon, ChevronDownIcon, Logo, LockIcon } from '../../constants/platform';
+import { NAV_ITEMS, SunIcon, MoonIcon, SearchIcon, MenuIcon, CheckCircleIcon, ChevronDownIcon, Logo, LockIcon, StarIcon } from '../../constants/platform';
 import { supabase } from '../../config/supabase';
 import { loadCourses } from '../../constants/platform';
 import type { Course, FaqItem, PricingPlan, Opportunity } from '../../types/platform';
@@ -157,6 +157,13 @@ export const TopBar: React.FC = () => {
         <>
         <header className="flex h-16 items-center justify-between border-b border-[color:var(--border)] bg-[color:var(--surface)] px-4 md:px-8">
             <div className="flex items-center gap-4">
+                <button 
+                    onClick={() => (window as any).toggleMobileSidebar?.()}
+                    data-mobile-toggle
+                    className="md:hidden p-2 rounded-lg hover:bg-[color:var(--surface-alt)] text-[color:var(--text-secondary)]"
+                >
+                    <MenuIcon className="h-6 w-6" />
+                </button>
             </div>
             <div className="flex flex-1 items-center justify-end gap-4">
                 <SearchComponent />
@@ -184,17 +191,36 @@ export const TopBar: React.FC = () => {
 export const SideNav: React.FC = () => {
     const { appState, navigate } = useContext(AppContext)!;
     const { currentUser, logout } = useAuth();
+    const [isMobileOpen, setIsMobileOpen] = useState(false);
 
     const [userPlan, setUserPlan] = useState('free');
     const { connectionLimit } = useMatchStore();
     
     useEffect(() => {
         getUserPlan().then(setUserPlan);
-    }, []);
+        // Expose toggle function globally
+        (window as any).toggleMobileSidebar = () => setIsMobileOpen(!isMobileOpen);
+        
+        // Close sidebar when clicking outside on mobile
+        const handleClickOutside = (event: MouseEvent) => {
+            if (isMobileOpen && !event.target?.closest('nav') && !event.target?.closest('button[data-mobile-toggle]')) {
+                setIsMobileOpen(false);
+            }
+        };
+        
+        if (isMobileOpen) {
+            document.addEventListener('click', handleClickOutside);
+            return () => document.removeEventListener('click', handleClickOutside);
+        }
+    }, [isMobileOpen]);
     
     return (
         <>
-        <nav className={`w-64 border-r border-[color:var(--border)] bg-[color:var(--surface)] flex-shrink-0 relative z-20`}>
+
+        
+        <nav className={`w-64 border-r border-[color:var(--border)] bg-[color:var(--surface)] flex-shrink-0 z-40 transition-transform duration-300 ${
+            isMobileOpen ? 'fixed left-0 top-0 h-full transform translate-x-0' : 'fixed left-0 top-0 h-full transform -translate-x-full'
+        } md:relative md:translate-x-0 md:block`}>
             <div className="flex h-16 items-center border-b border-[color:var(--border)] px-6">
                  <Logo />
             </div>
@@ -202,7 +228,10 @@ export const SideNav: React.FC = () => {
                 {NAV_ITEMS.map((item) => (
                     <button
                         key={item.name}
-                        onClick={() => navigate(item.page as any)}
+                        onClick={() => {
+                            navigate(item.page as any);
+                            setIsMobileOpen(false);
+                        }}
                         className={`flex items-center gap-3 rounded-md px-4 py-3 text-sm font-medium transition-colors ${
                             appState.page === item.page
                                 ? 'bg-[color:var(--accent)] text-black'
@@ -256,12 +285,16 @@ export const CourseCard: React.FC<{ course: Course }> = ({ course }) => {
   const { navigate } = useContext(AppContext)!;
 
   return (
-    <div onClick={() => navigate('course_detail', course.id)} className="group cursor-pointer overflow-hidden rounded-xl bg-[color:var(--surface)] shadow-soft transition-all duration-300 hover:shadow-elev hover:-translate-y-1 border border-[color:var(--border)]">
+    <div onClick={() => course.id === 1 ? navigate('free_course_access') : navigate('course_detail', course.id)} className="group cursor-pointer overflow-hidden rounded-xl bg-[color:var(--surface)] shadow-soft transition-all duration-300 hover:shadow-elev hover:-translate-y-1 border border-[color:var(--border)]">
       <div className="relative">
-        <img src={course.imageUrl} alt={course.title} className="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+        <img src={course.imageUrl} alt={course.title} className="h-48 w-full object-cover object-center transition-transform duration-300 group-hover:scale-105" />
         <div className="absolute top-3 left-3 rounded-full bg-[color:var(--surface)]/80 px-3 py-1 text-xs font-semibold text-[color:var(--text-primary)] backdrop-blur-sm">{course.level}</div>
         <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center">
-          <LockIcon className="w-3 h-3 text-white" />
+          {course.id === 1 ? (
+            <StarIcon className="w-3 h-3 text-yellow-400" />
+          ) : (
+            <LockIcon className="w-3 h-3 text-white" />
+          )}
         </div>
       </div>
       <div className="p-4">

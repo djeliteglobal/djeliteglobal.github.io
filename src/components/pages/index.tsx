@@ -386,15 +386,54 @@ export const CoursesPage: React.FC = () => {
             setShowFreeCourse(true);
         }
         
-        loadCourses()
-            .then(setCourses)
-            .catch(err => {
+        const loadCoursesWithProgress = async () => {
+            try {
+                const coursesData = await loadCourses();
+                
+                // Load progress for DJ Bookings Blueprint course (ID 1)
+                if (currentUser) {
+                    const { supabase } = await import('../../services/profileService');
+                    const { data: profile } = await supabase
+                        .from('profiles')
+                        .select('id')
+                        .eq('user_id', currentUser.email)
+                        .single();
+                    
+                    if (profile) {
+                        const { data: progress } = await supabase
+                            .from('course_progress')
+                            .select('*')
+                            .eq('user_id', profile.id);
+                        
+                        // Calculate progress for course ID 1 (DJ Bookings Blueprint)
+                        const totalModules = 12; // Total modules in FreeCourseAccess
+                        const completedModules = progress?.length || 0;
+                        const progressPercentage = Math.round((completedModules / totalModules) * 100);
+                        
+                        // Update course progress
+                        const updatedCourses = coursesData.map(course => 
+                            course.id === 1 
+                                ? { ...course, progress: progressPercentage }
+                                : course
+                        );
+                        setCourses(updatedCourses);
+                    } else {
+                        setCourses(coursesData);
+                    }
+                } else {
+                    setCourses(coursesData);
+                }
+            } catch (err) {
                 console.error('Courses error:', err);
                 setError('Failed to load courses');
                 setCourses([]);
-            })
-            .finally(() => setLoading(false));
-    }, []);
+            } finally {
+                setLoading(false);
+            }
+        };
+        
+        loadCoursesWithProgress();
+    }, [currentUser]);
 
     // Auto-open free course if URL path matches
     useEffect(() => {

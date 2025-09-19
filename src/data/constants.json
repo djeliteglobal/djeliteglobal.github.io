@@ -2,12 +2,12 @@
   "courses": [
     {
       "id": 1,
-      "title": "The DJ Booking Blueprint: 7 Insider Secrets to Landing Your First Paid Gigs",
+      "title": "DJ Bookings Blueprint - Complete Course",
       "description": "Register to unlock the exact strategies top DJs use to get booked consistently - includes real email templates and club contact methods that actually work.",
       "duration": "7 lessons",
       "level": "Beginner",
       "instructor": "DJ Elite Team",
-      "imageUrl": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDQwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjMUYyOTM3Ii8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE1MCIgcj0iNDAiIGZpbGw9IiNGRkQ3MDAiLz4KPHJlY3QgeD0iMTYwIiB5PSIyMDAiIHdpZHRoPSI4MCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNGRkQ3MDAiLz4KPHRleHQgeD0iMjAwIiB5PSIzNDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyNCIgZmlsbD0iI0ZGRDcwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Qk9PS0lORzwvdGV4dD4KPC9zdmc+",
+      "imageUrl": "https://images.unsplash.com/photo-1569315888779-22ceb4303f35",
       "progress": 0,
       "isLocked": false,
       "category": "Business",
