@@ -28,6 +28,15 @@ export interface DJProfile {
     phone?: string;
   };
   premium_badge?: boolean;
+  // Matching engine properties
+  matchScore?: number;
+  matchReasons?: string[];
+  compatibility?: {
+    musical: number;
+    geographic: number;
+    social: number;
+    activity: number;
+  };
 }
 
 export interface SwipeResult {

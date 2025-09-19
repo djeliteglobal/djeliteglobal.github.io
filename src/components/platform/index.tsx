@@ -6,6 +6,8 @@ import { TinderStyleProfileEditor } from '../profile/TinderStyleProfileEditor';
 import { useMatchStore } from '../../stores/matchStore';
 import { getUserPlan } from '../../services/subscriptionService';
 import { NAV_ITEMS, SunIcon, MoonIcon, SearchIcon, MenuIcon, CheckCircleIcon, ChevronDownIcon, Logo, LockIcon } from '../../constants/platform';
+import { supabase } from '../../config/supabase';
+import { loadCourses } from '../../constants/platform';
 import type { Course, FaqItem, PricingPlan, Opportunity } from '../../types/platform';
 
 // Button Component
@@ -28,6 +30,119 @@ export const Button: React.FC<ButtonProps> = ({ variant = 'primary', children, c
   );
 };
 
+const SearchComponent: React.FC = () => {
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState<any[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const [showResults, setShowResults] = useState(false);
+    const { navigate } = useContext(AppContext)!;
+    
+    const searchDatabase = async (query: string) => {
+        if (!query.trim()) {
+            setSearchResults([]);
+            setShowResults(false);
+            return;
+        }
+        
+        setIsSearching(true);
+        try {
+            const [courses, opportunities] = await Promise.all([
+                loadCourses(),
+                supabase.from('profiles').select('*').ilike('dj_name', `%${query}%`).limit(5)
+            ]);
+            
+            const courseResults = courses.filter(course => 
+                course.title.toLowerCase().includes(query.toLowerCase()) ||
+                course.instructor.toLowerCase().includes(query.toLowerCase()) ||
+                course.description?.toLowerCase().includes(query.toLowerCase())
+            ).slice(0, 3);
+            
+            const profileResults = opportunities.data?.map(profile => ({
+                ...profile,
+                type: 'profile'
+            })) || [];
+            
+            setSearchResults([
+                ...courseResults.map(course => ({ ...course, type: 'course' })),
+                ...profileResults
+            ]);
+            setShowResults(true);
+        } catch (error) {
+            console.error('Search error:', error);
+        } finally {
+            setIsSearching(false);
+        }
+    };
+    
+    useEffect(() => {
+        const debounce = setTimeout(() => {
+            searchDatabase(searchQuery);
+        }, 300);
+        
+        return () => clearTimeout(debounce);
+    }, [searchQuery]);
+    
+    const handleResultClick = (result: any) => {
+        if (result.type === 'course') {
+            navigate('course_detail', result.id);
+        } else {
+            navigate('opportunities');
+        }
+        setShowResults(false);
+        setSearchQuery('');
+    };
+    
+    return (
+        <div className="relative hidden sm:block w-full max-w-xs">
+            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[color:var(--muted)]" />
+            <input
+                type="search"
+                placeholder="Search courses, DJs..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => searchQuery && setShowResults(true)}
+                onBlur={() => setTimeout(() => setShowResults(false), 200)}
+                className="w-full rounded-lg border border-[color:var(--border)] bg-[color:var(--surface-alt)] py-2 pl-10 pr-4 text-[color:var(--text-primary)] placeholder-[color:var(--muted)] focus:border-[color:var(--accent)] focus:outline-none focus:ring-1 focus:ring-[color:var(--accent)]"
+            />
+            
+            {showResults && (searchResults.length > 0 || isSearching) && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-[color:var(--surface)] border border-[color:var(--border)] rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
+                    {isSearching ? (
+                        <div className="p-4 text-center">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[color:var(--accent)] mx-auto"></div>
+                        </div>
+                    ) : (
+                        searchResults.map((result, index) => (
+                            <div
+                                key={`${result.type}-${result.id}`}
+                                onClick={() => handleResultClick(result)}
+                                className="p-3 hover:bg-[color:var(--surface-alt)] cursor-pointer border-b border-[color:var(--border)] last:border-b-0"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className={`w-2 h-2 rounded-full ${
+                                        result.type === 'course' ? 'bg-blue-500' : 'bg-green-500'
+                                    }`}></div>
+                                    <div className="flex-1">
+                                        <p className="font-medium text-[color:var(--text-primary)]">
+                                            {result.type === 'course' ? result.title : result.dj_name}
+                                        </p>
+                                        <p className="text-sm text-[color:var(--text-secondary)]">
+                                            {result.type === 'course' ? `Course by ${result.instructor}` : `DJ • ${result.location || 'Location not set'}`}
+                                        </p>
+                                    </div>
+                                    <span className="text-xs bg-[color:var(--accent)]/20 text-[color:var(--accent)] px-2 py-1 rounded-full">
+                                        {result.type === 'course' ? 'Course' : 'DJ'}
+                                    </span>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+            )}
+        </div>
+    );
+};
+
 export const TopBar: React.FC = () => {
     const { appState, setAppState, navigate } = useContext(AppContext)!;
     const { currentUser } = useAuth();
@@ -36,30 +151,15 @@ export const TopBar: React.FC = () => {
         setAppState(prev => ({...prev, theme: prev.theme === 'dark' ? 'light' : 'dark' }));
     };
 
-    const toggleSidebar = () => {
-        setAppState(prev => ({...prev, isSidebarOpen: !prev.isSidebarOpen }));
-    }
+
 
     return (
         <>
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-[color:var(--border)] bg-[color:var(--surface)]/80 px-4 backdrop-blur-sm md:px-8">
+        <header className="flex h-16 items-center justify-between border-b border-[color:var(--border)] bg-[color:var(--surface)] px-4 md:px-8">
             <div className="flex items-center gap-4">
-                <button onClick={toggleSidebar} className="md:hidden text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]">
-                    <MenuIcon className="h-6 w-6" />
-                </button>
-                 <div className="hidden md:block">
-                    <Logo />
-                </div>
             </div>
             <div className="flex flex-1 items-center justify-end gap-4">
-                <div className="relative hidden sm:block w-full max-w-xs">
-                    <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[color:var(--muted)]" />
-                    <input
-                        type="search"
-                        placeholder="Search courses, opportunities..."
-                        className="w-full rounded-lg border border-[color:var(--border)] bg-[color:var(--surface-alt)] py-2 pl-10 pr-4 text-[color:var(--text-primary)] placeholder-[color:var(--muted)] focus:border-[color:var(--accent)] focus:outline-none focus:ring-1 focus:ring-[color:var(--accent)]"
-                    />
-                </div>
+                <SearchComponent />
                 <button onClick={toggleTheme} className="flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--surface-alt)] text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]">
                     {appState.theme === 'dark' ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
                 </button>
@@ -94,8 +194,8 @@ export const SideNav: React.FC = () => {
     
     return (
         <>
-        <nav className={`fixed z-40 md:z-auto md:relative inset-y-0 left-0 w-64 border-r border-[color:var(--border)] bg-[color:var(--surface)] transition-transform duration-300 ease-in-out md:translate-x-0 ${appState.isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
-            <div className="flex h-16 items-center border-b border-[color:var(--border)] px-6 md:hidden">
+        <nav className={`w-64 border-r border-[color:var(--border)] bg-[color:var(--surface)] flex-shrink-0 relative z-20`}>
+            <div className="flex h-16 items-center border-b border-[color:var(--border)] px-6">
                  <Logo />
             </div>
             <div className="flex flex-col p-4">
@@ -114,7 +214,7 @@ export const SideNav: React.FC = () => {
                     </button>
                 ))}
             </div>
-             <div className="absolute bottom-0 left-0 w-full p-4 space-y-2">
+             <div className="absolute bottom-0 left-0 w-full p-4 space-y-2 z-10">
                 <button 
                   onClick={() => navigate('profile')}
                   className={`flex w-full items-center gap-3 rounded-md px-4 py-3 text-sm font-medium transition-colors hover:bg-[color:var(--surface-alt)] hover:text-[color:var(--text-primary)] text-[color:var(--text-secondary)]`}>

@@ -2,6 +2,7 @@ import { supabase } from '../config/supabase';
 import { sanitizeForLog, validateInput } from '../utils/sanitizer';
 import { migrateDjNames } from '../utils/migrateDjNames';
 import { matchingEngine } from './matchingEngine';
+import { ApiError } from '../hooks/useApiError';
 
 // Export supabase for other services
 export { supabase };
@@ -88,7 +89,7 @@ export const fetchSwipeProfiles = async (): Promise<DJProfile[]> => {
 
   if (error) {
     console.error('Profile fetch error:', error);
-    return profileCache;
+    throw new ApiError(`Failed to fetch swipe profiles: ${error.message}`, { statusCode: error.code as any });
   }
   
   // Transform and cache
@@ -121,10 +122,13 @@ export const testSupabaseConnection = async (): Promise<boolean> => {
   try {
     const { data, error } = await supabase.from('events').select('count').limit(1);
     console.log('🔍 SUPABASE TEST:', { data, error });
-    return !error;
-  } catch (error) {
+    if (error) {
+      throw new ApiError(`Supabase connection test failed: ${error.message}`, { statusCode: error.code as any });
+    }
+    return true;
+  } catch (error: any) {
     console.error('🚨 SUPABASE CONNECTION FAILED:', error);
-    return false;
+    throw new ApiError(`Supabase connection failed: ${error.message}`, { isNetworkError: true });
   }
 };
 
@@ -239,7 +243,9 @@ export const createProfile = async (profileData: {
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) {
+    throw new ApiError(`Failed to create profile: ${error.message}`, { statusCode: error.code as any });
+  }
   return profile;
 };
 
@@ -272,7 +278,9 @@ export const uploadProfileImage = async (file: File): Promise<string> => {
     .from('profile-images')
     .upload(fileName, file);
 
-  if (error) throw error;
+  if (error) {
+    throw new ApiError(`Failed to upload image: ${error.message}`, { statusCode: error.code as any });
+  }
 
   const { data: { publicUrl } } = supabase.storage
     .from('profile-images')
@@ -309,11 +317,19 @@ export const getCurrentProfile = async (): Promise<DJProfile | null> => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data: profile } = await supabase
+  const { data: profile, error } = await supabase
     .from('profiles')
     .select('*')
     .eq('user_id', user.id)
     .single();
+
+  if (error) {
+    // If no profile found, it's not an error, just return null
+    if (error.code === 'PGRST116') { // No rows found
+      return null;
+    }
+    throw new ApiError(`Failed to get current profile: ${error.message}`, { statusCode: error.code as any });
+  }
 
   // Auto-sync Google profile picture if missing
   if (profile && !profile.profile_image_url) {
@@ -345,7 +361,7 @@ export const syncCurrentUserGoogleProfile = async (): Promise<void> => {
     
     if (error) {
       console.error('❌ SYNC ERROR: Failed to fetch profiles:', error);
-      return;
+      throw new ApiError(`Failed to sync Google profile: ${error.message}`, { statusCode: error.code as any });
     }
     
     if (!profiles || profiles.length === 0) {
@@ -397,6 +413,7 @@ export const syncCurrentUserGoogleProfile = async (): Promise<void> => {
           
           if (updateError) {
             console.error(`❌ SYNC ERROR: Failed to update profile ${profile.id}:`, updateError);
+            throw new ApiError(`Failed to update profile ${profile.id} during sync: ${updateError.message}`, { statusCode: updateError.code as any });
           } else {
             console.log(`✅ SYNC: Updated ${sanitizeForLog(updates.dj_name || profile.dj_name)} with Google data`);
           }
@@ -408,8 +425,9 @@ export const syncCurrentUserGoogleProfile = async (): Promise<void> => {
       }
     }
     
-  } catch (error) {
-    // Silent sync - don't spam console
+  } catch (error: any) {
+    console.error('❌ SYNC ERROR: General sync failure:', error);
+    throw new ApiError(`General sync failure: ${error.message}`, { isNetworkError: true });
   }
 };
 
@@ -552,7 +570,9 @@ export const undoSwipe = async (): Promise<void> => {
     .order('created_at', { ascending: false })
     .limit(1);
 
-  if (error) throw error;
+  if (error) {
+    throw new ApiError(`Failed to undo swipe: ${error.message}`, { statusCode: error.code as any });
+  }
 };
 
 export const deleteMatch = async (matchId: string): Promise<void> => {
@@ -606,7 +626,7 @@ export const deleteMatch = async (matchId: string): Promise<void> => {
         .eq('swiped_id', userProfile.id);
     } catch (deleteError) {
       console.error('Delete match error:', sanitizeForLog(deleteError));
-      throw deleteError;
+      throw new ApiError(`Failed to delete match: ${deleteError.message}`, { statusCode: (deleteError as any).code });
     }
       
     console.log('✨ HYBRID UNMATCH COMPLETE: Trigger + manual cleanup!');
@@ -662,9 +682,9 @@ export const subscribeToCareerAccelerator = async (email: string, firstName?: st
       console.error('Email function error:', emailError);
       // Don't throw - signup was successful even if emails failed
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error('Career Accelerator signup error:', err);
-    throw err;
+    throw new ApiError(`Career Accelerator signup failed: ${err.message}`, { statusCode: err.code as any, isNetworkError: err instanceof TypeError });
   }
 };
 
@@ -693,8 +713,8 @@ export const subscribeToNewsletter = async (email: string, firstName?: string): 
     }
     
     console.log('Newsletter subscription successful:', data);
-  } catch (err) {
+  } catch (err: any) {
     console.error('Newsletter subscription error:', err);
-    throw err;
+    throw new ApiError(`Newsletter subscription failed: ${err.message}`, { statusCode: err.code as any, isNetworkError: err instanceof TypeError });
   }
 };

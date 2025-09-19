@@ -1,4 +1,4 @@
-export type Page = 'dashboard' | 'courses' | 'course_detail' | 'community' | 'opportunities' | 'events' | 'premium_features' | 'settings' | 'landing';
+export type Page = 'dashboard' | 'free_course' | 'courses' | 'course_detail' | 'community' | 'opportunities' | 'events' | 'profile' | 'referrals' | 'premium' | 'premium_features' | 'settings' | 'landing';
 
 export interface AppState {
   theme: 'light' | 'dark';
@@ -74,4 +74,12 @@ export interface Opportunity {
   bio?: string;       // Profile bio
   age?: number;       // Age
   skills?: string[];  // Skills like Music Production, Event Production, etc.
+  matchScore?: number; // Match score from matching engine
+  matchReasons?: string[]; // Reasons for match
+  compatibility?: { // Compatibility breakdown
+    musical: number;
+    geographic: number;
+    social: number;
+    activity: number;
+  };
 }

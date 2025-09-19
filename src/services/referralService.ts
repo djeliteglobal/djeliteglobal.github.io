@@ -23,7 +23,7 @@ interface ReferralStats {
 }
 
 interface ReferralReward {
-  type: 'premium_days' | 'super_likes' | 'boosts';
+  type: 'premium_days' | 'super_likes' | 'boosts' | 'account_upgrade';
   amount: number;
   description: string;
 }
@@ -44,6 +44,11 @@ class ReferralService {
       type: 'boosts',
       amount: 1,
       description: '1 Free Boost (30 minutes)'
+    },
+    mega_referrer: {
+      type: 'account_upgrade',
+      amount: 1,
+      description: 'Free Account Upgrade to Pro Annual'
     }
   };
 
@@ -211,6 +216,8 @@ class ReferralService {
         reward = this.REFERRAL_REWARDS.multiple_referrals;
       } else if (referralCount >= 10 && referralCount % 5 === 0) {
         reward = this.REFERRAL_REWARDS.power_referrer;
+      } else if (referralCount >= 20) {
+        reward = this.REFERRAL_REWARDS.mega_referrer;
       }
 
       if (!reward) {
@@ -301,9 +308,83 @@ class ReferralService {
               boost_credits: reward.amount
             }, { onConflict: 'user_id' });
           break;
+
+        case 'account_upgrade':
+          // Upgrade user account to Pro Annual
+          await this.upgradeUserAccount(userId);
+          break;
       }
     } catch (error) {
       console.error('❌ REFERRAL: Error applying reward:', error);
+    }
+  }
+
+  /**
+   * Upgrade user account to Pro Annual
+   */
+  private async upgradeUserAccount(userId: string): Promise<void> {
+    try {
+      console.log('🚀 REFERRAL: Upgrading user account to Pro Annual:', userId);
+      
+      // Check if user already has a subscription
+      const { data: existingSubscription } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+
+      const oneYearFromNow = new Date();
+      oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+
+      if (existingSubscription) {
+        // Extend existing subscription
+        await supabase
+          .from('subscriptions')
+          .update({
+            status: 'active',
+            plan_type: 'Pro Annual',
+            current_period_end: oneYearFromNow.toISOString(),
+            is_referral_reward: true,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', userId);
+      } else {
+        // Create new subscription
+        await supabase
+          .from('subscriptions')
+          .insert({
+            user_id: userId,
+            status: 'active',
+            plan_type: 'Pro Annual',
+            current_period_end: oneYearFromNow.toISOString(),
+            is_referral_reward: true,
+            created_at: new Date().toISOString()
+          });
+      }
+
+      // Update user profile to reflect premium status
+      await supabase
+        .from('profiles')
+        .update({
+          plan: 'Pro Annual',
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', userId);
+
+      // Send upgrade notification
+      await supabase
+        .from('notifications')
+        .insert({
+          user_id: userId,
+          type: 'account_upgrade',
+          title: '🎉 Account Upgraded to Pro Annual!',
+          message: 'Congratulations! You\'ve earned a free Pro Annual upgrade through referrals. Enjoy all premium features for a full year!',
+          data: { upgrade_type: 'Pro Annual', is_referral_reward: true }
+        });
+
+      console.log('✅ REFERRAL: Account upgraded successfully for user:', userId);
+    } catch (error) {
+      console.error('❌ REFERRAL: Error upgrading user account:', error);
     }
   }
 

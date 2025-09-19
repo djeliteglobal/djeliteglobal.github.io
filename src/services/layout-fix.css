@@ -1,0 +1,53 @@
+/* Force all main content to use full width and left alignment */
+main {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+}
+
+main > * {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  text-align: left !important;
+  align-self: stretch !important;
+}
+
+/* Specific premium page fixes */
+[data-page="premium"] {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+  align-self: stretch !important;
+}
+
+[data-page="premium"] > * {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  text-align: left !important;
+}
+
+/* Fix sidebar overflow */
+nav {
+  overflow: hidden !important;
+  z-index: 20 !important;
+}
+
+main {
+  z-index: 10 !important;
+  position: relative !important;
+}
+
+/* Prevent sidebar content from extending beyond boundaries */
+nav > * {
+  max-width: 100% !important;
+  overflow: hidden !important;
+}

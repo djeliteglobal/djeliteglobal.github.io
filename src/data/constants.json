@@ -2,6 +2,220 @@
   "courses": [
     {
       "id": 1,
+      "title": "The DJ Booking Blueprint: 7 Insider Secrets to Landing Your First Paid Gigs",
+      "description": "Register to unlock the exact strategies top DJs use to get booked consistently - includes real email templates and club contact methods that actually work.",
+      "duration": "7 lessons",
+      "level": "Beginner",
+      "instructor": "DJ Elite Team",
+      "imageUrl": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDQwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjMUYyOTM3Ii8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE1MCIgcj0iNDAiIGZpbGw9IiNGRkQ3MDAiLz4KPHJlY3QgeD0iMTYwIiB5PSIyMDAiIHdpZHRoPSI4MCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNGRkQ3MDAiLz4KPHRleHQgeD0iMjAwIiB5PSIzNDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyNCIgZmlsbD0iI0ZGRDcwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Qk9PS0lORzwvdGV4dD4KPC9zdmc+",
+      "progress": 0,
+      "isLocked": false,
+      "category": "Business",
+      "isFeatured": true,
+      "lessons": [
+        {
+          "id": 1,
+          "title": "The Professional First Impression System",
+          "subtitle": "Why 90% of DJs Never Get Past the Email",
+          "duration": "15 min",
+          "content": {
+            "sections": [
+              {
+                "title": "The Reality Check",
+                "content": "Most DJs send emails like this: 'Hey, I'm a DJ and I'm good. Can I play at your club?'"
+              },
+              {
+                "title": "The 3-Part Professional Email Formula",
+                "content": "**Subject Line:** 'Available [DATE] - [YOUR DJ NAME] - [GENRE] Specialist'\n\n**Opening:** Reference something specific about their venue\n*'I was at [CLUB NAME] last Saturday during [RESIDENT DJ NAME]'s set and loved how the crowd responded to his transition from tech house to progressive around midnight.'*\n\n**Value Proposition:** Show you understand their business\n*'I specialize in reading crowds and building energy during those crucial 10pm-11pm warm-up hours when most DJs struggle to fill the dance floor.'*\n\n**Call to Action:** Make it easy to say yes\n*'I've attached a 20-minute mix that matches your venue's vibe. Would you be open to a 5-minute call this week to discuss upcoming dates?'*"
+              },
+              {
+                "title": "Pro Tip",
+                "content": "The biggest mistake DJs make is talking about themselves instead of solving the venue's problem. Clubs need DJs who can pack the floor, not DJs who just love music."
+              },
+              {
+                "title": "Action Item",
+                "content": "Research 3 clubs in your area. Find their resident DJs on social media and study what they play during different time slots."
+              }
+            ]
+          }
+        },
+        {
+          "id": 2,
+          "title": "The Promo Pack That Gets Opened",
+          "subtitle": "What Promoters Actually Look For (It's Not What You Think)",
+          "duration": "20 min",
+          "content": {
+            "sections": [
+              {
+                "title": "The Booking-Winning Promo Pack",
+                "content": "**1. Power Bio (2-3 sentences max):**\n*'[DJ NAME] has packed dance floors across [CITY] for [TIME PERIOD], specializing in [SPECIFIC GENRE/STYLE]. Known for reading crowds and building energy during prime hours, [he/she] has maintained residencies at [VENUE NAMES] and regularly draws [AUDIENCE SIZE] followers to events.'*\n\n**2. Strategic Mix Selection:**\n- 10-15 minutes max (they won't listen to more)\n- Peak-hour energy only (no warm-up tracks)\n- Recorded live with crowd noise (proves you can handle real gigs)\n- Match their venue's vibe exactly (research their usual sound)\n\n**3. Social Proof Package:**\n- Screenshots of packed dance floors\n- Testimonials from venue owners\n- Social media metrics\n- Previous booking confirmations\n\n**4. One Professional Photo:**\n- Action shot behind decks\n- Crowd visible in background\n- High resolution\n- Matches your brand aesthetic"
+              },
+              {
+                "title": "The Secret Most DJs Miss",
+                "content": "Promoters don't care about your technical skills - they care about your ability to pack their venue and keep people buying drinks."
+              },
+              {
+                "title": "Action Item",
+                "content": "Create a 12-minute peak-hour mix using only tracks that would work at your target venue. Record it during an actual party if possible."
+              }
+            ]
+          }
+        },
+        {
+          "id": 3,
+          "title": "The Venue Research Method",
+          "subtitle": "How to Find the Right Gigs (And Avoid Wasting Time)",
+          "duration": "18 min",
+          "content": {
+            "sections": [
+              {
+                "title": "The 4-Tier Venue Strategy",
+                "content": "**Tier 1 - Starting Points (Build Experience)**\n- Restaurants with late-night scenes\n- Private parties and events\n- Small bars with weekend DJ slots\n- Friend's events and gatherings\n\n**Tier 2 - Stepping Stones (Build Credibility)**\n- Lounges and cocktail bars\n- Daytime pool parties\n- Corporate events\n- Wedding receptions\n\n**Tier 3 - Target Venues (Build Reputation)**\n- Mid-sized nightclubs\n- Regular club nights at established venues\n- Music festivals (smaller stages)\n- Concert opening slots\n\n**Tier 4 - Elite Venues (Build Empire)**\n- Premium nightclubs\n- Main festival stages\n- Celebrity private events\n- International bookings"
+              },
+              {
+                "title": "The Research Process",
+                "content": "**Step 1: Map Your Local Scene**\n- Use Instagram to find venue hashtags\n- Check event listings on Facebook/Eventbrite\n- Follow local party photographers\n- Join city DJ groups on social media\n\n**Step 2: Identify Decision Makers**\n- Club owners (usually not on social media)\n- Talent bookers (check LinkedIn)\n- Event promoters (very active on Instagram)\n- Resident DJs (can provide introductions)\n\n**Step 3: Study Their Booking Patterns**\n- What genres do they book?\n- When do they book new talent?\n- What's their typical DJ fee range?\n- Do they book locals or import talent?"
+              },
+              {
+                "title": "Pro Insider Secret",
+                "content": "The best gigs come through warm introductions, not cold emails. Focus on building relationships with people already in the scene."
+              },
+              {
+                "title": "Action Item",
+                "content": "Create a spreadsheet with 20 venues in your area. Research and find the booking contact for each one."
+              }
+            ]
+          }
+        },
+        {
+          "id": 4,
+          "title": "The Networking Multiplication Effect",
+          "subtitle": "How One Connection Leads to 10 Gigs",
+          "duration": "22 min",
+          "content": {
+            "sections": [
+              {
+                "title": "The Relationship Hierarchy",
+                "content": "**Level 1: Other DJs (Your Future Referral Network)**\n- Support their events by attending\n- Share their mixes on social media\n- Offer to cover their gigs when they're unavailable\n- Collaborate on events and parties\n\n**Level 2: Photographers & Videographers**\n- They work every weekend at different venues\n- They know all the promoters and club owners\n- They can capture content for your promo pack\n- They often get asked 'do you know any good DJs?'\n\n**Level 3: Promoters & Event Organizers**\n- They book multiple DJs for different events\n- They know venue owners at multiple locations\n- They understand crowd demographics and preferences\n- They're always looking for reliable talent\n\n**Level 4: Venue Owners & Managers**\n- They have the final booking authority\n- They know other venue owners in the city\n- They can provide regular residency opportunities\n- They understand the business side of DJ bookings"
+              },
+              {
+                "title": "The Networking Action Plan",
+                "content": "**Week 1-2: Attend Everything**\n- Go to 5 different venues in your target market\n- Introduce yourself to the photographer/videographer\n- Stay until close to meet the DJ after their set\n- Follow everyone on social media before leaving\n\n**Week 3-4: Add Value First**\n- Share photos from events you attended\n- Tag venues and DJs in your posts\n- Offer to help promote upcoming events\n- Send congratulations messages for successful nights\n\n**Week 5-6: Make Strategic Connections**\n- Direct message DJs about specific tracks they played\n- Offer to collaborate on a mix or event\n- Ask photographers about their favorite venues to shoot\n- Comment meaningfully on promoters' posts\n\n**Week 7-8: Request Introductions**\n- Ask connected DJs about upcoming opportunities\n- Request brief introductions to promoters you've supported\n- Offer to fill last-minute cancellations\n- Propose collaboration opportunities"
+              },
+              {
+                "title": "The Magic Formula",
+                "content": "For every 1 person you genuinely help, they'll introduce you to 3 others in the scene. This compounds quickly."
+              },
+              {
+                "title": "Action Item",
+                "content": "Attend 2 events this weekend. Take photos with the DJs, tag them, and send a personal message about their performance."
+              }
+            ]
+          }
+        },
+        {
+          "id": 5,
+          "title": "The Pricing Psychology Strategy",
+          "subtitle": "How to Set Rates That Get You Booked (Not Ignored)",
+          "duration": "25 min",
+          "content": {
+            "sections": [
+              {
+                "title": "The Smart Pricing Framework",
+                "content": "**Tier 1 Gigs (Building Portfolio):**\n- Private parties: $200-400\n- Small bars/restaurants: $150-300\n- Corporate events: $300-500\n- Wedding receptions: $400-700\n\n**Tier 2 Gigs (Building Reputation):**\n- Lounges and upscale bars: $300-600\n- Club nights (non-headliner): $400-800\n- Pool parties and day events: $500-1000\n- Music festivals (smaller stages): $600-1200\n\n**Tier 3 Gigs (Premium Pricing):**\n- Major nightclubs: $800-2000+\n- Main festival stages: $1500-5000+\n- Celebrity events: $2000-10000+\n- International bookings: $3000-15000+"
+              },
+              {
+                "title": "The Negotiation Script",
+                "content": "**When They Ask Your Rate:**\n*'My rate varies depending on the event details. Can you tell me more about the venue, expected attendance, and event duration? I want to make sure we're a good fit before discussing pricing.'*\n\n**When You Quote:**\n*'For an event of this size and duration, my rate is $[AMOUNT]. This includes [SPECIFIC DELIVERABLES] and I'm available for [TIME FRAME]. I also provide [ADDITIONAL VALUE - social media promotion, custom playlist, etc.]'*\n\n**When They Counter Low:**\n*'I understand budget constraints. I can work with $[COMPROMISE PRICE] if we can [ADD VALUE - longer set, social media package, future booking priority, etc.]'*"
+              },
+              {
+                "title": "Pro Secret",
+                "content": "Never be the cheapest DJ in your market. Being 20% higher than the lowest price actually makes you more attractive because venues assume higher price = better quality."
+              },
+              {
+                "title": "Action Item",
+                "content": "Create a pricing sheet for different types of gigs. Practice your negotiation scripts with friends."
+              }
+            ]
+          }
+        },
+        {
+          "id": 6,
+          "title": "The Social Media Booking Magnet",
+          "subtitle": "Turn Your Instagram Into a Gig-Booking Machine",
+          "duration": "20 min",
+          "content": {
+            "sections": [
+              {
+                "title": "The Content Strategy That Gets You Booked",
+                "content": "**Content Pillar 1: Behind-the-Scenes (40%)**\n- Setting up equipment\n- Track selection process\n- Pre-gig preparation\n- Travel to venues\n- Sound check process\n\n**Content Pillar 2: Live Performance (30%)**\n- Short clips of packed dance floors\n- Crowd reactions to drops\n- Energy moments during sets\n- Venue atmosphere shots\n- Post-gig celebration\n\n**Content Pillar 3: Music Education (20%)**\n- Quick mixing tips\n- New track discoveries\n- Genre explanations\n- Equipment reviews\n- Industry insights\n\n**Content Pillar 4: Lifestyle & Personality (10%)**\n- Personal interests outside DJing\n- Travel and adventure content\n- Collaborations with other artists\n- Community involvement\n- Inspirational messages"
+              },
+              {
+                "title": "The Hashtag Strategy",
+                "content": "**Local Tags (Use 5-8):**\n#[YourCity]DJ #[YourCity]Nightlife #[YourCity]Events #[YourVenue]DJ\n\n**Genre Tags (Use 8-12):**\n#HouseMusic #TechHouse #DeepHouse #ProgressiveHouse #ElectronicMusic\n\n**Industry Tags (Use 5-8):**\n#DJ #ClubDJ #EventDJ #NightlifePhotography #DJLife\n\n**Engagement Tags (Use 5-8):**\n#DanceFloor #NightOut #PartyVibes #MusicIsLife #WeekendVibes"
+              },
+              {
+                "title": "The Engagement Strategy",
+                "content": "- Comment on every venue's posts\n- Share stories from events you attend\n- Tag DJs and venues in your content\n- Respond to all comments within 2 hours\n- Direct message venue managers about their events"
+              },
+              {
+                "title": "Action Item",
+                "content": "Post one piece of content every day for the next 7 days using this strategy. Track which posts get the most engagement from venue accounts."
+              }
+            ]
+          }
+        },
+        {
+          "id": 7,
+          "title": "The Follow-Up System That Never Fails",
+          "subtitle": "How to Stay Top-of-Mind Until They Book You",
+          "duration": "18 min",
+          "content": {
+            "sections": [
+              {
+                "title": "The Follow-Up Timeline",
+                "content": "**Day 1: Initial Contact**\nSend professional email with promo pack\n\n**Day 7: Value-Add Follow-Up**\n*'Hi [NAME], I wanted to share this mix I created specifically for [VENUE NAME]. I studied your crowd from last weekend and crafted this to match their energy. No pressure, just thought you might enjoy it. [LINK]'*\n\n**Day 21: Event-Specific Follow-Up**\n*'Hi [NAME], I saw your upcoming [EVENT NAME] on [DATE]. The theme looks amazing! I have that date available and would love to contribute to making it special. Here's a quick mix in that style: [LINK]'*\n\n**Day 45: Social Proof Follow-Up**\n*'Hi [NAME], Quick update - I just played at [SIMILAR VENUE] and the response was incredible. [Attach photos/videos]. Still very interested in bringing this energy to [THEIR VENUE]. Available for [UPCOMING DATES].'*\n\n**Day 90: Relationship Follow-Up**\n*'Hi [NAME], Hope you're well! Not pitching anything, just wanted to say I've been following [VENUE]'s events and the lineups have been fantastic. Especially loved the [SPECIFIC EVENT] last month. Keep up the great work!'*"
+              },
+              {
+                "title": "The CRM System",
+                "content": "Keep track of:\n- Contact information\n- Conversation history\n- Personal details (family, interests)\n- Event calendar and booking patterns\n- Response rates and preferences"
+              },
+              {
+                "title": "Pro Secret",
+                "content": "The fortune is in the follow-up. Most DJs give up after one email. The promoters remember the DJs who stay professionally persistent."
+              },
+              {
+                "title": "Action Item",
+                "content": "Create a simple spreadsheet to track all your venue contacts and set monthly reminders to touch base with each one."
+              }
+            ]
+          }
+        }
+      ],
+      "bonusContent": {
+        "title": "30-Day Action Plan",
+        "sections": [
+          {
+            "title": "Week 1: Foundation",
+            "content": "- Complete venue research spreadsheet\n- Create professional promo pack\n- Set up social media strategy\n- Send first round of introduction emails"
+          },
+          {
+            "title": "Week 2: Network Building",
+            "content": "- Attend 2 local events\n- Connect with 10 DJs on social media\n- Follow up with initial contacts\n- Create first venue-specific mix"
+          },
+          {
+            "title": "Week 3: Social Proof",
+            "content": "- Document all activities on social media\n- Collect testimonials from any performances\n- Build relationships with photographers\n- Send second round of follow-ups"
+          },
+          {
+            "title": "Week 4: Optimization",
+            "content": "- Analyze response rates\n- Refine promo pack based on feedback\n- Book first paid gig (any tier level)\n- Plan month 2 strategy"
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
       "title": "DJ Fundamentals",
       "description": "Master the basics of DJing, from equipment setup to your first mix",
       "duration": "4 weeks",
@@ -13,7 +227,7 @@
       "category": "Fundamentals"
     },
     {
-      "id": 2,
+      "id": 3,
       "title": "Advanced Mixing",
       "description": "Professional mixing techniques for seamless transitions and creative effects",
       "duration": "6 weeks", 

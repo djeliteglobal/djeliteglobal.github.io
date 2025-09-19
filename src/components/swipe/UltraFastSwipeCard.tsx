@@ -3,6 +3,7 @@ import { useSpring, animated } from 'react-spring';
 import { useDrag } from '@use-gesture/react';
 import { useMatchStore } from '../../stores/matchStore';
 import { UpgradeModal } from '../premium/UpgradeModal';
+import { DJHirePayment } from '../DJHirePayment';
 import type { Opportunity } from '../../types/platform';
 
 interface UltraFastSwipeCardProps {
@@ -21,6 +22,7 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showMoreInfo, setShowMoreInfo] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [showHireModal, setShowHireModal] = useState(false);
   const images = opportunity.images || [opportunity.imageUrl];
   const totalImages = images.length;
   const { checkCanConnect } = useMatchStore();
@@ -206,7 +208,7 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
             </div>
             
             <div className="ml-4 flex gap-2">
-              <button 
+              <button
                 onClick={(e) => {
                   e.stopPropagation();
                   setShowMoreInfo(!showMoreInfo);
@@ -215,7 +217,7 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
               >
                 <span className="text-sm font-bold">{showMoreInfo ? '−' : 'i'}</span>
               </button>
-              <button 
+              <button
                 onClick={(e) => {
                   e.stopPropagation();
                   onOpenProfile?.();
@@ -223,6 +225,16 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
                 className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors"
               >
                 <span className="text-sm font-bold">↗</span>
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowHireModal(true);
+                }}
+                className="w-8 h-8 rounded-full bg-[#40E0D0]/30 backdrop-blur-sm flex items-center justify-center text-[#40E0D0] hover:bg-[#40E0D0]/50 transition-colors"
+                title="Hire DJ"
+              >
+                <span className="text-sm font-bold">$</span>
               </button>
             </div>
           </div>
@@ -255,12 +267,24 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
         </animated.div>
       </animated.div>
       
-      <UpgradeModal 
+      <UpgradeModal
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
         onUpgrade={() => {
           setShowUpgradeModal(false);
           window.open('/', '_blank');
+        }}
+      />
+      
+      <DJHirePayment
+        isOpen={showHireModal}
+        onClose={() => setShowHireModal(false)}
+        djProfile={{
+          id: opportunity.id,
+          dj_name: opportunity.title,
+          bio: opportunity.bio,
+          location: opportunity.location,
+          rate: opportunity.fee ? parseInt(opportunity.fee.replace(/[^0-9]/g, '')) : undefined
         }}
       />
     </div>

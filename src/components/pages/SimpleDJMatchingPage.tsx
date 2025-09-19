@@ -1,8 +1,11 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { UltraFastSwipeCard } from '../swipe/UltraFastSwipeCard';
 import { Button } from '../platform';
 import { ReferralSection } from '../referrals/ReferralSection';
+import { matchingEngine, type MatchingPreferences } from '../../services/matchingEngine';
+import { useAuth } from '../../contexts/AuthContext';
 import type { Opportunity } from '../../types/platform';
+import type { DJProfile } from '../../types/profile';
 
 // Simulate swipe result
 const simulateSwipeResult = (direction: 'left' | 'right' | 'super') => {
@@ -14,7 +17,7 @@ const simulateSwipeResult = (direction: 'left' | 'right' | 'super') => {
 
 const MOCK_OPPORTUNITIES: Opportunity[] = [
   {
-    id: '1',
+    id: 1,
     title: 'Sarah Mix',
     age: 26,
     bio: 'House & Techno DJ from Berlin. Love underground vibes and late-night sets. Looking for collaboration opportunities!',
@@ -25,12 +28,13 @@ const MOCK_OPPORTUNITIES: Opportunity[] = [
     ],
     venue: 'Techno Club Berlin',
     location: 'Berlin, Germany',
+    date: '2025-01-20',
     genres: ['House', 'Techno', 'Deep House'],
     fee: '$300/night',
     skills: ['Mixing', 'Production', 'Event Planning']
   },
   {
-    id: '2',
+    id: 2,
     title: 'Mike Bass',
     age: 29,
     bio: 'Drum & Bass producer and DJ. 10+ years experience. Always down for back-to-back sets and studio sessions.',
@@ -41,12 +45,13 @@ const MOCK_OPPORTUNITIES: Opportunity[] = [
     ],
     venue: 'DnB Nights London',
     location: 'London, UK',
+    date: '2025-01-25',
     genres: ['Drum & Bass', 'Jungle', 'Breakbeat'],
     fee: '$250/night',
     skills: ['Production', 'Sound Engineering', 'Mastering']
   },
   {
-    id: '3',
+    id: 3,
     title: 'Luna Trance',
     age: 24,
     bio: 'Trance & Progressive DJ. Festival regular. Love connecting with crowds through uplifting melodies.',
@@ -57,6 +62,7 @@ const MOCK_OPPORTUNITIES: Opportunity[] = [
     ],
     venue: 'Trance Festival Amsterdam',
     location: 'Amsterdam, NL',
+    date: '2025-02-01',
     genres: ['Trance', 'Progressive', 'Uplifting'],
     fee: '$400/night',
     skills: ['Festival DJ', 'Crowd Control', 'Music Production']
@@ -64,12 +70,16 @@ const MOCK_OPPORTUNITIES: Opportunity[] = [
 ];
 
 export const SimpleDJMatchingPage: React.FC = () => {
+  const { currentUser } = useAuth();
   const [activeSection, setActiveSection] = useState<'discover' | 'matches' | 'referrals' | 'premium'>('discover');
-  const [profiles] = useState<Opportunity[]>(MOCK_OPPORTUNITIES);
+  const [profiles, setProfiles] = useState<Opportunity[]>(MOCK_OPPORTUNITIES);
+  const [djProfiles, setDjProfiles] = useState<DJProfile[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [matchCount, setMatchCount] = useState(0);
   const [processedSwipes, setProcessedSwipes] = useState<Set<string>>(new Set());
   const [swipeCooldown, setSwipeCooldown] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [matchingActive, setMatchingActive] = useState(false);
 
   const handleSwipe = useCallback((direction: 'left' | 'right' | 'super') => {
     if (!profiles[currentIndex] || swipeCooldown) return;
@@ -113,6 +123,64 @@ export const SimpleDJMatchingPage: React.FC = () => {
       setProcessedSwipes(new Set());
     }
   }, [currentIndex, profiles, processedSwipes, swipeCooldown]);
+
+  // Load DJ profiles using matching engine
+  useEffect(() => {
+    const loadDJProfiles = async () => {
+      if (!currentUser) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setMatchingActive(true);
+        console.log('🧠 Loading DJ profiles with matching engine...');
+        
+        const preferences: MatchingPreferences = {
+          collaborationType: 'all'
+        };
+        
+        const matches = await matchingEngine.getOptimalMatches(
+          currentUser?.email || 'unknown',
+          preferences,
+          20
+        );
+        
+        console.log(`✅ Loaded ${matches.length} DJ profiles`);
+        setDjProfiles(matches);
+        
+        // Convert DJ profiles to opportunities format for display
+        const opportunityProfiles: Opportunity[] = matches.map((profile, index) => ({
+          id: index + 1, // Use index as id since Opportunity expects number
+          title: profile.dj_name,
+          age: profile.age,
+          bio: profile.bio || '',
+          imageUrl: profile.images?.[0] || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDQwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMDAgMTAwQzIyNy42MTQgMTAwIDI1MCA4Ny42MTQyIDI1MCA2MEMyNTAgMzIuMzg1OCAyMjcuNjE0IDEwIDIwMCAxMEMxNzIuMzg2IDEwIDE1MCAzMi4zODU4IDE1MCA2MEMxNTAgODcuNjE0MiAxNzIuMzg2IDEwMCAyMDAgMTAwWiIgZmlsbD0iIzlDQTNBRiIvPgo8cGF0aCBkPSJNMzAwIDM5MEgxMDBDMTAwIDMzMC4yIDEzOS44IDI4MCAyMDAgMjgwQzI2MC4yIDI4MCAzMDAgMzMwLjIgMzAwIDM5MFoiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+',
+          images: profile.images || [],
+          venue: profile.location || 'Unknown',
+          location: profile.location || 'Unknown',
+          date: new Date().toISOString().split('T')[0], // Add required date field
+          genres: profile.genres || [],
+          fee: 'Negotiable',
+          skills: profile.skills || [],
+          matchScore: profile.matchScore,
+          matchReasons: profile.matchReasons,
+          compatibility: profile.compatibility
+        }));
+        
+        setProfiles(opportunityProfiles);
+      } catch (error) {
+        console.error('❌ Error loading DJ profiles:', error);
+        // Fallback to mock data
+        setProfiles(MOCK_OPPORTUNITIES);
+      } finally {
+        setLoading(false);
+        setMatchingActive(false);
+      }
+    };
+
+    loadDJProfiles();
+  }, [currentUser]);
 
   const handleCardLeftScreen = useCallback((cardId: string) => {
     console.log('Card left screen:', cardId);
@@ -173,9 +241,9 @@ export const SimpleDJMatchingPage: React.FC = () => {
         </div>
 
         {/* AI Status Indicator */}
-        <div className="max-w-md mx-auto bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-lg p-3">
+        <div className={`max-w-md mx-auto bg-gradient-to-r ${matchingActive ? 'from-purple-500/10 to-pink-500/10 border-purple-500/30' : 'from-green-500/10 to-blue-500/10 border-green-500/30'} border rounded-lg p-3`}>
           <div className="flex items-center gap-2 text-purple-300">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-purple-300 animate-pulse">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className={`${matchingActive ? 'text-purple-300 animate-pulse' : 'text-green-300'}`}>
               <rect x="3" y="11" width="18" height="10" rx="2" ry="2" fill="currentColor"/>
               <circle cx="12" cy="5" r="2" fill="currentColor"/>
               <path d="M12 7v4" stroke="white" strokeWidth="2"/>
@@ -183,8 +251,8 @@ export const SimpleDJMatchingPage: React.FC = () => {
               <line x1="16" y1="16" x2="16" y2="16" stroke="white" strokeWidth="2"/>
             </svg>
             <div>
-              <p className="text-sm font-semibold">AI Matching Active</p>
-              <p className="text-xs">Finding perfect gig opportunities based on your profile</p>
+              <p className="text-sm font-semibold">{matchingActive ? 'AI Matching Active' : 'AI Matching Ready'}</p>
+              <p className="text-xs">{matchingActive ? 'Finding perfect DJ matches based on compatibility...' : `Found ${djProfiles.length} potential matches`}</p>
             </div>
           </div>
         </div>
@@ -197,8 +265,13 @@ export const SimpleDJMatchingPage: React.FC = () => {
             {/* Profile Counter */}
             <div className="text-center">
               <p className="text-sm text-[color:var(--text-secondary)]">
-                Opportunity {currentIndex + 1} of {profiles.length}
+                DJ Profile {currentIndex + 1} of {profiles.length}
               </p>
+              {currentProfile.matchScore && (
+                <p className="text-sm text-[color:var(--accent)] font-semibold">
+                  Match Score: {currentProfile.matchScore}%
+                </p>
+              )}
             </div>
 
             {/* Swipe Card Container */}
@@ -208,6 +281,20 @@ export const SimpleDJMatchingPage: React.FC = () => {
                 onSwipe={handleSwipe}
                 onCardLeftScreen={handleCardLeftScreen}
               />
+              
+              {/* Match Reasons */}
+              {currentProfile.matchReasons && currentProfile.matchReasons.length > 0 && (
+                <div className="absolute bottom-4 left-4 right-4 bg-[color:var(--surface)]/90 backdrop-blur-sm border border-[color:var(--border)] rounded-lg p-3">
+                  <p className="text-xs text-[color:var(--text-secondary)] mb-1">Why you match:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {currentProfile.matchReasons.map((reason, index) => (
+                      <span key={index} className="text-xs bg-[color:var(--accent)]/20 text-[color:var(--accent)] px-2 py-1 rounded-full">
+                        {reason}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Swipe Instructions */}
@@ -217,7 +304,7 @@ export const SimpleDJMatchingPage: React.FC = () => {
                   <span className="text-red-500">←</span> Pass
                 </div>
                 <div className="flex items-center gap-1">
-                  <span className="text-[var(--accent)]">→</span> Apply
+                  <span className="text-[var(--accent)]">→</span> Connect
                 </div>
                 <div className="flex items-center gap-1">
                   <span className="text-yellow-500">↑</span> Super Like
@@ -227,7 +314,19 @@ export const SimpleDJMatchingPage: React.FC = () => {
           </div>
         )}
 
-        {activeSection === 'discover' && !currentProfile && (
+        {activeSection === 'discover' && loading && (
+          <div className="text-center py-12">
+            <div className="mb-4 flex justify-center">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[color:var(--accent)]"></div>
+            </div>
+            <h2 className="text-2xl font-bold mb-2">Finding Your Matches</h2>
+            <p className="text-[color:var(--text-secondary)]">
+              Our AI is analyzing compatibility with other DJs...
+            </p>
+          </div>
+        )}
+
+        {activeSection === 'discover' && !currentProfile && !loading && (
           <div className="text-center py-12">
             <div className="mb-4 flex justify-center">
               <svg width="64" height="64" viewBox="0 0 24 24" fill="none" className="text-pink-500">
@@ -237,10 +336,15 @@ export const SimpleDJMatchingPage: React.FC = () => {
             </div>
             <h2 className="text-2xl font-bold mb-2">All caught up!</h2>
             <p className="text-[color:var(--text-secondary)] mb-6">
-              New opportunities are added regularly. Check back soon!
+              You've seen all available DJ matches. Check back soon for new profiles!
             </p>
             <button
-              onClick={() => setCurrentIndex(0)}
+              onClick={() => {
+                setCurrentIndex(0);
+                // Clear matching cache to get fresh results
+                matchingEngine.clearCache(currentUser?.email || 'unknown');
+                window.location.reload();
+              }}
               className="bg-[color:var(--accent)] text-black px-8 py-4 rounded-lg font-semibold hover:bg-opacity-90 transition-colors"
             >
               <div className="flex items-center gap-2">
@@ -248,7 +352,7 @@ export const SimpleDJMatchingPage: React.FC = () => {
                   <path d="M3 7v6h6" stroke="currentColor" strokeWidth="2" fill="none"/>
                   <path d="m21 17a9 9 0 00-9-9 9 9 0 00-6 2.3l-3 2.7" stroke="currentColor" strokeWidth="2" fill="none"/>
                 </svg>
-                Start Over
+                Refresh Matches
               </div>
             </button>
           </div>

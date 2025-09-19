@@ -24,7 +24,7 @@ const ReferralDashboard: React.FC = () => {
   const [referralCode, setReferralCode] = useState<string>('LOADING...');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
-  const [showSidebar, setShowSidebar] = useState(false);
+
 
   console.log('🎯 ReferralDashboard mounted!', { currentUser, loading });
 
@@ -219,74 +219,7 @@ const ReferralDashboard: React.FC = () => {
   // Success - Main Dashboard
   return (
     <div className="min-h-screen bg-[color:var(--bg)] text-[color:var(--text-primary)] p-8">
-      {/* Hamburger Menu Button */}
-      <button
-        onClick={() => setShowSidebar(!showSidebar)}
-        className="fixed top-4 left-4 z-50 p-3 bg-[color:var(--surface)] border border-[color:var(--border)] rounded-lg hover:bg-[color:var(--surface-alt)] transition-all duration-300"
-      >
-        <div className="space-y-1">
-          <div className="w-6 h-0.5 bg-[color:var(--text-primary)]"></div>
-          <div className="w-6 h-0.5 bg-[color:var(--text-primary)]"></div>
-          <div className="w-6 h-0.5 bg-[color:var(--text-primary)]"></div>
-        </div>
-      </button>
-      
-      {/* Sliding Sidebar */}
-      <div className={`fixed left-0 top-0 h-full w-64 bg-[color:var(--surface)] border-r border-[color:var(--border)] transform transition-transform duration-300 z-40 ${
-        showSidebar ? 'translate-x-0' : '-translate-x-full'
-      }`}>
-        <div className="p-4 border-b border-[color:var(--border)]">
-          <h1 className="text-xl font-display font-bold bg-gradient-to-r from-[var(--accent)] to-pink-500 bg-clip-text text-transparent">
-            <div className="flex items-center gap-2">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-cyan-500">
-                <path d="M3 18v-6a9 9 0 0 1 18 0v6" stroke="currentColor" strokeWidth="2" fill="none"/>
-                <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" fill="currentColor"/>
-              </svg>
-              DJ Elite
-            </div>
-          </h1>
-        </div>
-        <nav className="p-4 space-y-2">
-          <button
-            onClick={() => window.location.href = '/swipe'}
-            className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-[color:var(--surface-alt)] text-[color:var(--text-secondary)] transition-colors"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-yellow-500">
-              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="currentColor"/>
-            </svg>
-            <span className="font-medium">Discover</span>
-          </button>
-          <button
-            className="w-full flex items-center gap-3 p-3 rounded-lg bg-[color:var(--accent)] text-black transition-colors"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-purple-500">
-              <path d="M20 12v10H4V12" stroke="currentColor" strokeWidth="2" fill="none"/>
-              <rect x="2" y="7" width="20" height="5" rx="1" fill="currentColor"/>
-              <path d="M12 22V7" stroke="white" strokeWidth="2"/>
-              <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" stroke="white" strokeWidth="2" fill="none"/>
-              <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" stroke="white" strokeWidth="2" fill="none"/>
-            </svg>
-            <span className="font-medium">Referrals</span>
-          </button>
-          <button
-            onClick={() => window.location.href = '/premium'}
-            className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-[color:var(--surface-alt)] text-[color:var(--text-secondary)] transition-colors"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-yellow-500">
-              <path d="M5 16L3 6l5.5 4L12 4l3.5 6L21 6l-2 10H5z" fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinejoin="round"/>
-            </svg>
-            <span className="font-medium">Premium</span>
-          </button>
-        </nav>
-      </div>
-      
-      {/* Overlay */}
-      {showSidebar && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-30"
-          onClick={() => setShowSidebar(false)}
-        ></div>
-      )}
+
       <div className="max-w-6xl mx-auto space-y-8">
 
         {/* Header */}
@@ -443,6 +376,18 @@ const ReferralDashboard: React.FC = () => {
               </div>
               <h4 className="font-bold">Power Referrer (10+)</h4>
               <p className="text-sm text-[color:var(--text-secondary)]">Free profile boosts</p>
+            </div>
+            <div className="text-center p-4">
+              <div className="mb-2 flex justify-center">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" className="text-purple-500">
+                  <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z" fill="currentColor"/>
+                  <path d="M12 22V2" stroke="white" strokeWidth="2"/>
+                  <path d="M8 12h8" stroke="white" strokeWidth="2"/>
+                  <path d="M12 8v8" stroke="white" strokeWidth="2"/>
+                </svg>
+              </div>
+              <h4 className="font-bold">Mega Referrer (20+)</h4>
+              <p className="text-sm text-[color:var(--text-secondary)]">Free Pro Annual Upgrade!</p>
             </div>
           </div>
         </div>

@@ -1,0 +1,20 @@
+-- COMPLETE MOCK USERS - All fields populated
+-- No nulls, should show in app properly
+
+INSERT INTO profiles (
+  user_id, dj_name, bio, age, location, experience_level, genres, skills, venues, fee,
+  profile_image_url, images, website, social_links, equipment, achievements, 
+  portfolio_tracks, contact_info, premium_badge, is_active, created_at
+) VALUES 
+('00000000-0000-0000-0000-000000000001', 'DJ Phoenix', 'House DJ from NYC with 5+ years experience', 25, 'New York, NY', 'Professional', ARRAY['House','Deep House'], ARRAY['Mixing','Beatmatching'], ARRAY['Club XYZ','The Underground'], '$500-1000', 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400', ARRAY['https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400'], 'https://djphoenix.com', '{"instagram": "https://instagram.com/djphoenix", "soundcloud": "https://soundcloud.com/djphoenix"}', '{"CDJ-2000", "DJM-900"}', '{"Best House DJ 2023", "Resident at Club XYZ"}', '{"Track 1", "Track 2"}', '{"email": "phoenix@example.com", "phone": "+1234567890"}', false, true, NOW()),
+
+('00000000-0000-0000-0000-000000000002', 'DJ Neon', 'Techno specialist from Berlin underground scene', 28, 'Berlin, Germany', 'Advanced', ARRAY['Techno','Minimal'], ARRAY['Production','Remixing'], ARRAY['Berghain','Watergate'], '$800-1500', 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400', ARRAY['https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400'], 'https://djneon.de', '{"instagram": "https://instagram.com/djneon", "soundcloud": "https://soundcloud.com/djneon"}', '{"Technics 1200", "Pioneer Mixer"}', '{"Berlin Underground Award", "Techno Producer"}', '{"Minimal Vibes", "Dark Techno"}', '{"email": "neon@example.com", "phone": "+49123456789"}', false, true, NOW()),
+
+('00000000-0000-0000-0000-000000000003', 'DJ Vibe', 'Trance lover spinning progressive sets', 30, 'London, UK', 'Professional', ARRAY['Trance','Progressive'], ARRAY['Crowd Reading','MC Skills'], ARRAY['Ministry of Sound','Fabric'], '$600-1200', 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400', ARRAY['https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400'], 'https://djvibe.co.uk', '{"instagram": "https://instagram.com/djvibe", "soundcloud": "https://soundcloud.com/djvibe"}', '{"CDJ-3000", "Allen & Heath Mixer"}', '{"UK Trance Champion", "Progressive Master"}', '{"Uplifting Trance", "Progressive Journey"}', '{"email": "vibe@example.com", "phone": "+44123456789"}', false, true, NOW()),
+
+('00000000-0000-0000-0000-000000000004', 'DJ Storm', 'Hip Hop master with turntable skills', 26, 'Los Angeles, CA', 'Advanced', ARRAY['Hip Hop','R&B'], ARRAY['Scratching','Turntablism'], ARRAY['The Observatory','Exchange LA'], '$400-800', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400', ARRAY['https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400'], 'https://djstorm.com', '{"instagram": "https://instagram.com/djstorm", "soundcloud": "https://soundcloud.com/djstorm"}', '{"Technics 1200", "Rane Mixer"}', '{"DMC Battle Winner", "Scratch Champion"}', '{"Hip Hop Classics", "R&B Vibes"}', '{"email": "storm@example.com", "phone": "+1987654321"}', false, true, NOW()),
+
+('00000000-0000-0000-0000-000000000005', 'DJ Luna', 'Electronic music producer and performer', 24, 'Miami, FL', 'Intermediate', ARRAY['Electronic','Dubstep'], ARRAY['Equipment Setup','Technical Skills'], ARRAY['LIV Miami','Story'], '$300-600', 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400', ARRAY['https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400'], 'https://djluna.net', '{"instagram": "https://instagram.com/djluna", "soundcloud": "https://soundcloud.com/djluna"}', '{"Pioneer DDJ-SX", "KRK Speakers"}', '{"Rising Star Award", "Electronic Producer"}', '{"Bass Drop", "Electronic Fusion"}', '{"email": "luna@example.com", "phone": "+1555123456"}', false, true, NOW());
+
+-- Quick check
+SELECT COUNT(*) as total FROM profiles WHERE user_id LIKE '00000000-0000-0000-0000-%';

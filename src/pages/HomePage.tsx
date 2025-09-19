@@ -3,13 +3,14 @@ import { Link } from 'react-router-dom';
 import type { AppState, AppContextType, Page } from '../types/platform';
 import { TopBar, SideNav } from '../components/platform';
 import { ProfileEditor } from '../components/profile/ProfileEditor';
-import { LandingPage, Dashboard, CoursesPage, CourseDetailPage, CommunityPage, OpportunitiesPage, SettingsPage, EventsPage, ProfilePage, ReferralsPage } from '../components/pages';
+import { LandingPage, Dashboard, CoursesPage, CourseDetailPage, CommunityPage, OpportunitiesPage, SettingsPage, EventsPage, ProfilePage, ReferralsPage, PremiumPage, FreeCoursePage } from '../components/pages';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { AuthModal } from '../components/auth/AuthModal';
 import { useTranslation } from '../i18n/useTranslation';
 import { PremiumFeaturesDemo } from '../components/platform/PremiumFeaturesDemo';
 import { useReferral } from '../contexts/ReferralContext';
 import { supabase } from '../config/supabase';
+import '../services/layout-fix.css';
 
 // Add bounce animation styles for sticky button
 const bounceInStyles = `
@@ -71,15 +72,29 @@ const HomePageContent: React.FC = () => {
     const { processReferralSignup } = useReferral();
     const { t } = useTranslation();
     const [showProfileEditor, setShowProfileEditor] = useState(false);
-    const [appState, setAppState] = useState<AppState>({
-        theme: 'dark',
-        isLoggedIn: !!currentUser,
-        page: currentUser ? 'opportunities' : 'landing',
-        courseId: null,
-        isSidebarOpen: true,
+    const [appState, setAppState] = useState<AppState>(() => {
+        const isFreeCourse = window.location.pathname === '/free_course';
+        
+        return {
+            theme: 'dark',
+            isLoggedIn: !!currentUser,
+            page: isFreeCourse ? 'courses' : (currentUser ? 'opportunities' : 'landing'),
+            courseId: null,
+            isSidebarOpen: true,
+        };
     });
 
     const [showAuthModal, setShowAuthModal] = useState(false);
+
+    // Listen for custom auth modal events
+    useEffect(() => {
+        const handleOpenAuthModal = () => {
+            setShowAuthModal(true);
+        };
+
+        window.addEventListener('openAuthModal', handleOpenAuthModal);
+        return () => window.removeEventListener('openAuthModal', handleOpenAuthModal);
+    }, []);
 
     // Process referral when new user authenticates - FIXED TIMING ISSUE
     useEffect(() => {
@@ -144,54 +159,86 @@ const HomePageContent: React.FC = () => {
             courseId,
         }));
     }, [currentUser]);
-    
+
+    // Handle direct course URL access (e.g., ?course=1 or ?wants_course=1 or /Free_course)
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const courseId = urlParams.get('course') || urlParams.get('wants_course');
+        const isFreeCourse = window.location.pathname === '/free_course';
+
+        if (isFreeCourse) {
+            console.log('🎯 Found free course URL path');
+            setAppState(prev => ({
+                ...prev,
+                page: 'courses'
+            }));
+        } else if (courseId && !isNaN(parseInt(courseId))) {
+            console.log('🎯 Found course URL parameter:', courseId);
+
+            // If user is not logged in, show auth modal first, then navigate
+            if (!currentUser) {
+                setShowAuthModal(true);
+                // Store the intended course for after login
+                sessionStorage.setItem('intended_course', courseId);
+            } else {
+                // User is logged in, navigate directly to the course
+                setAppState(prev => ({
+                    ...prev,
+                    page: 'course_detail',
+                    courseId: parseInt(courseId)
+                }));
+            }
+        }
+    }, [currentUser]);
+
     const contextValue = useMemo(() => ({ appState, setAppState, navigate }), [appState, navigate]);
 
     const renderPage = () => {
-        if (!currentUser) {
-            return <LandingPage />;
-        }
         switch (appState.page) {
             case 'dashboard':
-                return <Dashboard />;
+                return currentUser ? <Dashboard /> : <LandingPage />;
+            case 'free_course':
+                return <FreeCoursePage />;
             case 'courses':
                 return <CoursesPage />;
             case 'course_detail':
-                return <CourseDetailPage />;
+                return currentUser ? <CourseDetailPage /> : <LandingPage />;
             case 'community':
-                return <CommunityPage />;
+                return currentUser ? <CommunityPage /> : <LandingPage />;
             case 'opportunities':
-                return <OpportunitiesPage />;
+                return currentUser ? <OpportunitiesPage /> : <LandingPage />;
             case 'events':
-                return <EventsPage />;
+                return currentUser ? <EventsPage /> : <LandingPage />;
             case 'profile':
-                return <ProfilePage />;
+                return currentUser ? <ProfilePage /> : <LandingPage />;
             case 'referrals':
-                return <ReferralsPage />;
+                return currentUser ? <ReferralsPage /> : <LandingPage />;
+            case 'premium':
+                return currentUser ? <PremiumPage /> : <LandingPage />;
             case 'premium_features':
-                return <PremiumFeaturesDemo />;
+                return currentUser ? <PremiumFeaturesDemo /> : <LandingPage />;
             case 'settings':
-                return <SettingsPage />;
+                return currentUser ? <SettingsPage /> : <LandingPage />;
+            case 'landing':
+                return <LandingPage />;
             default:
-                return <OpportunitiesPage />;
+                return currentUser ? <OpportunitiesPage /> : <LandingPage />;
         }
     };
     
     return (
         <AppContext.Provider value={contextValue}>
-            {currentUser ? (
+            {currentUser || appState.page === 'courses' ? (
                 <div className="flex h-screen w-full bg-[color:var(--bg)]">
                     <SideNav />
-                    <div className="flex flex-1 flex-col overflow-hidden min-w-0">
+                    <div className="flex-1 flex flex-col overflow-hidden">
                         <TopBar />
                         <main className="flex-1 overflow-y-auto">
                             {renderPage()}
                         </main>
                     </div>
-                    {appState.isSidebarOpen && (
-                        <div onClick={() => setAppState(prev => ({...prev, isSidebarOpen: false}))} className="fixed inset-0 z-30 bg-black/50 md:hidden"></div>
-                    )}
-                    <ProfileEditor isOpen={showProfileEditor} onClose={() => setShowProfileEditor(false)} />
+
+                    {currentUser && <ProfileEditor isOpen={showProfileEditor} onClose={() => setShowProfileEditor(false)} />}
                 </div>
             ) : (
                 <>

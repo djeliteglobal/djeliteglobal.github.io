@@ -57,8 +57,7 @@ function App() {
                 <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/premium" element={<PremiumFeaturesDemo />} />
                 <Route path="/referrals" element={<ReferralDashboard />} />
-
-
+                <Route path="/free_course" element={<HomePage />} />
               </Routes>
             </Router>
           </ReferralProvider>

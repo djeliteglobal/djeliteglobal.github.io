@@ -124,7 +124,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setCurrentUser({
             name: user.user_metadata?.display_name || user.email?.split('@')[0] || 'User',
             email: user.email || '',
-            avatarUrl: user.user_metadata?.avatar_url || `https://picsum.photos/seed/${user.id}/100/100`,
+            avatarUrl: `https://picsum.photos/seed/${user.id}/100/100`,
             plan: 'Free'
           });
           
