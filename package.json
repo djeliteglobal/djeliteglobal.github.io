@@ -19,10 +19,13 @@
     "@stripe/react-stripe-js": "^2.4.0",
     "@use-gesture/react": "^10.3.0",
     "@hookform/resolvers": "^3.3.2",
+    "ably": "^1.2.50",
+    "cloudinary": "^1.41.3",
     "framer-motion": "^10.16.16",
     "react-hook-form": "^7.48.2",
     "react-hot-toast": "^2.4.1",
     "react-spring": "^9.7.3",
+    "resend": "^3.2.0",
     "stripe": "^14.15.0",
     "zod": "^3.22.4",
     "zustand": "^4.4.7"
