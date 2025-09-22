@@ -6,7 +6,7 @@ const AudioServicesPage: React.FC = () => {
 
   const handleStripePayment = async (priceId: string, amount: number) => {
     try {
-      const response = await fetch('/.netlify/functions/create-checkout-session', {
+      const response = await fetch(`${window.location.origin}/.netlify/functions/create-checkout-session`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
