@@ -20,6 +20,7 @@
     "@hookform/resolvers": "^3.3.2",
     "framer-motion": "^10.16.16",
     "react-hook-form": "^7.48.2",
+    "react-hot-toast": "^2.4.1",
     "react-spring": "^9.7.3",
     "stripe": "^14.15.0",
     "zod": "^3.22.4",
