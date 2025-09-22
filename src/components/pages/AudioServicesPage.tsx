@@ -41,6 +41,13 @@ const AudioServicesPage: React.FC = () => {
           <div className="flex gap-2">
             <button className="px-4 py-2 rounded-xl text-black font-semibold bg-gradient-to-r from-[color:var(--accent)] to-green-400 shadow-lg hover:shadow-xl transition-all">EN</button>
             <button className="px-4 py-2 rounded-xl bg-[color:var(--surface-alt)]/50 text-[color:var(--text-secondary)] backdrop-blur-sm hover:bg-[color:var(--surface-alt)] transition-all">ES</button>
+            <Button 
+              onClick={() => window.dispatchEvent(new CustomEvent('openAuthModal'))}
+              variant="secondary"
+              className="px-4 py-2 bg-[color:var(--surface)]/50 backdrop-blur-sm border border-[color:var(--border)]/50"
+            >
+              Login
+            </Button>
           </div>
         </div>
       </header>

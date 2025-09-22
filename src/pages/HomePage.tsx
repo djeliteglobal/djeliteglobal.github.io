@@ -152,7 +152,9 @@ const HomePageContent: React.FC = () => {
     }, [appState.theme]);
 
     const navigate = useCallback((page: Page, courseId: number | null = null) => {
-        if (page !== 'landing' && page !== 'free_course_access' && !currentUser) {
+        // Allow access to landing, free course, and audio services without login
+        const publicPages = ['landing', 'free_course_access', 'audio-services'];
+        if (!publicPages.includes(page) && !currentUser) {
             setShowAuthModal(true);
             return;
         }
@@ -242,11 +244,11 @@ const HomePageContent: React.FC = () => {
     
     return (
         <AppContext.Provider value={contextValue}>
-            {currentUser || appState.page === 'courses' ? (
+            {currentUser || appState.page === 'courses' || appState.page === 'audio-services' ? (
                 <div className="flex h-screen w-full bg-[color:var(--bg)]">
-                    <SideNav />
+                    {(currentUser || appState.page === 'courses') && <SideNav />}
                     <div className="flex-1 flex flex-col overflow-hidden">
-                        <TopBar />
+                        {(currentUser || appState.page === 'courses') && <TopBar />}
                         <main className="flex-1 overflow-y-auto">
                             {renderPage()}
                         </main>
