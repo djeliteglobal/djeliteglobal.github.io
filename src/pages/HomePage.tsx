@@ -4,6 +4,7 @@ import type { AppState, AppContextType, Page } from '../types/platform';
 import { TopBar, SideNav } from '../components/platform';
 import { ProfileEditor } from '../components/profile/ProfileEditor';
 import { LandingPage, Dashboard, CoursesPage, CourseDetailPage, CommunityPage, OpportunitiesPage, SettingsPage, EventsPage, ProfilePage, ReferralsPage, PremiumPage, FreeCoursePage } from '../components/pages';
+import AudioServicesPage from '../components/pages/AudioServicesPage';
 import { FreeCourseAccess } from '../components/FreeCourseAccess';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { AuthModal } from '../components/auth/AuthModal';
@@ -75,11 +76,12 @@ const HomePageContent: React.FC = () => {
     const [showProfileEditor, setShowProfileEditor] = useState(false);
     const [appState, setAppState] = useState<AppState>(() => {
         const isFreeCourse = window.location.pathname === '/free_course';
+        const isAudioServices = window.location.pathname === '/audio-services';
         
         return {
             theme: 'dark',
             isLoggedIn: !!currentUser,
-            page: isFreeCourse ? 'courses' : (currentUser ? 'opportunities' : 'landing'),
+            page: isFreeCourse ? 'courses' : isAudioServices ? 'audio-services' : (currentUser ? 'opportunities' : 'landing'),
             courseId: null,
             isSidebarOpen: true,
         };
@@ -166,12 +168,19 @@ const HomePageContent: React.FC = () => {
         const urlParams = new URLSearchParams(window.location.search);
         const courseId = urlParams.get('course') || urlParams.get('wants_course');
         const isFreeCourse = window.location.pathname === '/free_course';
+        const isAudioServices = window.location.pathname === '/audio-services';
 
         if (isFreeCourse) {
             console.log('🎯 Found free course URL path');
             setAppState(prev => ({
                 ...prev,
                 page: 'courses'
+            }));
+        } else if (isAudioServices) {
+            console.log('🎯 Found audio services URL path');
+            setAppState(prev => ({
+                ...prev,
+                page: 'audio-services'
             }));
         } else if (courseId && !isNaN(parseInt(courseId))) {
             console.log('🎯 Found course URL parameter:', courseId);
@@ -220,6 +229,8 @@ const HomePageContent: React.FC = () => {
                 return currentUser ? <PremiumPage /> : <LandingPage />;
             case 'premium_features':
                 return currentUser ? <PremiumFeaturesDemo /> : <LandingPage />;
+            case 'audio-services':
+                return <AudioServicesPage />;
             case 'settings':
                 return currentUser ? <SettingsPage /> : <LandingPage />;
             case 'landing':

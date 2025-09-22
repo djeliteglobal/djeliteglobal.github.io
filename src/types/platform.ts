@@ -1,4 +1,4 @@
-export type Page = 'dashboard' | 'free_course' | 'free_course_access' | 'courses' | 'course_detail' | 'community' | 'opportunities' | 'events' | 'profile' | 'referrals' | 'premium' | 'premium_features' | 'settings' | 'landing';
+export type Page = 'dashboard' | 'free_course' | 'free_course_access' | 'courses' | 'course_detail' | 'community' | 'opportunities' | 'events' | 'profile' | 'referrals' | 'premium' | 'premium_features' | 'audio-services' | 'settings' | 'landing';
 
 export interface AppState {
   theme: 'light' | 'dark';

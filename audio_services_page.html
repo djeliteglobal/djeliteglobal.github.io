@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Audio Services | DJ Elite</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background-color: #2d2d30;
+            border-bottom: 1px solid #3d3d40;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            border-radius: 8px;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        .lang-switch {
+            display: flex;
+            background-color: #3d3d40;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .lang-btn {
+            padding: 8px 16px;
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .lang-btn.active {
+            background-color: #00ff88;
+            color: #000;
+        }
+        
+        .container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+        
+        .sidebar {
+            width: 280px;
+            background-color: #2d2d30;
+            padding: 30px 0;
+            border-right: 1px solid #3d3d40;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 30px;
+            color: #888;
+            text-decoration: none;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        
+        .nav-item:hover {
+            background-color: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+        }
+        
+        .nav-item.active {
+            background-color: #00ff88;
+            color: #000;
+            border-left-color: #00ff88;
+        }
+        
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            background-color: #1a1a1a;
+        }
+        
+        .welcome-text {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 40px;
+            color: #ffffff;
+        }
+        
+        .service-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .service-card {
+            background-color: #2d2d30;
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid #3d3d40;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .service-card:hover {
+            border-color: #00ff88;
+            transform: translateY(-5px);
+        }
+        
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #00ff88, #00cc6a);
+        }
+        
+        .service-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        
+        .service-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+        
+        .service-price {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #00ff88;
+        }
+        
+        .service-features {
+            list-style: none;
+            margin-bottom: 25px;
+        }
+        
+        .service-features li {
+            padding: 8px 0;
+            color: #aaa;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .service-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #00ff88;
+            font-weight: bold;
+        }
+        
+        .package-highlight {
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: #000;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 40px 0;
+        }
+        
+        .package-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .package-price {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .package-savings {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+        
+        .terms-section {
+            background-color: #2d2d30;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+            border: 1px solid #3d3d40;
+        }
+        
+        .terms-title {
+            font-size: 1.5rem;
+            color: #ffffff;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .terms-title::before {
+            content: '📋';
+            margin-right: 10px;
+        }
+        
+        .terms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .term-item {
+            background-color: #3d3d40;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .term-label {
+            color: #00ff88;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .term-value {
+            color: #ffffff;
+        }
+        
+        .cta-section {
+            text-align: center;
+            margin: 50px 0;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: #000;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 10px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 255, 136, 0.3);
+        }
+        
+        .cta-button.secondary {
+            background: #2d2d30;
+            color: #ffffff;
+            border: 1px solid #3d3d40;
+        }
+        
+        .cta-button.secondary:hover {
+            border-color: #00ff88;
+            color: #00ff88;
+        }
+        
+        .value-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+        
+        .value-item {
+            background-color: #2d2d30;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #3d3d40;
+            text-align: center;
+        }
+        
+        .value-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+        
+        .value-title {
+            color: #00ff88;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .value-desc {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        
+        .footer-info {
+            background-color: #2d2d30;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 40px;
+            border: 1px solid #3d3d40;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #3d3d40;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background-color: #3d3d40;
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .user-status {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                order: 2;
+            }
+            
+            .main-content {
+                order: 1;
+                padding: 20px;
+            }
+            
+            .service-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <div class="logo-icon">🎵</div>
+            Audio Elite
+        </div>
+        <div class="lang-switch">
+            <button class="lang-btn active">EN</button>
+            <button class="lang-btn">ES</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <nav class="sidebar">
+            <a href="#services" class="nav-item active">
+                <span class="nav-icon">🏠</span>
+                Services
+            </a>
+            <a href="#mixing" class="nav-item">
+                <span class="nav-icon">🎛️</span>
+                Mixing
+            </a>
+            <a href="#mastering" class="nav-item">
+                <span class="nav-icon">🎯</span>
+                Mastering
+            </a>
+            <a href="#production" class="nav-item">
+                <span class="nav-icon">⚡</span>
+                Production
+            </a>
+            <a href="#portfolio" class="nav-item">
+                <span class="nav-icon">👥</span>
+                Portfolio
+            </a>
+            <a href="#premium" class="nav-item">
+                <span class="nav-icon">👑</span>
+                Premium
+            </a>
+            <a href="#contact" class="nav-item">
+                <span class="nav-icon">⚙️</span>
+                Contact
+            </a>
+            
+            <div class="user-info">
+                <div class="user-avatar">👤</div>
+                <div>
+                    <div class="user-name">Audio Producer</div>
+                    <div class="user-status">Professional Services</div>
+                </div>
+            </div>
+        </nav>
+        
+        <main class="main-content">
+            <h1 class="welcome-text">Professional Audio Services for Your DJ Track!</h1>
+            
+            <div class="package-highlight">
+                <div class="package-title">COMPLETE AUDIO PACKAGE</div>
+                <div class="package-price">$450</div>
+                <div class="package-savings">Save $100 vs. Individual Services</div>
+                <p>Everything you need to make your track radio-ready and club-perfect</p>
+            </div>
+            
+            <div class="service-cards">
+                <div class="service-card">
+                    <div class="service-header">
+                        <div>
+                            <div class="service-title">🎛️ Professional Mixing</div>
+                            <div class="service-price">$250</div>
+                        </div>
+                    </div>
+                    <ul class="service-features">
+                        <li>Complete balance and EQ optimization</li>
+                        <li>Professional compression and dynamics</li>
+                        <li>Spatial effects (reverb, delay, chorus)</li>
+                        <li>Volume and pan automation</li>
+                        <li>Up to 3 revisions included</li>
+                    </ul>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-header">
+                        <div>
+                            <div class="service-title">🎯 Final Mastering</div>
+                            <div class="service-price">$100</div>
+                        </div>
+                    </div>
+                    <ul class="service-features">
+                        <li>Corrective and musical EQ</li>
+                        <li>Multiband compression</li>
+                        <li>Volume maximization (industry LUFS)</li>
+                        <li>Complete spectral analysis</li>
+                        <li>Multiple format delivery</li>
+                    </ul>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-header">
+                        <div>
+                            <div class="service-title">⚡ Production Consulting</div>
+                            <div class="service-price">$100</div>
+                        </div>
+                    </div>
+                    <ul class="service-features">
+                        <li>Musical arrangement review</li>
+                        <li>DJ-optimized structure suggestions</li>
+                        <li>Transition optimization</li>
+                        <li>Detailed written feedback</li>
+                        <li>30-minute video consultation</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="terms-section">
+                <h3 class="terms-title">Professional Terms & Delivery</h3>
+                <div class="terms-grid">
+                    <div class="term-item">
+                        <div class="term-label">Payment</div>
+                        <div class="term-value">50% upfront, 50% completion</div>
+                    </div>
+                    <div class="term-item">
+                        <div class="term-label">Delivery</div>
+                        <div class="term-value">5-7 business days</div>
+                    </div>
+                    <div class="term-item">
+                        <div class="term-label">Revisions</div>
+                        <div class="term-value">Included in price</div>
+                    </div>
+                    <div class="term-item">
+                        <div class="term-label">Files Kept</div>
+                        <div class="term-value">6 months retention</div>
+                    </div>
+                    <div class="term-item">
+                        <div class="term-label">Guarantee</div>
+                        <div class="term-value">Satisfaction guaranteed</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="value-section">
+                <div class="value-item">
+                    <div class="value-icon">📊</div>
+                    <div class="value-title">Technical Report</div>
+                    <div class="value-desc">Detailed mastering analysis included</div>
+                </div>
+                <div class="value-item">
+                    <div class="value-icon">🎵</div>
+                    <div class="value-title">Separate Stems</div>
+                    <div class="value-desc">Individual tracks if needed for DJ sets</div>
+                </div>
+                <div class="value-item">
+                    <div class="value-icon">🚀</div>
+                    <div class="value-title">Distribution Tips</div>
+                    <div class="value-desc">Platform optimization guidance</div>
+                </div>
+                <div class="value-item">
+                    <div class="value-icon">💰</div>
+                    <div class="value-title">Future Discount</div>
+                    <div class="value-desc">20% off your next projects</div>
+                </div>
+            </div>
+            
+            <div class="cta-section">
+                <a href="https://buy.stripe.com/REPLACE_WITH_YOUR_STRIPE_LINK" class="cta-button">
+                    💳 Pay $225 Deposit (50%)
+                </a>
+                <a href="mailto:your-email@example.com?subject=DJ Track Audio Services - Let's Start" class="cta-button secondary">
+                    📧 Discuss Project First
+                </a>
+                <div style="margin-top: 20px;">
+                    <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="REPLACE_WITH_YOUR_USERNAME" data-color="#00ff88" data-emoji="🎵" data-font="Cookie" data-text="Quick Consultation" data-outline-color="#ffffff" data-font-color="#000000" data-coffee-color="#FFDD00" ></script>
+                </div>
+            </div>
+            
+            <div class="footer-info">
+                <h4 style="color: #00ff88; margin-bottom: 15px;">Ready to elevate your DJ track to professional standards?</h4>
+                <p style="color: #aaa; line-height: 1.6;">
+                    With years of experience in electronic music production and mastering, I guarantee radio-ready quality that will make your track stand out in any DJ set. Professional equipment, fast turnaround, and unlimited communication during the entire process.
+                </p>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // Navigation interaction
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // Service card hover effects
+        document.querySelectorAll('.service-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+                this.style.borderColor = '#00ff88';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.borderColor = '#3d3d40';
+            });
+        });
+        
+        // Language switch
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // Button click effects
+        document.querySelectorAll('.cta-button').forEach(button => {
+            button.addEventListener('click', function(e) {
+                this.style.transform = 'translateY(-2px) scale(0.98)';
+                setTimeout(() => {
+                    this.style.transform = 'translateY(-2px) scale(1)';
+                }, 150);
+            });
+        });
+    </script>
+</body>
+</html>

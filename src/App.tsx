@@ -17,6 +17,10 @@ import { startPeriodicProfileSync } from './services/profileService';
 import { referralHandler } from './utils/referralHandler';
 import { PremiumFeaturesDemo } from './components/platform/PremiumFeaturesDemo';
 import { SimpleDJMatchingPage } from './components/pages/SimpleDJMatchingPage';
+import AudioSuccessPage from './components/pages/AudioSuccessPage';
+import MixingServicePage from './components/pages/MixingServicePage';
+import MasteringServicePage from './components/pages/MasteringServicePage';
+import ConsultingServicePage from './components/pages/ConsultingServicePage';
 import './index.css';
 import './debug.css';
 import './styles/pages.css';
@@ -58,6 +62,11 @@ function App() {
                 <Route path="/premium" element={<PremiumFeaturesDemo />} />
                 <Route path="/referrals" element={<ReferralDashboard />} />
                 <Route path="/free_course" element={<HomePage />} />
+                <Route path="/audio-services" element={<HomePage />} />
+                <Route path="/audio-services/success" element={<AudioSuccessPage />} />
+                <Route path="/mixing-service" element={<MixingServicePage />} />
+                <Route path="/mastering-service" element={<MasteringServicePage />} />
+                <Route path="/consulting-service" element={<ConsultingServicePage />} />
               </Routes>
             </Router>
           </ReferralProvider>
