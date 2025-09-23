@@ -22,11 +22,7 @@ export const handler = async (event, context) => {
         price_amount: parseFloat(price_amount),
         price_currency: 'usd',
         pay_currency: 'btc',
-        order_id: order_id,
-        order_description: order_description,
-        ipn_callback_url: `${process.env.URL}/.netlify/functions/nowpayments-webhook`,
-        success_url: `${process.env.URL}/crypto-success`,
-        cancel_url: `${process.env.URL}/crypto-payment`
+        order_id: order_id
       })
     });
 
