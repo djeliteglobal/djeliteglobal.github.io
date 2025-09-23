@@ -10,9 +10,7 @@ export const handler = async (event, context) => {
     console.log('API Key exists:', !!process.env.NOWPAYMENTS_API_KEY);
     console.log('API Key length:', process.env.NOWPAYMENTS_API_KEY?.length);
 
-    // Check API key format
     const apiKey = process.env.NOWPAYMENTS_API_KEY;
-    console.log('API Key first 10 chars:', apiKey?.substring(0, 10));
     
     const response = await fetch('https://api.nowpayments.io/v1/payment', {
       method: 'POST',
@@ -22,10 +20,13 @@ export const handler = async (event, context) => {
       },
       body: JSON.stringify({
         price_amount: parseFloat(price_amount),
-        price_currency: price_currency.toLowerCase(),
+        price_currency: 'usd',
         pay_currency: 'btc',
-        order_id: order_id.toString(),
-        order_description: order_description || 'DJ Elite Payment'
+        order_id: order_id,
+        order_description: order_description,
+        ipn_callback_url: `${process.env.URL}/.netlify/functions/nowpayments-webhook`,
+        success_url: `${process.env.URL}/crypto-success`,
+        cancel_url: `${process.env.URL}/crypto-payment`
       })
     });
 
@@ -51,8 +52,11 @@ export const handler = async (event, context) => {
         'Access-Control-Allow-Headers': 'Content-Type',
       },
       body: JSON.stringify({
-        invoice_url: `https://nowpayments.io/payment/?iid=${data.payment_id}`,
+        invoice_url: data.invoice_url || `https://nowpayments.io/payment/?iid=${data.payment_id}`,
         payment_id: data.payment_id,
+        payment_status: data.payment_status,
+        pay_address: data.pay_address,
+        pay_amount: data.pay_amount,
         order_id: data.order_id
       })
     };
