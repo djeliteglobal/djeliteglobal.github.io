@@ -24,6 +24,7 @@ import ConsultingServicePage from './components/pages/ConsultingServicePage';
 import AgencySignupPage from './components/pages/AgencySignupPage';
 import CryptoPaymentPage from './components/pages/CryptoPaymentPage';
 import CryptoSuccessPage from './components/pages/CryptoSuccessPage';
+import WisePaymentPage from './components/pages/WisePaymentPage';
 import './index.css';
 import './debug.css';
 import './styles/pages.css';
@@ -73,6 +74,7 @@ function App() {
                 <Route path="/agency-signup" element={<AgencySignupPage />} />
                 <Route path="/crypto-payment" element={<CryptoPaymentPage />} />
                 <Route path="/crypto-success" element={<CryptoSuccessPage />} />
+                <Route path="/wise-payment" element={<WisePaymentPage />} />
               </Routes>
             </Router>
           </ReferralProvider>
