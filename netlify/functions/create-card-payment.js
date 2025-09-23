@@ -12,7 +12,7 @@ export const handler = async (event, context) => {
 
     const apiKey = process.env.NOWPAYMENTS_API_KEY;
     
-    const response = await fetch('https://api.nowpayments.io/v1/invoice', {
+    const response = await fetch('https://api.nowpayments.io/v1/payment', {
       method: 'POST',
       headers: {
         'x-api-key': apiKey,
@@ -22,7 +22,6 @@ export const handler = async (event, context) => {
         price_amount: parseFloat(price_amount),
         price_currency: 'usd',
         pay_currency: 'btc',
-        payout_address: process.env.BTC_WALLET_ADDRESS,
         order_id: order_id,
         order_description: order_description || 'DJ Elite Payment'
       })
@@ -50,8 +49,8 @@ export const handler = async (event, context) => {
         'Access-Control-Allow-Headers': 'Content-Type',
       },
       body: JSON.stringify({
-        invoice_url: data.invoice_url,
-        invoice_id: data.id,
+        invoice_url: `https://nowpayments.io/payment/?iid=${data.payment_id}`,
+        payment_id: data.payment_id,
         order_id: data.order_id
       })
     };
