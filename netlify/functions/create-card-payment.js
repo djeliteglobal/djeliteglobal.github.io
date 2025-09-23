@@ -12,6 +12,7 @@ export const handler = async (event, context) => {
 
     const apiKey = process.env.NOWPAYMENTS_API_KEY;
     
+    // Create fiat-to-crypto payment
     const response = await fetch('https://api.nowpayments.io/v1/invoice', {
       method: 'POST',
       headers: {
@@ -21,8 +22,14 @@ export const handler = async (event, context) => {
       body: JSON.stringify({
         price_amount: parseFloat(price_amount),
         price_currency: 'usd',
+        pay_currency: 'btc',
+        payout_address: process.env.BTC_WALLET_ADDRESS, // Your BTC wallet
+        payout_currency: 'btc',
         order_id: order_id,
-        order_description: order_description || 'DJ Elite Payment'
+        order_description: order_description || 'DJ Elite Payment',
+        is_fee_paid_by_user: false,
+        is_fixed_rate: true,
+        fiat_invoice: true // Enable fiat payment
       })
     });
 
