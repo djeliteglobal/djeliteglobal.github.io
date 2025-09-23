@@ -21,6 +21,9 @@ import AudioSuccessPage from './components/pages/AudioSuccessPage';
 import MixingServicePage from './components/pages/MixingServicePage';
 import MasteringServicePage from './components/pages/MasteringServicePage';
 import ConsultingServicePage from './components/pages/ConsultingServicePage';
+import AgencySignupPage from './components/pages/AgencySignupPage';
+import CryptoPaymentPage from './components/pages/CryptoPaymentPage';
+import CryptoSuccessPage from './components/pages/CryptoSuccessPage';
 import './index.css';
 import './debug.css';
 import './styles/pages.css';
@@ -67,6 +70,9 @@ function App() {
                 <Route path="/mixing-service" element={<MixingServicePage />} />
                 <Route path="/mastering-service" element={<MasteringServicePage />} />
                 <Route path="/consulting-service" element={<ConsultingServicePage />} />
+                <Route path="/agency-signup" element={<AgencySignupPage />} />
+                <Route path="/crypto-payment" element={<CryptoPaymentPage />} />
+                <Route path="/crypto-success" element={<CryptoSuccessPage />} />
               </Routes>
             </Router>
           </ReferralProvider>

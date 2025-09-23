@@ -27,6 +27,8 @@ const AudioServicesPage: React.FC = () => {
     }
   };
 
+
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[color:var(--bg)] via-gray-900 to-black text-[color:var(--text-primary)]">
       {/* Header */}
@@ -86,28 +88,7 @@ const AudioServicesPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Studio Images */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
-          {[
-            { src: "https://images.unsplash.com/photo-1633933769681-dc8d28bdeb6d", title: "Professional Mixing" },
-            { src: "https://images.unsplash.com/photo-1525183480399-e8706926adac", title: "Final Mastering" },
-            { src: "https://plus.unsplash.com/premium_photo-1682786762320-a933c15e95a2", title: "Production Consulting" }
-          ].map((image, index) => (
-            <div key={index} className="group relative aspect-video rounded-2xl overflow-hidden shadow-2xl">
-              <img 
-                src={image.src} 
-                alt={image.title}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <div className="absolute bottom-4 left-4 text-white font-bold text-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                {image.title}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Service Cards */}
+        {/* Service Cards with Images */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
           {[
             {
@@ -116,7 +97,8 @@ const AudioServicesPage: React.FC = () => {
               price: "$250",
               features: ["Complete balance and EQ optimization", "Professional compression and dynamics", "Spatial effects (reverb, delay, chorus)", "Volume and pan automation", "Up to 3 revisions included"],
               deposit: 125,
-              priceId: "price_mixing"
+              priceId: "price_mixing",
+              image: "https://images.unsplash.com/photo-1633933769681-dc8d28bdeb6d"
             },
             {
               icon: <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>,
@@ -124,7 +106,8 @@ const AudioServicesPage: React.FC = () => {
               price: "$100",
               features: ["Corrective and musical EQ", "Multiband compression", "Volume maximization (industry LUFS)", "Complete spectral analysis", "Multiple format delivery"],
               deposit: 50,
-              priceId: "price_mastering"
+              priceId: "price_mastering",
+              image: "https://images.unsplash.com/photo-1525183480399-e8706926adac"
             },
             {
               icon: <path d="M9 11H7v6h2v-6zm4 0h-2v6h2v-6zm4 0h-2v6h2v-6zm2.5-9H15V1h-2v1H9V1H7v1H4.5C3.67 2 3 2.67 3 3.5v15c0 .83.67 1.5 1.5 1.5h15c.83 0 1.5-.67 1.5-1.5v-15c0-.83-.67-1.5-1.5-1.5zM19 18.5H5V8h14v10.5z"/>,
@@ -132,50 +115,67 @@ const AudioServicesPage: React.FC = () => {
               price: "$100",
               features: ["Musical arrangement review", "DJ-optimized structure suggestions", "Transition optimization", "Detailed written feedback", "30-minute video consultation"],
               deposit: 50,
-              priceId: "price_consulting"
+              priceId: "price_consulting",
+              image: "https://plus.unsplash.com/premium_photo-1682786762320-a933c15e95a2"
             }
           ].map((service, index) => (
-            <div key={index} className="group relative rounded-2xl p-8 bg-gradient-to-br from-[color:var(--surface)] to-[color:var(--surface-alt)] border border-[color:var(--border)]/30 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:border-[color:var(--accent)]/50 backdrop-blur-sm">
-              <div className="absolute inset-0 bg-gradient-to-br from-[color:var(--accent)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
-              <div className="relative z-10">
-                <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 bg-gradient-to-br from-[color:var(--accent)] to-green-400 shadow-lg group-hover:shadow-xl transition-shadow">
-                  <svg className="w-8 h-8 text-black" fill="currentColor" viewBox="0 0 24 24">
-                    {service.icon}
-                  </svg>
+            <div key={index} className="group relative rounded-2xl overflow-hidden bg-gradient-to-br from-[color:var(--surface)] to-[color:var(--surface-alt)] border border-[color:var(--border)]/30 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:border-[color:var(--accent)]/50 backdrop-blur-sm">
+              {/* Service Image */}
+              <div className="relative aspect-video overflow-hidden">
+                <img 
+                  src={service.image} 
+                  alt={service.title}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute bottom-4 left-4 text-white font-bold text-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  {service.title}
                 </div>
-                <h3 className="text-3xl font-bold mb-3 font-display group-hover:text-[color:var(--accent)] transition-colors">{service.title}</h3>
-                <div className="text-4xl font-bold text-[color:var(--accent)] mb-6">{service.price}</div>
-                <ul className="space-y-4 mb-8">
-                  {service.features.map((feature, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <div className="w-5 h-5 rounded-full bg-[color:var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-[color:var(--accent)] text-sm">✓</span>
-                      </div>
-                      <span className="text-[color:var(--text-secondary)] leading-relaxed">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                <div className="space-y-3">
-                  <Button 
-                    onClick={() => {
-                      const serviceRoutes = {
-                        'price_mixing': '/mixing-service',
-                        'price_mastering': '/mastering-service', 
-                        'price_consulting': '/consulting-service'
-                      };
-                      window.location.href = serviceRoutes[service.priceId] || '#';
-                    }}
-                    className="w-full py-4 text-lg font-semibold bg-gradient-to-r from-[color:var(--accent)] to-green-400 hover:from-green-400 hover:to-[color:var(--accent)] transition-all duration-300 shadow-lg hover:shadow-xl"
-                  >
-                    Learn More & Pay ${service.deposit} Deposit
-                  </Button>
-                  <Button 
-                    variant="secondary"
-                    onClick={() => handleStripePayment(service.priceId, service.deposit)}
-                    className="w-full py-2 text-sm bg-[color:var(--surface)]/50 backdrop-blur-sm border border-[color:var(--border)]/50 hover:border-[color:var(--accent)]/50"
-                  >
-                    Quick Pay ${service.deposit} Deposit
-                  </Button>
+              </div>
+              
+              {/* Service Content */}
+              <div className="p-8">
+                <div className="absolute inset-0 bg-gradient-to-br from-[color:var(--accent)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+                <div className="relative z-10">
+                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 bg-gradient-to-br from-[color:var(--accent)] to-green-400 shadow-lg group-hover:shadow-xl transition-shadow">
+                    <svg className="w-8 h-8 text-black" fill="currentColor" viewBox="0 0 24 24">
+                      {service.icon}
+                    </svg>
+                  </div>
+                  <h3 className="text-3xl font-bold mb-3 font-display group-hover:text-[color:var(--accent)] transition-colors">{service.title}</h3>
+                  <div className="text-4xl font-bold text-[color:var(--accent)] mb-6">{service.price}</div>
+                  <ul className="space-y-4 mb-8">
+                    {service.features.map((feature, i) => (
+                      <li key={i} className="flex items-start gap-3">
+                        <div className="w-5 h-5 rounded-full bg-[color:var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <span className="text-[color:var(--accent)] text-sm">✓</span>
+                        </div>
+                        <span className="text-[color:var(--text-secondary)] leading-relaxed">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="space-y-3">
+                    <Button 
+                      onClick={() => {
+                        const serviceRoutes = {
+                          'price_mixing': '/mixing-service',
+                          'price_mastering': '/mastering-service', 
+                          'price_consulting': '/consulting-service'
+                        };
+                        window.location.href = serviceRoutes[service.priceId] || '#';
+                      }}
+                      className="w-full py-4 text-lg font-semibold bg-gradient-to-r from-[color:var(--accent)] to-green-400 hover:from-green-400 hover:to-[color:var(--accent)] transition-all duration-300 shadow-lg hover:shadow-xl"
+                    >
+                      Learn More & Pay ${service.deposit} Deposit
+                    </Button>
+                    <Button 
+                      variant="secondary"
+                      onClick={() => handleStripePayment(service.priceId, service.deposit)}
+                      className="w-full py-2 text-sm bg-[color:var(--surface)]/50 backdrop-blur-sm border border-[color:var(--border)]/50 hover:border-[color:var(--accent)]/50"
+                    >
+                      Quick Pay ${service.deposit} Deposit
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
