@@ -49,7 +49,7 @@ export const handler = async (event, context) => {
         'Access-Control-Allow-Headers': 'Content-Type',
       },
       body: JSON.stringify({
-        invoice_url: `https://nowpayments.io/payment/?iid=${data.payment_id}`,
+        invoice_url: `https://nowpayments.io/payment/?pid=${data.payment_id}`,
         payment_id: data.payment_id,
         order_id: data.order_id
       })
