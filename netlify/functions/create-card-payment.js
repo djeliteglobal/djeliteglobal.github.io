@@ -10,11 +10,14 @@ export const handler = async (event, context) => {
     console.log('API Key exists:', !!process.env.NOWPAYMENTS_API_KEY);
     console.log('API Key length:', process.env.NOWPAYMENTS_API_KEY?.length);
 
-    // Use sandbox for testing
-    const response = await fetch('https://api-sandbox.nowpayments.io/v1/payment', {
+    // Check API key format
+    const apiKey = process.env.NOWPAYMENTS_API_KEY;
+    console.log('API Key first 10 chars:', apiKey?.substring(0, 10));
+    
+    const response = await fetch('https://api.nowpayments.io/v1/payment', {
       method: 'POST',
       headers: {
-        'x-api-key': process.env.NOWPAYMENTS_API_KEY,
+        'x-api-key': apiKey,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -48,7 +51,7 @@ export const handler = async (event, context) => {
         'Access-Control-Allow-Headers': 'Content-Type',
       },
       body: JSON.stringify({
-        invoice_url: `https://sandbox.nowpayments.io/payment/?iid=${data.payment_id}`,
+        invoice_url: `https://nowpayments.io/payment/?iid=${data.payment_id}`,
         payment_id: data.payment_id,
         order_id: data.order_id
       })
