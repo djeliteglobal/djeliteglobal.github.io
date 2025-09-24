@@ -1,4 +1,5 @@
 import React, { useState, useContext, useRef, useEffect, memo } from 'react';
+import { motion } from 'framer-motion';
 import { AppContext } from '../../pages/HomePage';
 import { useAuth } from '../../contexts/AuthContext';
 import { LanguageSwitcher } from '../LanguageSwitcher';
@@ -520,10 +521,15 @@ export const OpportunitySwipeCard: React.FC<{ opportunity: Opportunity; onSwipe:
     const onTouchEnd = () => handleDragEnd();
 
     return (
-        <div
+        <motion.div
             ref={cardRef}
             className="absolute h-full w-full cursor-grab active:cursor-grabbing"
             style={style}
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            whileHover={{ scale: 1.02 }}
             onMouseDown={onMouseDown}
             onMouseMove={onMouseMove}
             onMouseUp={onMouseUp}
@@ -616,6 +622,6 @@ export const OpportunitySwipeCard: React.FC<{ opportunity: Opportunity; onSwipe:
                     </div>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 };
