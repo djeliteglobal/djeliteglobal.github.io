@@ -259,7 +259,13 @@ const HomePageContent: React.FC = () => {
             ) : (
                 <>
                     <LandingPage />
-                    <div className="fixed bottom-4 right-4 z-50">
+                    <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-3">
+                        <Link 
+                            to="/agency-signup" 
+                            className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-full font-bold hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg"
+                        >
+                            🎵 Join DJ Agency
+                        </Link>
                         <Link 
                             to="/funnel" 
                             className="bg-[color:var(--accent)] text-black px-6 py-3 rounded-full font-bold hover:bg-[color:var(--accent-muted)] transition-all shadow-lg dj-button-animated"

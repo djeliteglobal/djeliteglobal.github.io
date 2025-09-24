@@ -242,6 +242,18 @@ export const SideNav: React.FC = () => {
                         <span>{item.name}</span>
                     </button>
                 ))}
+                
+                {/* Agency Signup Button */}
+                <a
+                    href="/agency-signup"
+                    onClick={() => setIsMobileOpen(false)}
+                    className="flex items-center gap-3 rounded-md px-4 py-3 text-sm font-medium transition-colors text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-alt)] hover:text-[color:var(--text-primary)]"
+                >
+                    <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                    <span>DJ Agency</span>
+                </a>
             </div>
              <div className="absolute bottom-0 left-0 w-full p-4 space-y-2 z-10">
                 <button 
