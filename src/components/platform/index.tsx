@@ -232,16 +232,21 @@ export const SideNav: React.FC = () => {
                             navigate(item.page as any);
                             setIsMobileOpen(false);
                         }}
-                        className={`flex items-center gap-3 rounded-md px-4 py-3 text-sm font-medium transition-colors ${
+                        className={`flex items-center gap-3 rounded-md px-4 py-3 text-sm font-medium transition-all duration-300 ${
                             appState.page === item.page
                                 ? 'bg-[color:var(--accent)] text-black'
                                 : 'text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-alt)] hover:text-[color:var(--text-primary)]'
+                        } ${
+                            item.name === 'Swipe' ? 'animate-pulse hover:animate-none hover:scale-105' : ''
                         }`}
                     >
                         <item.icon className="h-5 w-5" />
                         <span>{item.name}</span>
+                        {item.name === 'Swipe' && (
+                            <span className="ml-auto w-2 h-2 bg-[color:var(--accent)] rounded-full animate-ping"></span>
+                        )}
                     </button>
-                ))}
+                ))
                 
                 {/* Agency Signup Button */}
                 <a

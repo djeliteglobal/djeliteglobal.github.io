@@ -8,6 +8,7 @@ import AudioServicesPage from '../components/pages/AudioServicesPage';
 import { FreeCourseAccess } from '../components/FreeCourseAccess';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { AuthModal } from '../components/auth/AuthModal';
+import { SwipeTour } from '../components/platform/SwipeTour';
 import { useTranslation } from '../i18n/useTranslation';
 import { PremiumFeaturesDemo } from '../components/platform/PremiumFeaturesDemo';
 import { useReferral } from '../contexts/ReferralContext';
@@ -280,6 +281,7 @@ const HomePageContent: React.FC = () => {
                 </>
             )}
             <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
+            <SwipeTour />
         </AppContext.Provider>
     );
 };

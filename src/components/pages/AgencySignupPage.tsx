@@ -43,9 +43,10 @@ const AgencySignupPage: React.FC = () => {
       
       if (response.ok) {
         setSubmitted(true);
-        // Redirect to platform after 2 seconds
+        // Set tour flag and redirect to profile section after 2 seconds
+        sessionStorage.setItem('showSwipeTour', 'true');
         setTimeout(() => {
-          window.location.href = '/';
+          window.location.href = '/?page=profile';
         }, 2000);
       }
     } catch (error) {
