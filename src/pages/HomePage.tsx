@@ -9,6 +9,7 @@ import { FreeCourseAccess } from '../components/FreeCourseAccess';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { AuthModal } from '../components/auth/AuthModal';
 import { SwipeTour } from '../components/platform/SwipeTour';
+import { Toaster } from 'react-hot-toast';
 import { useTranslation } from '../i18n/useTranslation';
 import { PremiumFeaturesDemo } from '../components/platform/PremiumFeaturesDemo';
 import { useReferral } from '../contexts/ReferralContext';
@@ -282,6 +283,23 @@ const HomePageContent: React.FC = () => {
             )}
             <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
             <SwipeTour />
+            <Toaster
+                position="top-right"
+                toastOptions={{
+                    duration: 4000,
+                    style: {
+                        background: 'var(--surface)',
+                        color: 'var(--text-primary)',
+                        border: '1px solid var(--border)',
+                    },
+                    success: {
+                        iconTheme: {
+                            primary: 'var(--accent)',
+                            secondary: 'var(--surface)',
+                        },
+                    },
+                }}
+            />
         </AppContext.Provider>
     );
 };

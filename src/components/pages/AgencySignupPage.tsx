@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '../platform';
 import { useAuth } from '../../contexts/AuthContext';
 import { AuthModal } from '../auth/AuthModal';
+import toast from 'react-hot-toast';
 
 const AgencySignupPage: React.FC = () => {
   const { currentUser: user, loading: authLoading } = useAuth();
@@ -42,15 +43,19 @@ const AgencySignupPage: React.FC = () => {
       });
       
       if (response.ok) {
+        toast.success('🎧 Application submitted successfully! Redirecting to your profile...');
         setSubmitted(true);
         // Set tour flag and redirect to profile section after 2 seconds
         sessionStorage.setItem('showSwipeTour', 'true');
         setTimeout(() => {
           window.location.href = '/?page=profile';
         }, 2000);
+      } else {
+        toast.error('Failed to submit application. Please try again.');
       }
     } catch (error) {
       console.error('Signup error:', error);
+      toast.error('Network error. Please check your connection and try again.');
     }
     setLoading(false);
   };
