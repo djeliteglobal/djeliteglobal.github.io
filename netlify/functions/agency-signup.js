@@ -7,7 +7,10 @@ export const handler = async (event, context) => {
   }
 
   try {
-    const { name, email, phone, djName, epkUrl, instagramUrl, soundcloudUrl, youtubeUrl, experience, marketingConsent } = JSON.parse(event.body);
+    const formData = JSON.parse(event.body);
+    console.log('Agency form data received:', formData);
+    
+    const { name, email, phone, djName, epkUrl, instagramUrl, soundcloudUrl, youtubeUrl, experience, marketingConsent } = formData;
     
     if (!name || !email || !phone || !djName || !experience) {
       return { statusCode: 400, body: 'Required fields missing' };
@@ -19,22 +22,25 @@ export const handler = async (event, context) => {
       process.env.VITE_SUPABASE_ANON_KEY
     );
     
+    const insertData = {
+      name,
+      email,
+      phone,
+      dj_name: djName,
+      epk_url: epkUrl || null,
+      instagram_url: instagramUrl || null,
+      soundcloud_url: soundcloudUrl || null,
+      youtube_url: youtubeUrl || null,
+      experience,
+      marketing_consent: marketingConsent || false,
+      status: 'pending'
+    };
+    
+    console.log('Inserting to Supabase:', insertData);
+    
     const { error: dbError } = await supabase
       .from('agency_applications')
-      .insert({
-        name,
-        email,
-        phone,
-        dj_name: djName,
-        epk_url: epkUrl || null,
-        instagram_url: instagramUrl || null,
-        soundcloud_url: soundcloudUrl || null,
-        youtube_url: youtubeUrl || null,
-        experience,
-        marketing_consent: marketingConsent || false,
-        status: 'pending',
-        created_at: new Date().toISOString()
-      });
+      .insert(insertData);
     
     if (dbError) {
       console.error('Database error:', dbError);
