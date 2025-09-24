@@ -102,7 +102,7 @@ export const CrownIcon = memo((props: React.SVGProps<SVGSVGElement>) => (
 export const NAV_ITEMS = [
     { name: 'Dashboard', icon: HomeIcon, page: 'dashboard' },
     { name: 'Courses', icon: BookOpenIcon, page: 'courses' },
-    { name: 'Discover', icon: ZapIcon, page: 'opportunities' },
+    { name: 'Swipe', icon: ZapIcon, page: 'opportunities' },
     { name: 'Events', icon: CalendarIcon, page: 'community' },
     { name: 'Referrals', icon: UserPlusIcon, page: 'referrals' },
     { name: 'Premium', icon: CrownIcon, page: 'premium_features' },
