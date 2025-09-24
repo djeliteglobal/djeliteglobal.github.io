@@ -246,7 +246,7 @@ export const SideNav: React.FC = () => {
                             <span className="ml-auto w-2 h-2 bg-[color:var(--accent)] rounded-full animate-ping"></span>
                         )}
                     </button>
-                ))
+                ))}
                 
                 {/* Agency Signup Button */}
                 <a
