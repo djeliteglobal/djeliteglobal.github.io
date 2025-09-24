@@ -7,7 +7,7 @@ export const handler = async (event, context) => {
   }
 
   try {
-    const { name, email, phone, djName, epkUrl, instagramUrl, soundcloudUrl, youtubeUrl, experience } = JSON.parse(event.body);
+    const { name, email, phone, djName, epkUrl, instagramUrl, soundcloudUrl, youtubeUrl, experience, marketingConsent } = JSON.parse(event.body);
     
     if (!name || !email || !phone || !djName || !experience) {
       return { statusCode: 400, body: 'Required fields missing' };
@@ -31,6 +31,7 @@ export const handler = async (event, context) => {
         soundcloud_url: soundcloudUrl || null,
         youtube_url: youtubeUrl || null,
         experience,
+        marketing_consent: marketingConsent || false,
         status: 'pending',
         created_at: new Date().toISOString()
       });
