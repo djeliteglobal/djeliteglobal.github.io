@@ -316,14 +316,16 @@ const HomePageContent: React.FC = () => {
     );
 };
 
-// Create a client
+// Create a client with aggressive caching to reduce DB calls
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
-            staleTime: 5 * 60 * 1000, // 5 minutes
-            cacheTime: 10 * 60 * 1000, // 10 minutes
-            retry: 2,
+            staleTime: 15 * 60 * 1000, // 15 minutes - much longer
+            cacheTime: 30 * 60 * 1000, // 30 minutes - much longer
+            retry: 1, // Reduce retries
             refetchOnWindowFocus: false,
+            refetchOnMount: false, // Don't refetch on mount if cached
+            refetchOnReconnect: false, // Don't refetch on reconnect
         },
     },
 });
