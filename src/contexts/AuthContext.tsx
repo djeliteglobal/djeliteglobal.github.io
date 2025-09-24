@@ -121,19 +121,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       async (event, session) => {
         if (session?.user) {
           const user: SupabaseUser = session.user;
-          // Get user profile from Supabase to get real avatar
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('profile_image_url')
-            .eq('user_id', user.id)
-            .single();
-            
           setCurrentUser({
             name: user.user_metadata?.display_name || user.email?.split('@')[0] || 'User',
             email: user.email || '',
-            avatarUrl: profile?.profile_image_url || `https://picsum.photos/seed/${user.id}/100/100`,
+            avatarUrl: `https://picsum.photos/seed/${user.id}/100/100`,
             plan: 'Free'
           });
+          
+          // Fetch profile image separately to avoid blocking
+          supabase
+            .from('profiles')
+            .select('profile_image_url')
+            .eq('user_id', user.id)
+            .single()
+            .then(({ data: profile }) => {
+              if (profile?.profile_image_url) {
+                setCurrentUser(prev => prev ? {
+                  ...prev,
+                  avatarUrl: profile.profile_image_url
+                } : null);
+              }
+            })
+            .catch(() => {}); // Ignore errors
           
           // Process referral after OAuth signup
           if (event === 'SIGNED_IN') {
