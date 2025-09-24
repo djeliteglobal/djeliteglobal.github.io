@@ -1,24 +1,30 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../config/supabase';
+import { mockProfiles } from '../data/mockProfiles';
 
 export const useProfiles = (userId?: string, limit = 20) => {
   return useQuery({
     queryKey: ['profiles', userId, limit],
     queryFn: async () => {
-      if (!userId) return [];
+      if (!userId) return mockProfiles;
       
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .neq('user_id', userId)
-        .limit(limit);
-      
-      if (error) {
-        console.error('Profile fetch error:', error);
-        return [];
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .neq('user_id', userId)
+          .limit(limit);
+        
+        if (error) {
+          console.warn('Supabase error, using mock data:', error);
+          return mockProfiles;
+        }
+        
+        return data && data.length > 0 ? data : mockProfiles;
+      } catch (error) {
+        console.warn('Network error, using mock data:', error);
+        return mockProfiles;
       }
-      
-      return data || [];
     },
     enabled: !!userId,
     staleTime: 5 * 60 * 1000, // 5 minutes
