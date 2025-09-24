@@ -25,6 +25,8 @@ import AgencySignupPage from './components/pages/AgencySignupPage';
 import CryptoPaymentPage from './components/pages/CryptoPaymentPage';
 import CryptoSuccessPage from './components/pages/CryptoSuccessPage';
 import WisePaymentPage from './components/pages/WisePaymentPage';
+import BinancePayPage from './components/pages/BinancePayPage';
+import BinanceSuccessPage from './components/pages/BinanceSuccessPage';
 import './index.css';
 import './debug.css';
 import './styles/pages.css';
@@ -75,6 +77,8 @@ function App() {
                 <Route path="/crypto-payment" element={<CryptoPaymentPage />} />
                 <Route path="/crypto-success" element={<CryptoSuccessPage />} />
                 <Route path="/wise-payment" element={<WisePaymentPage />} />
+                <Route path="/binance-pay" element={<BinancePayPage />} />
+                <Route path="/binance-success" element={<BinanceSuccessPage />} />
               </Routes>
             </Router>
           </ReferralProvider>
