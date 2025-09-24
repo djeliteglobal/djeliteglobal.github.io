@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '../platform';
 import { useAuth } from '../../contexts/AuthContext';
+import { AuthModal } from '../auth/AuthModal';
 
 const AgencySignupPage: React.FC = () => {
   const { user, signInWithGoogle } = useAuth();
@@ -63,14 +64,7 @@ const AgencySignupPage: React.FC = () => {
     }));
   };
 
-  const handleLogin = async () => {
-    try {
-      await signInWithGoogle();
-      setShowLoginModal(false);
-    } catch (error) {
-      console.error('Login error:', error);
-    }
-  };
+
 
   if (submitted) {
     return (
@@ -246,31 +240,11 @@ const AgencySignupPage: React.FC = () => {
           </Button>
         </form>
 
-        {/* Login Modal */}
-        {showLoginModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-gradient-to-br from-[color:var(--surface)] to-[color:var(--surface-alt)] p-8 rounded-2xl border border-[color:var(--border)]/30 shadow-xl max-w-md w-full mx-4">
-              <h3 className="text-2xl font-bold text-[color:var(--accent)] mb-4 text-center">Sign Up Required</h3>
-              <p className="text-[color:var(--text-secondary)] mb-6 text-center">
-                You need to create an account to apply for DJ Elite Agency. Sign up with Google to continue.
-              </p>
-              <div className="space-y-4">
-                <Button
-                  onClick={handleLogin}
-                  className="w-full py-3 bg-gradient-to-r from-[color:var(--accent)] to-green-400 hover:from-green-400 hover:to-[color:var(--accent)] transition-all duration-300"
-                >
-                  Sign Up with Google
-                </Button>
-                <Button
-                  onClick={() => setShowLoginModal(false)}
-                  className="w-full py-3 bg-transparent border border-[color:var(--border)] hover:bg-[color:var(--surface-alt)] transition-all duration-300"
-                >
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Auth Modal */}
+        <AuthModal 
+          isOpen={showLoginModal} 
+          onClose={() => setShowLoginModal(false)} 
+        />
       </div>
     </div>
   );
