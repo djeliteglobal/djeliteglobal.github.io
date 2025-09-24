@@ -43,6 +43,10 @@ const AgencySignupPage: React.FC = () => {
       
       if (response.ok) {
         setSubmitted(true);
+        // Redirect to platform after 2 seconds
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 2000);
       }
     } catch (error) {
       console.error('Signup error:', error);
@@ -90,6 +94,15 @@ const AgencySignupPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[color:var(--bg)] via-gray-900 to-black text-[color:var(--text-primary)]">
       <div className="max-w-2xl mx-auto px-6 py-16">
+        <button
+          onClick={() => window.location.href = '/'}
+          className="mb-6 flex items-center gap-2 text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)] transition-colors"
+        >
+          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+          </svg>
+          Back to Platform
+        </button>
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold mb-4 font-display bg-gradient-to-r from-[color:var(--accent)] to-green-400 bg-clip-text text-transparent">
             DJ Elite Agency
