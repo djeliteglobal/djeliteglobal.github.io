@@ -172,8 +172,8 @@ export const TopBar: React.FC = () => {
                 </button>
                 <LanguageSwitcher inline={true} />
                 <button onClick={() => navigate('profile')} className="h-10 w-10 rounded-full hover:ring-2 hover:ring-[color:var(--accent)] transition-all overflow-hidden">
-                    {currentUser?.profile_image_url ? (
-                        <img src={currentUser.profile_image_url} alt={currentUser?.name} className="h-full w-full rounded-full object-cover" />
+                    {currentUser?.avatarUrl ? (
+                        <img src={currentUser.avatarUrl} alt={currentUser?.name} className="h-full w-full rounded-full object-cover" />
                     ) : (
                         <div className="h-full w-full rounded-full bg-[color:var(--surface-alt)] flex items-center justify-center">
                             <svg className="w-5 h-5 text-[color:var(--text-secondary)]" fill="currentColor" viewBox="0 0 24 24">
@@ -264,8 +264,8 @@ export const SideNav: React.FC = () => {
                 <button 
                   onClick={() => navigate('profile')}
                   className={`flex w-full items-center gap-3 rounded-md px-4 py-3 text-sm font-medium transition-colors hover:bg-[color:var(--surface-alt)] hover:text-[color:var(--text-primary)] text-[color:var(--text-secondary)]`}>
-                    {currentUser?.profile_image_url ? (
-                        <img src={currentUser.profile_image_url} alt={currentUser?.name} className="h-8 w-8 rounded-full object-cover" />
+                    {currentUser?.avatarUrl ? (
+                        <img src={currentUser.avatarUrl} alt={currentUser?.name} className="h-8 w-8 rounded-full object-cover" />
                     ) : (
                         <div className="h-8 w-8 rounded-full bg-[color:var(--surface-alt)] flex items-center justify-center">
                             <svg className="w-4 h-4 text-[color:var(--text-secondary)]" fill="currentColor" viewBox="0 0 24 24">

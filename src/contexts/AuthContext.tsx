@@ -121,10 +121,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       async (event, session) => {
         if (session?.user) {
           const user: SupabaseUser = session.user;
+          // Get user profile from Supabase to get real avatar
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('profile_image_url')
+            .eq('user_id', user.id)
+            .single();
+            
           setCurrentUser({
             name: user.user_metadata?.display_name || user.email?.split('@')[0] || 'User',
             email: user.email || '',
-            avatarUrl: `https://picsum.photos/seed/${user.id}/100/100`,
+            avatarUrl: profile?.profile_image_url || `https://picsum.photos/seed/${user.id}/100/100`,
             plan: 'Free'
           });
           
