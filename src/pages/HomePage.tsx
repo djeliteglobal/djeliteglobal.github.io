@@ -11,6 +11,7 @@ import { AuthModal } from '../components/auth/AuthModal';
 import { SwipeTour } from '../components/platform/SwipeTour';
 import { Toaster } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useTranslation } from '../i18n/useTranslation';
 import { PremiumFeaturesDemo } from '../components/platform/PremiumFeaturesDemo';
 import { useReferral } from '../contexts/ReferralContext';
@@ -315,12 +316,26 @@ const HomePageContent: React.FC = () => {
     );
 };
 
+// Create a client
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            staleTime: 5 * 60 * 1000, // 5 minutes
+            cacheTime: 10 * 60 * 1000, // 10 minutes
+            retry: 2,
+            refetchOnWindowFocus: false,
+        },
+    },
+});
+
 export const HomePage: React.FC = () => {
     return (
         <div className="bg-[color:var(--bg)] text-[color:var(--text-primary)] min-h-screen">
-            <AuthProvider>
-                <HomePageContent />
-            </AuthProvider>
+            <QueryClientProvider client={queryClient}>
+                <AuthProvider>
+                    <HomePageContent />
+                </AuthProvider>
+            </QueryClientProvider>
         </div>
     );
 };
