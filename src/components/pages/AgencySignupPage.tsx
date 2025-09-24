@@ -4,9 +4,9 @@ import { useAuth } from '../../contexts/AuthContext';
 import { AuthModal } from '../auth/AuthModal';
 
 const AgencySignupPage: React.FC = () => {
-  const { user } = useAuth();
+  const { currentUser: user, loading: authLoading } = useAuth();
   
-  console.log('Agency page - user:', user); // Debug log
+  console.log('Agency page - user:', user, 'loading:', authLoading); // Debug log
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -25,10 +25,11 @@ const AgencySignupPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) {
+    if (!authLoading && !user) {
       setShowLoginModal(true);
       return;
     }
+    if (authLoading) return;
     if (!formData.ready) return;
     
     setLoading(true);
@@ -49,16 +50,17 @@ const AgencySignupPage: React.FC = () => {
   };
 
   const handleInputFocus = () => {
-    if (!user) {
+    if (!authLoading && !user) {
       setShowLoginModal(true);
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    if (!user) {
+    if (!authLoading && !user) {
       setShowLoginModal(true);
       return;
     }
+    if (authLoading) return;
     const { name, value, type } = e.target;
     setFormData(prev => ({
       ...prev,
