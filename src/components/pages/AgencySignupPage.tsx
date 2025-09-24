@@ -4,7 +4,9 @@ import { useAuth } from '../../contexts/AuthContext';
 import { AuthModal } from '../auth/AuthModal';
 
 const AgencySignupPage: React.FC = () => {
-  const { user, signInWithGoogle } = useAuth();
+  const { user } = useAuth();
+  
+  console.log('Agency page - user:', user); // Debug log
   const [formData, setFormData] = useState({
     name: '',
     email: '',
