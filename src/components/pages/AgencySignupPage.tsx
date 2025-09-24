@@ -17,7 +17,8 @@ const AgencySignupPage: React.FC = () => {
     soundcloudUrl: '',
     youtubeUrl: '',
     experience: '',
-    ready: false
+    ready: false,
+    marketingConsent: false
   });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -30,7 +31,7 @@ const AgencySignupPage: React.FC = () => {
       return;
     }
     if (authLoading) return;
-    if (!formData.ready) return;
+    if (!formData.ready || !formData.marketingConsent) return;
     
     setLoading(true);
     try {
@@ -217,27 +218,50 @@ const AgencySignupPage: React.FC = () => {
             />
           </div>
 
-          <div className="rounded-xl p-6 bg-gradient-to-br from-[color:var(--accent)]/10 to-green-400/10 border border-[color:var(--accent)]/20">
-            <label className="flex items-start gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                name="ready"
-                checked={formData.ready}
-                onChange={handleChange}
-                className="mt-1 w-5 h-5 rounded border-2 border-[color:var(--accent)] bg-transparent checked:bg-[color:var(--accent)] focus:outline-none"
-              />
-              <div>
-                <div className="font-semibold text-[color:var(--accent)] mb-1">I confirm I'm ready for professional representation</div>
-                <div className="text-sm text-[color:var(--text-secondary)]">
-                  I have played in more than 10 clubs OR released 2+ tracks and feel ready for agency representation
+          <div className="space-y-4">
+            <div className="rounded-xl p-6 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="marketingConsent"
+                  checked={formData.marketingConsent}
+                  onChange={handleChange}
+                  onFocus={handleInputFocus}
+                  required
+                  className="mt-1 w-5 h-5 rounded border-2 border-purple-500 bg-transparent checked:bg-purple-500 focus:outline-none"
+                />
+                <div>
+                  <div className="font-semibold text-purple-400 mb-1">Marketing Communications Consent *</div>
+                  <div className="text-sm text-[color:var(--text-secondary)]">
+                    I consent to receive marketing communications and promotional materials from DJ Elite and our commercial partners via email for business development and networking opportunities.
+                  </div>
                 </div>
-              </div>
-            </label>
+              </label>
+            </div>
+
+            <div className="rounded-xl p-6 bg-gradient-to-br from-[color:var(--accent)]/10 to-green-400/10 border border-[color:var(--accent)]/20">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="ready"
+                  checked={formData.ready}
+                  onChange={handleChange}
+                  onFocus={handleInputFocus}
+                  className="mt-1 w-5 h-5 rounded border-2 border-[color:var(--accent)] bg-transparent checked:bg-[color:var(--accent)] focus:outline-none"
+                />
+                <div>
+                  <div className="font-semibold text-[color:var(--accent)] mb-1">I confirm I'm ready for professional representation</div>
+                  <div className="text-sm text-[color:var(--text-secondary)]">
+                    I have played in more than 10 clubs OR released 2+ tracks and feel ready for agency representation
+                  </div>
+                </div>
+              </label>
+            </div>
           </div>
 
           <Button
             type="submit"
-            disabled={loading || !formData.ready}
+            disabled={loading || !formData.ready || !formData.marketingConsent}
             className="w-full py-4 text-lg font-semibold bg-gradient-to-r from-[color:var(--accent)] to-green-400 hover:from-green-400 hover:to-[color:var(--accent)] transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50"
           >
             {loading ? 'Submitting...' : 'Submit Application'}
