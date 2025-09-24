@@ -6,7 +6,7 @@ import { AuthModal } from '../auth/AuthModal';
 const AgencySignupPage: React.FC = () => {
   const { currentUser: user, loading: authLoading } = useAuth();
   
-  console.log('Agency page - user:', user, 'loading:', authLoading); // Debug log
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',

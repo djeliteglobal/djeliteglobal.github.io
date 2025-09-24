@@ -19,8 +19,11 @@ export const handler = async (event, context) => {
     // Store in Supabase
     const supabase = createClient(
       process.env.VITE_SUPABASE_URL,
-      process.env.VITE_SUPABASE_ANON_KEY
+      process.env.SUPABASE_SERVICE_ROLE_KEY
     );
+    
+    console.log('Supabase URL:', process.env.VITE_SUPABASE_URL ? 'Set' : 'Missing');
+    console.log('Service key:', process.env.SUPABASE_SERVICE_ROLE_KEY ? 'Set' : 'Missing');
     
     const insertData = {
       name,
