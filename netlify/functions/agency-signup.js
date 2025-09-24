@@ -22,8 +22,8 @@ export const handler = async (event, context) => {
       process.env.SUPABASE_SERVICE_ROLE_KEY
     );
     
-    console.log('Supabase URL:', process.env.VITE_SUPABASE_URL ? 'Set' : 'Missing');
-    console.log('Service key:', process.env.SUPABASE_SERVICE_ROLE_KEY ? 'Set' : 'Missing');
+    console.log('Supabase URL:', process.env.VITE_SUPABASE_URL);
+    console.log('Service key first 20 chars:', process.env.SUPABASE_SERVICE_ROLE_KEY?.substring(0, 20));
     
     const insertData = {
       name,
