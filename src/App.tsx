@@ -13,7 +13,6 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ReferralProvider } from './contexts/ReferralContext';
 import ReferralDashboard from './components/premium/ReferralDashboard';
 import { notificationService } from './services/notificationService';
-import { startPeriodicProfileSync } from './services/profileService';
 import { referralHandler } from './utils/referralHandler';
 import { PremiumFeaturesDemo } from './components/platform/PremiumFeaturesDemo';
 import { SimpleDJMatchingPage } from './components/pages/SimpleDJMatchingPage';
@@ -41,14 +40,6 @@ function App() {
     // Initialize core services
     notificationService.initialize();
     referralHandler.initialize();
-
-    // Start automatic Google profile picture sync
-    const stopSync = startPeriodicProfileSync();
-
-    // Cleanup on unmount
-    return () => {
-      stopSync();
-    };
   }, []);
 
   return (
