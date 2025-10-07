@@ -65,14 +65,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loginWithOAuth = async (provider: 'google' | 'facebook' | 'spotify' | 'discord') => {
     try {
+      console.log(`🔐 SuperTokens: Starting ${provider} OAuth flow`);
+      
       const referralCode = new URLSearchParams(window.location.search).get('ref');
       if (referralCode) {
         sessionStorage.setItem('dj_elite_referral_code', referralCode);
+        console.log('🔗 Stored referral code:', referralCode);
       }
 
+      console.log(`🚀 Redirecting to ${provider} auth...`);
       await redirectToAuth({ thirdPartyId: provider });
+      console.log(`✅ Redirect initiated for ${provider}`);
     } catch (error: any) {
-      throw new Error(`Failed to sign in with ${provider}`);
+      console.error(`❌ SuperTokens OAuth error for ${provider}:`, error);
+      throw new Error(`Failed to sign in with ${provider}: ${error.message}`);
     }
   };
 

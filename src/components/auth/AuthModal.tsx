@@ -18,11 +18,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
   const handleOAuthLogin = async (provider: 'google' | 'facebook' | 'spotify' | 'discord') => {
     try {
+      console.log(`🔐 Attempting ${provider} login...`);
       setError('');
       setLoading(true);
       await loginWithOAuth(provider);
+      console.log(`✅ ${provider} login initiated`);
       onClose();
     } catch (error: any) {
+      console.error(`❌ ${provider} login failed:`, error);
       setError(error.message || `${provider} login failed`);
     }
     setLoading(false);
