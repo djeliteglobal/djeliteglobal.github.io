@@ -25,6 +25,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { user, isLoaded } = useUser();
   const { signOut, openSignIn } = useClerk();
 
+  React.useEffect(() => {
+    if (isLoaded && user && window.location.pathname === '/') {
+      window.location.href = '/swipe';
+    }
+  }, [isLoaded, user]);
+
   const currentUser: User | null = user ? {
     name: user.fullName || user.username || 'User',
     email: user.primaryEmailAddress?.emailAddress || '',
@@ -41,7 +47,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const loginWithOAuth = async (provider: 'google' | 'facebook' | 'spotify' | 'discord') => {
-    openSignIn();
+    openSignIn({ redirectUrl: '/swipe' });
   };
 
   const logout = async () => {
