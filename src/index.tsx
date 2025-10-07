@@ -1,16 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import SuperTokens from 'supertokens-auth-react';
-import { SuperTokensConfig } from './config/supertokens';
+import { ClerkProvider } from '@clerk/clerk-react';
 import './index.css';
 import App from './App';
 
-// Initialize SuperTokens with error handling
-try {
-  SuperTokens.init(SuperTokensConfig);
-  console.log('✅ SuperTokens initialized successfully');
-} catch (error) {
-  console.error('❌ SuperTokens initialization failed:', error);
+const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+
+if (!clerkPubKey) {
+  throw new Error('Missing VITE_CLERK_PUBLISHABLE_KEY');
 }
 
 const rootElement = document.getElementById('root');
@@ -21,6 +18,8 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
-    <App />
+    <ClerkProvider publishableKey={clerkPubKey}>
+      <App />
+    </ClerkProvider>
   </React.StrictMode>
 );
