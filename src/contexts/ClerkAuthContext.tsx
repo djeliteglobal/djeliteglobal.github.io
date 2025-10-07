@@ -27,7 +27,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   React.useEffect(() => {
     if (isLoaded && user && window.location.pathname === '/') {
-      window.location.href = '/swipe';
+      window.location.href = '/';
     }
   }, [isLoaded, user]);
 
@@ -47,7 +47,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const loginWithOAuth = async (provider: 'google' | 'facebook' | 'spotify' | 'discord') => {
-    openSignIn({ redirectUrl: '/swipe' });
+    openSignIn({ redirectUrl: '/' });
   };
 
   const logout = async () => {
