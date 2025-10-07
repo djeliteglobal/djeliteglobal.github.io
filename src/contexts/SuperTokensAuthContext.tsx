@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import Session from 'supertokens-auth-react/recipe/session';
 import { signOut, redirectToAuth } from 'supertokens-auth-react/recipe/thirdpartyemailpassword';
-import { query } from '../config/neon';
 import type { User } from '../types/platform';
 
 interface AuthContextType {
@@ -94,30 +93,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const checkSession = async () => {
       try {
+        console.log('🔍 Checking SuperTokens session...');
         const sessionExists = await Session.doesSessionExist();
+        console.log('📋 Session exists:', sessionExists);
         
         if (sessionExists) {
           const userId = await Session.getUserId();
-          const response = await fetch('/api/user/profile');
-          const userData = await response.json();
-
+          console.log('👤 User ID:', userId);
+          
+          // For now, create a basic user object
+          // TODO: Fetch user profile from backend API
           setCurrentUser({
-            name: userData.name || 'User',
-            email: userData.email || '',
-            avatarUrl: userData.avatarUrl || `https://picsum.photos/seed/${userId}/100/100`,
-            plan: userData.plan || 'Free'
+            name: 'DJ User',
+            email: 'user@example.com',
+            avatarUrl: `https://picsum.photos/seed/${userId}/100/100`,
+            plan: 'Free'
           });
-
-          const referralCode = sessionStorage.getItem('dj_elite_referral_code');
-          if (referralCode) {
-            await processReferral(userId, referralCode);
-            sessionStorage.removeItem('dj_elite_referral_code');
-          }
+          console.log('✅ User session loaded');
         } else {
+          console.log('❌ No active session');
           setCurrentUser(null);
         }
       } catch (error) {
-        console.error('Session check failed:', error);
+        console.error('❌ Session check failed:', error);
         setCurrentUser(null);
       } finally {
         setLoading(false);
@@ -127,30 +125,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     checkSession();
   }, []);
 
-  const processReferral = async (userId: string, referralCode: string) => {
-    try {
-      const referrer = await query(
-        'SELECT user_id FROM profiles WHERE referral_code = $1',
-        [referralCode]
-      );
 
-      if (referrer.length === 0) return;
-
-      await query(
-        `INSERT INTO referrals (referrer_id, referred_user_id, referral_code, status, completed_at) 
-         VALUES ($1, $2, $3, 'completed', NOW())`,
-        [referrer[0].user_id, userId, referralCode]
-      );
-
-      await query(
-        `INSERT INTO notifications (user_id, type, title, message) 
-         VALUES ($1, 'referral_success', '🎉 Your referral joined!', 'Someone signed up using your link!')`,
-        [referrer[0].user_id]
-      );
-    } catch (error) {
-      console.error('Failed to process referral:', error);
-    }
-  };
 
   const value = {
     currentUser,
