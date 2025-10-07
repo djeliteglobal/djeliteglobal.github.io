@@ -9,7 +9,7 @@ import { PrivacyPage } from './pages/PrivacyPage';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { ThemeProvider } from './theme/ThemeProvider';
 import { QueryProvider } from './providers/QueryProvider';
-import { AuthProvider } from './contexts/SuperTokensAuthContext';
+import { AuthProvider } from './contexts/AuthContext';
 import { ReferralProvider } from './contexts/ReferralContext';
 import ReferralDashboard from './components/premium/ReferralDashboard';
 import { notificationService } from './services/notificationService';
