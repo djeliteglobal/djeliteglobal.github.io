@@ -7,9 +7,8 @@
 [functions]
   node_bundler = "esbuild"
 
-[functions.supertokens]
-  node_bundler = "none"
-  included_files = ["node_modules/**"]
+[functions."supertokens"]
+  node_bundler = "esbuild_zisi"
   
 [[redirects]]
   from = "/api/auth/*"
