@@ -30,7 +30,9 @@
     "stripe": "^14.15.0",
     "wavesurfer.js": "^7.10.2",
     "zod": "^3.22.4",
-    "zustand": "^4.4.7"
+    "zustand": "^4.4.7",
+    "supertokens-node": "^18.0.0",
+    "@neondatabase/serverless": "^0.9.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",
