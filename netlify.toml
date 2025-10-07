@@ -7,6 +7,7 @@
 [functions]
   node_bundler = "esbuild"
   external_node_modules = ["supertokens-node"]
+  included_files = ["node_modules/supertokens-node/**"]
   
 [[redirects]]
   from = "/api/auth/*"
