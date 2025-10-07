@@ -8,7 +8,7 @@
   node_bundler = "esbuild"
 
 [functions."supertokens"]
-  node_bundler = "zisi"
+  node_bundler = "nft"
   
 [[redirects]]
   from = "/api/auth/*"
