@@ -1,4 +1,3 @@
-const { Handler } = require('@netlify/functions');
 const supertokens = require('supertokens-node');
 const { middleware } = require('supertokens-node/framework/awsLambda');
 const ThirdPartyEmailPassword = require('supertokens-node/recipe/thirdpartyemailpassword');
@@ -34,13 +33,13 @@ try {
   supertokens.init({
     framework: 'awsLambda',
     supertokens: {
-      connectionURI: requiredEnvVars.SUPERTOKENS_CONNECTION_URI!,
+      connectionURI: requiredEnvVars.SUPERTOKENS_CONNECTION_URI,
       apiKey: requiredEnvVars.SUPERTOKENS_API_KEY
     },
     appInfo: {
       appName: 'DJ Elite',
-      apiDomain: requiredEnvVars.URL!,
-      websiteDomain: requiredEnvVars.URL!,
+      apiDomain: requiredEnvVars.URL,
+      websiteDomain: requiredEnvVars.URL,
       apiBasePath: '/api/auth',
       websiteBasePath: '/auth'
     },
@@ -51,8 +50,8 @@ try {
             config: {
               thirdPartyId: 'google',
               clients: [{
-                clientId: requiredEnvVars.GOOGLE_CLIENT_ID!,
-                clientSecret: requiredEnvVars.GOOGLE_CLIENT_SECRET!
+                clientId: requiredEnvVars.GOOGLE_CLIENT_ID,
+                clientSecret: requiredEnvVars.GOOGLE_CLIENT_SECRET
               }]
             }
           }
