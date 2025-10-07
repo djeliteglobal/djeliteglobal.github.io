@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '../platform';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/ClerkAuthContext';
 import { AuthModal } from '../auth/AuthModal';
 import toast from 'react-hot-toast';
 

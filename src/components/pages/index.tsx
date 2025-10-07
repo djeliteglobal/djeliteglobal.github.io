@@ -29,7 +29,7 @@
 import React, { useContext, useMemo, useState, useCallback, useEffect, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { AppContext } from '../../pages/HomePage';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/ClerkAuthContext';
 import { Button, CourseCard, FaqItemComponent, PricingCard } from '../platform';
 import { UltraFastSwipeCard } from '../swipe/UltraFastSwipeCard';
 import { ChatInterface } from '../messaging/ChatInterface';

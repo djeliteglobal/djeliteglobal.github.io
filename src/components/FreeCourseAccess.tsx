@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/ClerkAuthContext';
 import { supabase } from '../config/supabase';
 import { Button } from './platform';
 import { PlayCircleIcon, LockIcon, BookOpenIcon, VideoIcon, FileTextIcon } from '../constants/platform';

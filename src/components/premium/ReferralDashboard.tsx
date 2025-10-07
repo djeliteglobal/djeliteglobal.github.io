@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../config/supabase';
 import { referralService, ReferralStats } from '../../services/referralService';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/ClerkAuthContext';
 
 interface Referral {
   id: string;

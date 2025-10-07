@@ -6,7 +6,7 @@ import { AdvancedProfileForm } from '../profile/AdvancedProfileForm';
 import { PremiumProfileDisplay } from '../profile/PremiumProfileDisplay';
 import { getCurrentProfile } from '../../services/profileService';
 import { createCheckoutSession, STRIPE_PRICES } from '../../services/stripeService';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/ClerkAuthContext';
 import { DJProfile } from '../../types/profile';
 import '../../index.css';
 

@@ -1,7 +1,7 @@
 import React, { useState, useContext, useRef, useEffect, memo } from 'react';
 import { motion } from 'framer-motion';
 import { AppContext } from '../../pages/HomePage';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/ClerkAuthContext';
 import { LanguageSwitcher } from '../LanguageSwitcher';
 import { TinderStyleProfileEditor } from '../profile/TinderStyleProfileEditor';
 import { useMatchStore } from '../../stores/matchStore';

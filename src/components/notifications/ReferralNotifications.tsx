@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { notificationService, Notification } from '../../services/notificationService';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/ClerkAuthContext';
 import { supabase } from '../../config/supabase';
 
 export const ReferralNotifications: React.FC = () => {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { referralService } from '../../services/referralService';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/ClerkAuthContext';
 
 export const ReferralSection: React.FC = () => {
   const { currentUser } = useAuth();

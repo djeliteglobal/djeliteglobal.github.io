@@ -4,7 +4,7 @@ import { getCurrentProfile } from '../../services/profileService';
 import { useMatchStore } from '../../stores/matchStore';
 import { Button } from '../platform';
 import { ProfileEditor } from '../profile/ProfileEditor';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/ClerkAuthContext';
 import type { Opportunity } from '../../types/platform';
 import type { DJProfile } from '../../types/profile';
 

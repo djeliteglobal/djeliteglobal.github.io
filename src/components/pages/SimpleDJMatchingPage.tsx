@@ -3,7 +3,7 @@ import { UltraFastSwipeCard } from '../swipe/UltraFastSwipeCard';
 import { Button } from '../platform';
 import { ReferralSection } from '../referrals/ReferralSection';
 import { matchingEngine, type MatchingPreferences } from '../../services/matchingEngine';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/ClerkAuthContext';
 import type { Opportunity } from '../../types/platform';
 import type { DJProfile } from '../../types/profile';
 

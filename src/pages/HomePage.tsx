@@ -6,7 +6,7 @@ import { ProfileEditor } from '../components/profile/ProfileEditor';
 import { LandingPage, Dashboard, CoursesPage, CourseDetailPage, CommunityPage, OpportunitiesPage, SettingsPage, EventsPage, ProfilePage, ReferralsPage, PremiumPage, FreeCoursePage } from '../components/pages';
 import AudioServicesPage from '../components/pages/AudioServicesPage';
 import { FreeCourseAccess } from '../components/FreeCourseAccess';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/ClerkAuthContext';
 import { AuthModal } from '../components/auth/AuthModal';
 import { SwipeTour } from '../components/platform/SwipeTour';
 import { Toaster } from 'react-hot-toast';

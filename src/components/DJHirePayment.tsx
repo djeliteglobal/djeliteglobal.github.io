@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/ClerkAuthContext';
 import { XIcon } from '../constants/platform';
 
 const stripePromise = loadStripe((import.meta as any).env.VITE_STRIPE_PUBLISHABLE_KEY!);
