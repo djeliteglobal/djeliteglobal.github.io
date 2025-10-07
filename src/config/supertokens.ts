@@ -1,8 +1,7 @@
-import SuperTokens from 'supertokens-auth-react';
 import ThirdPartyEmailPassword from 'supertokens-auth-react/recipe/thirdpartyemailpassword';
 import Session from 'supertokens-auth-react/recipe/session';
 
-SuperTokens.init({
+export const SuperTokensConfig = {
   appInfo: {
     appName: 'DJ Elite',
     apiDomain: import.meta.env.VITE_API_DOMAIN || window.location.origin,
@@ -16,19 +15,9 @@ SuperTokens.init({
         providers: [
           ThirdPartyEmailPassword.Google.init(),
           ThirdPartyEmailPassword.Facebook.init(),
-          {
-            id: 'spotify',
-            name: 'Spotify',
-            buttonComponent: () => <div>Continue with Spotify</div>
-          },
-          {
-            id: 'discord',
-            name: 'Discord',
-            buttonComponent: () => <div>Continue with Discord</div>
-          }
         ]
       }
     }),
     Session.init()
   ]
-});
+};
