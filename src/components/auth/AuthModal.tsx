@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../contexts/ClerkAuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { XIcon } from '../../constants/platform';
 
 interface AuthModalProps {
