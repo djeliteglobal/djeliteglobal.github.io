@@ -71,14 +71,24 @@ export const handler: Handler = async (event, context) => {
   try {
     console.log('📥 SuperTokens request:', {
       path: event.path,
+      rawPath: event.rawUrl,
       method: event.httpMethod,
       headers: Object.keys(event.headers)
     });
     
-    const result = await middleware()(event, context);
+    // Ensure path starts with /api/auth for SuperTokens
+    const modifiedEvent = {
+      ...event,
+      path: event.path.replace('/.netlify/functions/supertokens', '/api/auth')
+    };
+    
+    console.log('🔄 Modified path:', modifiedEvent.path);
+    
+    const result = await middleware()(modifiedEvent, context);
     
     console.log('📤 SuperTokens response:', {
-      statusCode: result.statusCode
+      statusCode: result.statusCode,
+      headers: result.headers ? Object.keys(result.headers) : []
     });
     
     return result;
