@@ -1,8 +1,8 @@
-import { Handler } from '@netlify/functions';
-import supertokens from 'supertokens-node';
-import { middleware } from 'supertokens-node/framework/awsLambda';
-import ThirdPartyEmailPassword from 'supertokens-node/recipe/thirdpartyemailpassword';
-import Session from 'supertokens-node/recipe/session';
+const { Handler } = require('@netlify/functions');
+const supertokens = require('supertokens-node');
+const { middleware } = require('supertokens-node/framework/awsLambda');
+const ThirdPartyEmailPassword = require('supertokens-node/recipe/thirdpartyemailpassword');
+const Session = require('supertokens-node/recipe/session');
 
 // Validate environment variables
 const requiredEnvVars = {
@@ -67,7 +67,7 @@ try {
   throw error;
 }
 
-export const handler: Handler = async (event, context) => {
+exports.handler = async (event, context) => {
   try {
     console.log('📥 SuperTokens request:', {
       path: event.path,
