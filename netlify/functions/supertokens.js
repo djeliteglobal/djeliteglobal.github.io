@@ -1,7 +1,7 @@
 const supertokens = require('supertokens-node');
 const { middleware } = require('supertokens-node/framework/awsLambda');
-const ThirdPartyEmailPassword = require('supertokens-node/recipe/thirdpartyemailpassword');
-const Session = require('supertokens-node/recipe/session');
+const ThirdPartyEmailPassword = require('supertokens-node').default.ThirdPartyEmailPassword;
+const Session = require('supertokens-node').default.Session;
 
 // Validate environment variables
 const requiredEnvVars = {
