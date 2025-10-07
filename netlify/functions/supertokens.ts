@@ -76,10 +76,26 @@ export const handler: Handler = async (event, context) => {
       headers: Object.keys(event.headers)
     });
     
+    // Health check endpoint
+    if (event.path.includes('/health')) {
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ status: 'ok', message: 'SuperTokens function is running' })
+      };
+    }
+    
     // Ensure path starts with /api/auth for SuperTokens
+    let authPath = event.path;
+    if (authPath.includes('/.netlify/functions/supertokens')) {
+      authPath = authPath.replace('/.netlify/functions/supertokens', '');
+    }
+    if (!authPath.startsWith('/api/auth')) {
+      authPath = '/api/auth' + authPath;
+    }
+    
     const modifiedEvent = {
       ...event,
-      path: event.path.replace('/.netlify/functions/supertokens', '/api/auth')
+      path: authPath
     };
     
     console.log('🔄 Modified path:', modifiedEvent.path);
@@ -94,11 +110,16 @@ export const handler: Handler = async (event, context) => {
     return result;
   } catch (error) {
     console.error('❌ SuperTokens handler error:', error);
+    console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack');
     return {
       statusCode: 500,
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({ 
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error'
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined
       })
     };
   }
