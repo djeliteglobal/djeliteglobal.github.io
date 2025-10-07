@@ -25,11 +25,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { user, isLoaded } = useUser();
   const { signOut, openSignIn } = useClerk();
 
-  React.useEffect(() => {
-    if (isLoaded && user && window.location.pathname === '/') {
-      window.location.href = '/';
-    }
-  }, [isLoaded, user]);
+
 
   const currentUser: User | null = user ? {
     name: user.fullName || user.username || 'User',
