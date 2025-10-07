@@ -8,7 +8,7 @@
   node_bundler = "esbuild"
 
 [functions."supertokens"]
-  node_bundler = "esbuild_zisi"
+  node_bundler = "zisi"
   
 [[redirects]]
   from = "/api/auth/*"
