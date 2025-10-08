@@ -117,18 +117,18 @@ export const fetchSwipeProfiles = async (): Promise<DJProfile[]> => {
   return profiles;
 };
 
-// Debug function to check Supabase connection
+// Debug function to check Neon connection
 export const testSupabaseConnection = async (): Promise<boolean> => {
   try {
-    const { data, error } = await supabase.from('events').select('count').limit(1);
-    console.log('🔍 SUPABASE TEST:', { data, error });
+    const { data, error } = await supabase.from('profiles').select('count').limit(1);
+    console.log('🔍 NEON TEST:', { data, error });
     if (error) {
-      throw new ApiError(`Supabase connection test failed: ${error.message}`, { statusCode: error.code as any });
+      throw new ApiError(`Neon connection test failed: ${error.message}`, { statusCode: error.code as any });
     }
     return true;
   } catch (error: any) {
-    console.error('🚨 SUPABASE CONNECTION FAILED:', error);
-    throw new ApiError(`Supabase connection failed: ${error.message}`, { isNetworkError: true });
+    console.error('🚨 NEON CONNECTION FAILED:', error);
+    throw new ApiError(`Neon connection failed: ${error.message}`, { isNetworkError: true });
   }
 };
 

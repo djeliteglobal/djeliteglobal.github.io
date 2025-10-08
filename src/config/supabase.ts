@@ -1,22 +1,24 @@
-import { createClient } from '@supabase/supabase-js';
+import { neon } from '@neondatabase/serverless';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || import.meta.env.VITE_NEON_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_NEON_KEY;
+const connectionString = import.meta.env.VITE_NEON_DATABASE_URL || '';
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  db: {
-    schema: 'public',
+export const sql = neon(connectionString);
+
+// Legacy export for compatibility - throws errors to catch usage
+export const supabase = {
+  from: () => { throw new Error('Supabase deprecated - use Neon SQL'); },
+  auth: { 
+    getUser: async () => ({ data: { user: null }, error: new Error('Use Clerk auth') }),
+    getSession: async () => ({ data: { session: null }, error: new Error('Use Clerk auth') }),
+    onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } })
   },
-  auth: {
-    autoRefreshToken: false, // Reduce auth connections
-    persistSession: true,
-    detectSessionInUrl: false // Reduce URL checking
+  storage: {
+    from: () => { throw new Error('Supabase storage deprecated'); }
   },
-  realtime: {
-    params: {
-      eventsPerSecond: 2 // Limit realtime events
-    }
-  }
-});
-
-export { supabase };
+  rpc: () => { throw new Error('Supabase RPC deprecated'); },
+  removeChannel: () => {},
+  channel: () => ({
+    on: () => ({}),
+    subscribe: () => ({})
+  })
+};

@@ -1,14 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
-
-// Use existing Supabase client from profile service
-let supabase: any;
-try {
-  const { supabase: existingClient } = require('./profileService');
-  supabase = existingClient;
-} catch {
-  // Fallback if no Supabase available
-  supabase = null;
-}
+import { sql } from '../config/supabase'; // This is actually Neon now
 
 export interface Event {
   id: string;
@@ -38,25 +28,7 @@ export interface Application {
 }
 
 export const createEvent = async (eventData: Omit<Event, 'id' | 'created_at' | 'applications'>): Promise<Event> => {
-  if (supabase) {
-    try {
-      const { data, error } = await supabase
-        .from('events')
-        .insert([{
-          ...eventData,
-          status: 'open'
-        }])
-        .select()
-        .single();
-      
-      if (error) throw error;
-      return data;
-    } catch (error) {
-      console.error('Supabase event creation failed:', error);
-    }
-  }
-  
-  // Fallback to localStorage
+  // Use localStorage only (events table not in Neon schema)
   const event = {
     id: Date.now().toString(),
     ...eventData,
@@ -73,48 +45,13 @@ export const createEvent = async (eventData: Omit<Event, 'id' | 'created_at' | '
 };
 
 export const fetchEvents = async (): Promise<Event[]> => {
-  if (supabase) {
-    try {
-      const { data, error } = await supabase
-        .from('events')
-        .select(`
-          *,
-          applications:event_applications(*)
-        `)
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      return data || [];
-    } catch (error) {
-      console.error('Supabase event fetch failed:', error);
-    }
-  }
-  
-  // Fallback to localStorage
+  // Use localStorage only (events table not in Neon schema)
   const events = JSON.parse(localStorage.getItem('dj-events-global') || '[]');
   return events;
 };
 
 export const submitApplication = async (applicationData: Omit<Application, 'id' | 'applied_at'>): Promise<Application> => {
-  if (supabase) {
-    try {
-      const { data, error } = await supabase
-        .from('event_applications')
-        .insert([{
-          ...applicationData,
-          status: 'pending'
-        }])
-        .select()
-        .single();
-      
-      if (error) throw error;
-      return data;
-    } catch (error) {
-      console.error('Supabase application submission failed:', error);
-    }
-  }
-  
-  // Fallback to localStorage
+  // Use localStorage only (events table not in Neon schema)
   const application = {
     id: Date.now().toString(),
     ...applicationData,
