@@ -892,10 +892,16 @@ export const OpportunitiesPage: React.FC = () => {
     const handleSwipe = useCallback(async (direction?: 'left' | 'right' | 'super') => {
         // Comprehensive validation to prevent undefined access
         if (!direction || !currentUser?.id || isSwipeInProgress || loading) return;
-        if (!Array.isArray(opportunities) || opportunities.length === 0) return;
+        if (!Array.isArray(opportunities) || opportunities.length === 0) {
+            console.warn('⚠️ SWIPE WARNING: No opportunities available');
+            return;
+        }
         
         const currentProfile = opportunities[0];
-        if (!currentProfile || !currentProfile.id || typeof currentProfile.id !== 'string') return;
+        if (!currentProfile || !currentProfile.id) {
+            console.warn('⚠️ SWIPE WARNING: Invalid current profile');
+            return;
+        }
         
         setIsSwipeInProgress(true);
         
