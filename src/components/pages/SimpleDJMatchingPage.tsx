@@ -140,8 +140,11 @@ export const SimpleDJMatchingPage: React.FC = () => {
           collaborationType: 'all'
         };
         
+        // Get Clerk user ID for database queries
+        const userId = currentUser?.id || 'unknown';
+        
         const matches = await matchingEngine.getOptimalMatches(
-          currentUser?.email || 'unknown',
+          userId,
           preferences,
           20
         );
