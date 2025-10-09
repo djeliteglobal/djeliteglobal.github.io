@@ -46,6 +46,7 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
       
       // Validate opportunity data before swiping
       if (!opportunity || !opportunity.id) {
+        console.warn('⚠️ SWIPE WARNING: Invalid opportunity data');
         return;
       }
       
@@ -72,6 +73,7 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
     } else if (!down && my < -80) {
       // Validate opportunity data before super like
       if (!opportunity || !opportunity.id) {
+        console.warn('⚠️ SWIPE WARNING: Invalid opportunity data for super like');
         return;
       }
       
