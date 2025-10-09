@@ -186,7 +186,7 @@ export const SimpleDJMatchingPage: React.FC = () => {
     console.log('Card left screen:', cardId);
   }, []);
 
-  const currentProfile = profiles[currentIndex];
+  const currentProfile = profiles && profiles.length > 0 ? profiles[currentIndex] : null;
 
   const getTabButtonClass = (isActive: boolean) => {
     return `px-4 py-2 rounded-lg transition-colors ${
@@ -260,7 +260,7 @@ export const SimpleDJMatchingPage: React.FC = () => {
 
       {/* Main Content */}
       <div className="max-w-md mx-auto px-4 py-6">
-        {activeSection === 'discover' && currentProfile && (
+        {activeSection === 'discover' && !loading && currentProfile && (
           <div className="space-y-6">
             {/* Profile Counter */}
             <div className="text-center">
