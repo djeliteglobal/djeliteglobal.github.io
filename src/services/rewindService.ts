@@ -1,4 +1,4 @@
-import { supabase } from '../config/supabase';
+import { sql } from '../config/supabase';
 
 export interface RewindAction {
   id: string;
@@ -8,78 +8,31 @@ export interface RewindAction {
   created_at: string;
 }
 
-export const undoLastSwipe = async (): Promise<{ success: boolean; profileId?: string }> => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Not authenticated');
+export const undoLastSwipe = async (userId: string): Promise<{ success: boolean; profileId?: string }> => {
+  const profile = await sql`SELECT id FROM profiles WHERE user_id = ${userId}`;
+  if (!profile.rows[0]) throw new Error('Profile not found');
 
-  const { data: userProfile } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('user_id', user.id)
-    .single();
+  const profileId = profile.rows[0].id;
+  const lastSwipe = await sql`SELECT * FROM swipes WHERE swiper_id = ${profileId} ORDER BY created_at DESC LIMIT 1`;
+  if (!lastSwipe.rows[0]) throw new Error('No swipes to undo');
 
-  if (!userProfile) throw new Error('Profile not found');
+  const today = new Date().toISOString().split('T')[0];
+  const rewindCount = await sql`SELECT COUNT(*) FROM rewind_actions WHERE user_id = ${userId} AND created_at >= ${today}`;
+  if (parseInt(rewindCount.rows[0]?.count || '0') >= 1) throw new Error('Daily rewind limit reached');
 
-  // Get last swipe
-  const { data: lastSwipe } = await supabase
-    .from('swipes')
-    .select('*')
-    .eq('swiper_id', userProfile.id)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .single();
+  await sql`DELETE FROM swipes WHERE id = ${lastSwipe.rows[0].id}`;
+  await sql`INSERT INTO rewind_actions (user_id, swiped_profile_id, original_direction) VALUES (${userId}, ${lastSwipe.rows[0].swiped_id}, ${lastSwipe.rows[0].direction})`;
 
-  if (!lastSwipe) throw new Error('No swipes to undo');
-
-  // Check if rewind was already used today
-  const { count: rewindCount } = await supabase
-    .from('rewind_actions')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id)
-    .gte('created_at', new Date().toISOString().split('T')[0]);
-
-  if ((rewindCount || 0) >= 1) {
-    throw new Error('Daily rewind limit reached');
+  if (lastSwipe.rows[0].direction === 'right' || lastSwipe.rows[0].direction === 'super') {
+    await sql`DELETE FROM matches WHERE (profile1_id = ${profileId} OR profile2_id = ${profileId}) AND (profile1_id = ${lastSwipe.rows[0].swiped_id} OR profile2_id = ${lastSwipe.rows[0].swiped_id})`;
   }
 
-  // Delete the swipe
-  const { error: deleteError } = await supabase
-    .from('swipes')
-    .delete()
-    .eq('id', lastSwipe.id);
-
-  if (deleteError) throw deleteError;
-
-  // Record rewind action
-  await supabase
-    .from('rewind_actions')
-    .insert({
-      user_id: user.id,
-      swiped_profile_id: lastSwipe.swiped_id,
-      original_direction: lastSwipe.direction
-    });
-
-  // If it was a match, remove it
-  if (lastSwipe.direction === 'right' || lastSwipe.direction === 'super') {
-    await supabase
-      .from('matches')
-      .delete()
-      .or(`profile1_id.eq.${userProfile.id},profile2_id.eq.${userProfile.id}`)
-      .or(`profile1_id.eq.${lastSwipe.swiped_id},profile2_id.eq.${lastSwipe.swiped_id}`);
-  }
-
-  return { success: true, profileId: lastSwipe.swiped_id };
+  return { success: true, profileId: lastSwipe.rows[0].swiped_id };
 };
 
-export const getRewindCount = async (): Promise<number> => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return 0;
-
-  const { count } = await supabase
-    .from('rewind_actions')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id)
-    .gte('created_at', new Date().toISOString().split('T')[0]);
-
-  return 1 - (count || 0); // 1 free rewind per day
+export const getRewindCount = async (userId: string): Promise<number> => {
+  const today = new Date().toISOString().split('T')[0];
+  const result = await sql`SELECT COUNT(*) FROM rewind_actions WHERE user_id = ${userId} AND created_at >= ${today}`;
+  const count = parseInt(result.rows[0]?.count || '0');
+  return 1 - count;
 };

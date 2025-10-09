@@ -5,6 +5,19 @@ import { checkConnectionLimit } from '../services/subscriptionService';
 import { sanitizeForLog, validateInput } from '../utils/sanitizer';
 import type { Match, MatchStore } from '../types/match';
 
+let cachedUserId: string | null = null;
+
+export const setMatchStoreUserId = (userId: string) => {
+  cachedUserId = userId;
+};
+
+const getUserId = (): string => {
+  if (!cachedUserId) {
+    throw new Error('Not authenticated');
+  }
+  return cachedUserId;
+};
+
 export const useMatchStore = create<MatchStore>()(
   subscribeWithSelector((set, get) => ({
     matches: [],
@@ -15,8 +28,9 @@ export const useMatchStore = create<MatchStore>()(
     loadMatches: async () => {
       set({ isLoading: true });
       try {
-        const matches = await fetchMatches();
-        const connectionLimit = await checkConnectionLimit();
+        const userId = getUserId();
+        const matches = await fetchMatches(userId);
+        const connectionLimit = await checkConnectionLimit(userId);
         const { unmatchedIds } = get();
         
         // Filter out unmatched profiles
@@ -32,7 +46,8 @@ export const useMatchStore = create<MatchStore>()(
     },
 
     checkCanConnect: async () => {
-      const connectionLimit = await checkConnectionLimit();
+      const userId = getUserId();
+      const connectionLimit = await checkConnectionLimit(userId);
       set({ connectionLimit });
       return connectionLimit.canConnect;
     },
@@ -57,7 +72,8 @@ export const useMatchStore = create<MatchStore>()(
       });
       
       try {
-        await deleteMatch(matchId);
+        const userId = getUserId();
+        await deleteMatch(matchId, userId);
         console.log('✅ Unmatch successful for ID:', sanitizeForLog(matchId));
       } catch (error) {
         console.error('❌ Unmatch failed:', sanitizeForLog(error));

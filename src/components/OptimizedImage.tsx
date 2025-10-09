@@ -99,6 +99,21 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
 
     const loadImage = async () => {
       try {
+        // Block Google images immediately
+        if (src.includes('googleusercontent.com')) {
+          const fallbackAvatar = `data:image/svg+xml;base64,${btoa(`
+            <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="${width}" height="${height}" fill="#6366f1"/>
+              <text x="50%" y="50%" text-anchor="middle" dy="0.3em" fill="white" font-size="${Math.min(width, height) * 0.4}" font-family="Arial, sans-serif">
+                ${alt.charAt(0).toUpperCase()}
+              </text>
+            </svg>
+          `)}`;
+          setImageSrc(fallbackAvatar);
+          setIsLoading(false);
+          return;
+        }
+
         // Check cache first
         const cacheKey = `${src}-${width}-${height}-${quality}`;
         if (imageCache.has(cacheKey)) {
@@ -114,20 +129,51 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
           return;
         }
 
+        // Test if image loads before compression
+        const testImg = new Image();
+        testImg.crossOrigin = 'anonymous';
+        
+        await new Promise((resolve, reject) => {
+          testImg.onload = resolve;
+          testImg.onerror = (e) => {
+            // Check if it's a 429 error or similar rate limit
+            if (src.includes('googleusercontent.com')) {
+              reject(new Error('RATE_LIMITED'));
+            } else {
+              reject(e);
+            }
+          };
+          testImg.src = src;
+        });
+
         // Compress image
         const compressedSrc = await compressImage(src, width, height, quality);
         imageCache.set(cacheKey, compressedSrc);
         setImageSrc(compressedSrc);
         setIsLoading(false);
-      } catch (error) {
-        console.error('Image compression failed:', error);
-        setImageSrc(src); // Fallback to original
+      } catch (error: any) {
+        console.error('Image load failed:', error);
+        
+        // Handle rate limiting with fallback avatar
+        if (error.message === 'RATE_LIMITED' || src.includes('googleusercontent.com')) {
+          const fallbackAvatar = `data:image/svg+xml;base64,${btoa(`
+            <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="${width}" height="${height}" fill="#6366f1"/>
+              <text x="50%" y="50%" text-anchor="middle" dy="0.3em" fill="white" font-size="${Math.min(width, height) * 0.4}" font-family="Arial, sans-serif">
+                ${alt.charAt(0).toUpperCase()}
+              </text>
+            </svg>
+          `)}`;
+          setImageSrc(fallbackAvatar);
+        } else {
+          setImageSrc(src); // Fallback to original
+        }
         setIsLoading(false);
       }
     };
 
     loadImage();
-  }, [src, width, height, quality, isInView]);
+  }, [src, width, height, quality, isInView, alt]);
 
   return (
     <div className={`relative overflow-hidden ${className}`}>
@@ -139,6 +185,21 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
           isLoading ? 'opacity-50' : 'opacity-100'
         } w-full h-full object-cover`}
         loading={lazy ? 'lazy' : 'eager'}
+        onError={(e) => {
+          // Additional fallback for runtime errors
+          const target = e.target as HTMLImageElement;
+          if (!target.src.startsWith('data:image/svg')) {
+            const fallbackAvatar = `data:image/svg+xml;base64,${btoa(`
+              <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="${width}" height="${height}" fill="#6366f1"/>
+                <text x="50%" y="50%" text-anchor="middle" dy="0.3em" fill="white" font-size="${Math.min(width, height) * 0.4}" font-family="Arial, sans-serif">
+                  ${alt.charAt(0).toUpperCase()}
+                </text>
+              </svg>
+            `)}`;
+            target.src = fallbackAvatar;
+          }
+        }}
       />
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
@@ -151,6 +212,11 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
 
 // Utility function to preload and compress images
 export const preloadImage = async (src: string, width = 400, height = 400, quality = 0.8) => {
+  // Block Google images immediately
+  if (src.includes('googleusercontent.com')) {
+    return;
+  }
+  
   const cacheKey = `${src}-${width}-${height}-${quality}`;
   if (!imageCache.has(cacheKey) && src && !src.startsWith('data:')) {
     try {

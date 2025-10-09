@@ -1,5 +1,3 @@
-import { sql } from '../config/supabase'; // This is actually Neon now
-
 export interface Event {
   id: string;
   title: string;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/ClerkAuthContext';
-import { supabase } from '../config/supabase';
+import { sql } from '../config/supabase';
 import { Button } from './platform';
 import { PlayCircleIcon, LockIcon, BookOpenIcon, VideoIcon, FileTextIcon } from '../constants/platform';
 
@@ -171,24 +171,13 @@ export const FreeCourseAccess: React.FC<{ preview?: boolean }> = ({ preview = fa
   }, [currentUser]);
 
   const loadUserProgress = async () => {
-    if (!currentUser) return;
+    if (!currentUser?.id) return;
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      const profile = await sql`SELECT id FROM profiles WHERE user_id = ${currentUser.id} LIMIT 1`;
 
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('user_id', user.id)
-        .single();
-
-      if (profile) {
-        const { data: progress } = await supabase
-          .from('course_progress')
-          .select('*')
-          .eq('user_id', profile.id);
-
+      if (profile?.[0]) {
+        const progress = await sql`SELECT * FROM course_progress WHERE user_id = ${profile[0].id}`;
         setUserProgress(progress || []);
       }
     } catch (error) {
@@ -199,18 +188,10 @@ export const FreeCourseAccess: React.FC<{ preview?: boolean }> = ({ preview = fa
   };
 
   const checkCourseAccess = async () => {
-    if (!currentUser) return;
+    if (!currentUser?.id) return;
 
     try {
-      // Check if user has premium subscription or course access
-      const { data: subscription } = await supabase
-        .from('subscriptions')
-        .select('*')
-        .eq('user_id', currentUser.email)
-        .eq('status', 'active')
-        .single();
-
-      // Free users get access to free modules, premium users get all modules
+      const subscription = await sql`SELECT * FROM subscriptions WHERE user_id = ${currentUser.id} AND status = 'active' LIMIT 1`;
       setHasAccess(true); // Everyone gets access to free content
     } catch (error) {
       console.error('Failed to check course access:', error);
@@ -600,54 +581,40 @@ export const FreeCourseAccess: React.FC<{ preview?: boolean }> = ({ preview = fa
   };
 
   const markModuleComplete = async (moduleId: string) => {
-    if (!currentUser) {
+    if (!currentUser?.id) {
       console.log('❌ No current user');
       return;
     }
 
     try {
-      console.log('🔍 DEBUG: Starting markModuleComplete for:', moduleId);
-      
-      const { data: { user } } = await supabase.auth.getUser();
-      console.log('🔍 DEBUG: Supabase user:', user?.id);
-      if (!user) return;
+      let profile = await sql`SELECT * FROM profiles WHERE user_id = ${currentUser.id} LIMIT 1`;
 
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('user_id', user.id)
-        .single();
-      
-      console.log('🔍 DEBUG: Profile lookup:', { profile, profileError });
-
-      if (profile) {
-        const progressData = {
-          user_id: profile.id,
-          module_id: moduleId,
-          completed: true,
-          completed_at: new Date().toISOString(),
-          progress_percentage: 100
-        };
-        
-        console.log('🔍 DEBUG: Inserting progress:', progressData);
-        
-        const { data: result, error: upsertError } = await supabase
-          .from('course_progress')
-          .upsert(progressData, { onConflict: 'user_id,module_id' });
-        
-        console.log('🔍 DEBUG: Upsert result:', { result, upsertError });
-
-        // Force reload progress
-        await loadUserProgress();
-        
-        console.log('🔍 DEBUG: Current progress after reload:', userProgress.length);
-        console.log('🔍 DEBUG: Completion percentage:', getCompletionPercentage());
-        
-        alert(`✅ Module completed! Progress: ${getCompletionPercentage()}%`);
-      } else {
-        console.log('❌ No profile found');
-        alert('❌ Profile not found');
+      if (!profile?.[0]) {
+        await sql`
+          INSERT INTO profiles (user_id, dj_name, bio)
+          VALUES (${currentUser.id}, ${currentUser.name || 'DJ Student'}, ${'Learning DJ booking strategies'})
+          ON CONFLICT (user_id) DO UPDATE SET dj_name = EXCLUDED.dj_name
+        `;
+        profile = await sql`SELECT * FROM profiles WHERE user_id = ${currentUser.id} LIMIT 1`;
       }
+
+      if (!profile?.[0]) {
+        throw new Error('Profile not found after creation attempt');
+      }
+      
+      const profileId = profile[0].id;
+      
+      await sql`
+        INSERT INTO course_progress (user_id, module_id, completed, completed_at, progress_percentage)
+        VALUES (${profileId}, ${moduleId}, true, ${new Date().toISOString()}, 100)
+        ON CONFLICT (user_id, module_id) DO UPDATE SET
+          completed = true,
+          completed_at = ${new Date().toISOString()},
+          progress_percentage = 100
+      `;
+
+      await loadUserProgress();
+      alert(`✅ Module completed! Progress: ${getCompletionPercentage()}%`);
     } catch (error) {
       console.error('❌ Failed to mark module complete:', error);
       alert('❌ Error: ' + error.message);

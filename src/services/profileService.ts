@@ -1,11 +1,9 @@
-import { supabase } from '../config/supabase';
+import { sql } from '../config/supabase';
+import { useUser } from '@clerk/clerk-react';
 import { sanitizeForLog, validateInput } from '../utils/sanitizer';
 import { migrateDjNames } from '../utils/migrateDjNames';
 import { matchingEngine } from './matchingEngine';
 import { ApiError } from '../hooks/useApiError';
-
-// Export supabase for other services
-export { supabase };
 
 // Export migration function for admin use
 export { migrateDjNames };
@@ -19,112 +17,60 @@ let profileCache: DJProfile[] = [];
 let cacheTimestamp = 0;
 const CACHE_DURATION = 30000; // 30 seconds
 
-export const fetchSwipeProfiles = async (): Promise<DJProfile[]> => {
+export const fetchSwipeProfiles = async (userId?: string): Promise<DJProfile[]> => {
   // INSTANT CACHE CHECK: Return cached data immediately if fresh
   const now = Date.now();
   if (profileCache.length > 0 && (now - cacheTimestamp) < CACHE_DURATION) {
     console.log('⚡ INSTANT CACHE HIT: Returning cached profiles');
-    return [...profileCache]; // Return copy to prevent mutations
+    return [...profileCache];
   }
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Not authenticated');
+  if (!userId) throw new Error('Not authenticated');
 
   try {
-    // AI-POWERED MATCHING: Get optimally matched profiles with timeout
-    console.log('🧠 AI MATCHING: Computing optimal matches...');
+    // Query Neon directly
+    const data = await sql`
+      SELECT * FROM profiles 
+      WHERE user_id != ${userId}
+      AND is_active = true
+      LIMIT 20
+    `;
     
-    const matchingPromise = matchingEngine.getOptimalMatches(user.id, {}, 20);
-    const timeoutPromise = new Promise<never>((_, reject) => 
-      setTimeout(() => reject(new Error('AI matching timeout')), 2000)
-    );
-    
-    const smartMatches = await Promise.race([matchingPromise, timeoutPromise]);
-    
-    if (smartMatches && smartMatches.length > 0) {
-      // Transform smart matches to expected format
-      const profiles = smartMatches.map(profile => {
-        const profileImage = profile.profile_image_url || profile.images?.[0] || DEFAULT_PROFILE_IMAGE;
-        return {
-          id: profile.id,
-          title: profile.dj_name || 'DJ',
-          venue: profile.venues?.[0] || 'Local Venues',
-          location: profile.location || 'Unknown Location',
-          date: 'Available Now',
-          fee: profile.fee || 'Negotiable',
-          genres: profile.genres || ['House', 'Techno'],
-          skills: profile.skills || ['Mixing'],
-          bio: profile.bio || 'Passionate DJ ready to connect!',
-          imageUrl: profileImage,
-          images: profile.images || [profileImage],
-          // AI Enhancement: Add match insights
-          matchScore: profile.matchScore,
-          matchReasons: profile.matchReasons,
-          compatibility: profile.compatibility
-        };
-      });
-      
-      // Update cache
-      profileCache = profiles;
-      cacheTimestamp = now;
-      
-      console.log('✨ AI MATCHING: Returning', profiles.length, 'optimized matches');
-      return profiles;
-    }
-  } catch (error) {
-    console.warn('⚠️ AI MATCHING FALLBACK: Using standard fetch', error?.message || 'Unknown error');
-    // Clear any corrupted cache
-    profileCache = [];
-    cacheTimestamp = 0;
-  }
+    console.log('🚀 NEON FETCH: Loaded', data?.length || 0, 'profiles');
 
-  // FALLBACK: Standard query if AI matching fails
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .neq('user_id', user.id)
-    .limit(20);
+    // Transform and cache
+    const profiles = (data || []).map((profile: any) => {
+      const profileImage = profile.profile_image_url || profile.images?.[0] || DEFAULT_PROFILE_IMAGE;
+      return {
+        id: profile.id,
+        title: profile.dj_name || 'DJ',
+        venue: profile.venues?.[0] || 'Local Venues',
+        location: profile.location || 'Unknown Location',
+        date: 'Available Now',
+        fee: profile.fee || 'Negotiable',
+        genres: profile.genres || ['House', 'Techno'],
+        skills: profile.skills || ['Mixing'],
+        bio: profile.bio || 'Passionate DJ ready to connect!',
+        imageUrl: profileImage,
+        images: profile.images || [profileImage]
+      };
+    });
     
-  console.log('🚀 STANDARD FETCH: Loaded', data?.length || 0, 'profiles');
-
-  if (error) {
+    profileCache = profiles;
+    cacheTimestamp = now;
+    
+    return profiles;
+  } catch (error: any) {
     console.error('Profile fetch error:', error);
-    throw new ApiError(`Failed to fetch swipe profiles: ${error.message}`, { statusCode: error.code as any });
+    throw new ApiError(`Failed to fetch swipe profiles: ${error.message}`, { statusCode: 500 });
   }
-  
-  // Transform and cache
-  const profiles = (data || []).map(profile => {
-    const profileImage = profile.profile_image_url || profile.images?.[0] || DEFAULT_PROFILE_IMAGE;
-    return {
-      id: profile.id,
-      title: profile.dj_name || 'DJ',
-      venue: profile.venues?.[0] || 'Local Venues',
-      location: profile.location || 'Unknown Location',
-      date: 'Available Now',
-      fee: profile.fee || 'Negotiable',
-      genres: profile.genres || ['House', 'Techno'],
-      skills: profile.skills || ['Mixing'],
-      bio: profile.bio || 'Passionate DJ ready to connect!',
-      imageUrl: profileImage,
-      images: profile.images || [profileImage]
-    };
-  });
-  
-  // Update cache
-  profileCache = profiles;
-  cacheTimestamp = now;
-  
-  return profiles;
 };
 
 // Debug function to check Neon connection
 export const testSupabaseConnection = async (): Promise<boolean> => {
   try {
-    const { data, error } = await supabase.from('profiles').select('count').limit(1);
-    console.log('🔍 NEON TEST:', { data, error });
-    if (error) {
-      throw new ApiError(`Neon connection test failed: ${error.message}`, { statusCode: error.code as any });
-    }
+    await sql`SELECT 1`;
+    console.log('🔍 NEON TEST: Connected');
     return true;
   } catch (error: any) {
     console.error('🚨 NEON CONNECTION FAILED:', error);
@@ -138,34 +84,21 @@ export const createProfile = async (profileData: {
   age?: number;
   location?: string;
   experience_level?: string;
-}): Promise<DJProfile> => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Not authenticated');
+}, userId: string): Promise<DJProfile> => {
+  if (!userId) throw new Error('Not authenticated');
 
-  // Check if profile already exists
-  const { data: existing } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('user_id', user.id)
-    .single();
+  const existing = await sql`SELECT * FROM profiles WHERE user_id = ${userId} LIMIT 1`;
 
-  if (existing) {
-    // Update existing profile with latest Google data
-    const googlePicture = user.user_metadata?.avatar_url || user.user_metadata?.picture;
-    const googleName = user.user_metadata?.full_name || user.user_metadata?.name;
+  if (existing.rows[0]) {
+    const existingProfile = existing.rows[0];
+    const googlePicture = null;
+    const googleName = null;
     
     const updates: any = { updated_at: new Date().toISOString() };
     
     // Auto-update name from OAuth or email
     const getUpdatedName = () => {
-      // Try OAuth provider names first
       if (googleName) return googleName;
-      
-      // Fallback to email username if name is generic
-      if (user.email && (existing.dj_name === 'New DJ' || !existing.dj_name || existing.dj_name.trim() === '')) {
-        return user.email.split('@')[0];
-      }
-      
       return null;
     };
     
@@ -174,9 +107,8 @@ export const createProfile = async (profileData: {
       updates.dj_name = updatedName;
     }
     
-    // Smart profile picture logic: Only auto-update if user hasn't uploaded their own image
     if (googlePicture) {
-      const currentImages = existing.images || [];
+      const currentImages = existingProfile.images || [];
       const hasUserUploadedImage = currentImages.some((img: string) => 
         !img.includes('googleusercontent.com') && 
         !img.includes('data:image/svg') &&
@@ -184,7 +116,6 @@ export const createProfile = async (profileData: {
         !img.includes('picsum.photos')
       );
       
-      // Only update if user hasn't uploaded their own image
       if (!hasUserUploadedImage) {
         const newImages = [googlePicture, ...currentImages.filter((img: string) => img !== googlePicture)];
         updates.profile_image_url = googlePicture;
@@ -192,61 +123,22 @@ export const createProfile = async (profileData: {
       }
     }
     
-    if (Object.keys(updates).length > 1) { // More than just updated_at
-      const { data: updatedProfile } = await supabase
-        .from('profiles')
-        .update(updates)
-        .eq('id', existing.id)
-        .select()
-        .single();
-      
-      return updatedProfile || existing;
+    if (Object.keys(updates).length > 1) {
+      const result = await sql`UPDATE profiles SET ${sql(updates)} WHERE id = ${existingProfile.id} RETURNING *`;
+      return result.rows[0] || existingProfile;
     }
-    return existing;
+    return existingProfile;
   }
 
-  // Auto-sync Google profile picture on signup
-  const authProfilePic = user.user_metadata?.avatar_url || user.user_metadata?.picture;
-  const defaultImage = authProfilePic || DEFAULT_PROFILE_IMAGE;
-  
-  // Auto-generate DJ name from OAuth or email
-  const getDisplayName = () => {
-    // Try OAuth provider names first
-    const oauthName = user.user_metadata?.full_name || user.user_metadata?.name;
-    if (oauthName) return oauthName;
-    
-    // Fallback to email username (before @)
-    if (user.email) {
-      return user.email.split('@')[0];
-    }
-    
-    return profileData.dj_name || 'DJ';
-  };
-  
-  const displayName = getDisplayName();
+  const displayName = profileData.dj_name || 'DJ';
 
-  const { data: profile, error } = await supabase
-    .from('profiles')
-    .insert({
-      user_id: user.id,
-      dj_name: displayName,
-      bio: profileData.bio || 'New DJ ready to connect!',
-      age: profileData.age,
-      location: profileData.location,
-      experience_level: profileData.experience_level || 'Beginner',
-      profile_image_url: authProfilePic, // Always use Google profile pic
-      genres: ['House', 'Techno'],
-      skills: ['Mixing', 'Beatmatching'],
-      venues: ['Local Clubs'],
-      images: authProfilePic ? [authProfilePic] : [DEFAULT_PROFILE_IMAGE]
-    })
-    .select()
-    .single();
+  const result = await sql`
+    INSERT INTO profiles (user_id, dj_name, bio, age, location, experience_level, genres, skills, venues, images)
+    VALUES (${userId}, ${displayName}, ${profileData.bio || 'New DJ ready to connect!'}, ${profileData.age}, ${profileData.location}, ${profileData.experience_level || 'Beginner'}, ${JSON.stringify(['House', 'Techno'])}, ${JSON.stringify(['Mixing', 'Beatmatching'])}, ${JSON.stringify(['Local Clubs'])}, ${JSON.stringify([DEFAULT_PROFILE_IMAGE])})
+    RETURNING *
+  `;
 
-  if (error) {
-    throw new ApiError(`Failed to create profile: ${error.message}`, { statusCode: error.code as any });
-  }
-  return profile;
+  return result.rows[0];
 };
 
 export const uploadProfileImage = async (file: File): Promise<string> => {
@@ -290,145 +182,27 @@ export const uploadProfileImage = async (file: File): Promise<string> => {
   */
 };
 
-export const updateProfile = async (profileData: Partial<DJProfile>): Promise<DJProfile> => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Not authenticated');
+export const updateProfile = async (profileData: Partial<DJProfile>, userId: string): Promise<DJProfile> => {
+  if (!userId) throw new Error('Not authenticated');
 
-  // Clean the data - remove undefined values
   const cleanData = Object.fromEntries(
     Object.entries(profileData).filter(([_, value]) => value !== undefined)
   );
 
-  const { data: profile, error } = await supabase
-    .from('profiles')
-    .update(cleanData)
-    .eq('user_id', user.id)
-    .select()
-    .single();
-
-  if (error) {
-    console.error('Update profile error:', error);
-    throw new Error(`Failed to update profile: ${error.message}`);
-  }
-  return profile;
+  const result = await sql`UPDATE profiles SET ${sql(cleanData)} WHERE user_id = ${userId} RETURNING *`;
+  return result.rows[0];
 };
 
-export const getCurrentProfile = async (): Promise<DJProfile | null> => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
+export const getCurrentProfile = async (userId: string): Promise<DJProfile | null> => {
+  if (!userId) return null;
 
-  const { data: profile, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('user_id', user.id)
-    .single();
-
-  if (error) {
-    // If no profile found, it's not an error, just return null
-    if (error.code === 'PGRST116') { // No rows found
-      return null;
-    }
-    throw new ApiError(`Failed to get current profile: ${error.message}`, { statusCode: error.code as any });
-  }
-
-  // Auto-sync Google profile picture if missing
-  if (profile && !profile.profile_image_url) {
-    const authProfilePic = user.user_metadata?.avatar_url || user.user_metadata?.picture;
-    if (authProfilePic) {
-      await supabase
-        .from('profiles')
-        .update({ profile_image_url: authProfilePic })
-        .eq('user_id', user.id);
-      profile.profile_image_url = authProfilePic;
-    }
-  }
-
-  return profile;
+  const result = await sql`SELECT * FROM profiles WHERE user_id = ${userId} LIMIT 1`;
+  return result.rows[0] || null;
 };
 
-export const syncCurrentUserGoogleProfile = async (): Promise<void> => {
-  try {
-    // Get current user only for efficiency
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      return;
-    }
-    
-    const { data: profiles, error } = await supabase
-      .from('profiles')
-      .select('id, user_id, dj_name, profile_image_url, images')
-      .eq('user_id', user.id);
-    
-    if (error) {
-      console.error('❌ SYNC ERROR: Failed to fetch profiles:', error);
-      throw new ApiError(`Failed to sync Google profile: ${error.message}`, { statusCode: error.code as any });
-    }
-    
-    if (!profiles || profiles.length === 0) {
-      console.log('✅ SYNC: No profiles found');
-      return;
-    }
-    
-    console.log(`🔄 SYNC: Processing ${profiles.length} profiles`);
-    
-    for (const profile of profiles) {
-      try {
-        // User is already validated above
-        
-        const googlePicture = user.user_metadata?.avatar_url || user.user_metadata?.picture;
-        const googleName = user.user_metadata?.full_name || user.user_metadata?.name;
-        
-        const updates: any = {};
-        
-        // Update name if it's "New DJ" or empty
-        if (googleName && (profile.dj_name === 'New DJ' || !profile.dj_name || profile.dj_name.trim() === '')) {
-          updates.dj_name = googleName;
-        }
-        
-        // Smart profile picture logic: Only auto-update if user hasn't uploaded their own image
-        if (googlePicture) {
-          const currentImages = profile.images || [];
-          const hasUserUploadedImage = currentImages.some((img: string) => 
-            !img.includes('googleusercontent.com') && 
-            !img.includes('data:image/svg') &&
-            !img.includes('unsplash.com') &&
-            !img.includes('picsum.photos')
-          );
-          
-          // Only update if user hasn't uploaded their own image
-          if (!hasUserUploadedImage) {
-            updates.profile_image_url = googlePicture;
-            const newImages = [googlePicture, ...currentImages.filter((img: string) => img !== googlePicture)];
-            updates.images = newImages;
-          }
-        }
-        
-        // Only update if we have changes
-        if (Object.keys(updates).length > 0) {
-          
-          const { error: updateError } = await supabase
-            .from('profiles')
-            .update(updates)
-            .eq('id', profile.id);
-          
-          if (updateError) {
-            console.error(`❌ SYNC ERROR: Failed to update profile ${profile.id}:`, updateError);
-            throw new ApiError(`Failed to update profile ${profile.id} during sync: ${updateError.message}`, { statusCode: updateError.code as any });
-          } else {
-            console.log(`✅ SYNC: Updated ${sanitizeForLog(updates.dj_name || profile.dj_name)} with Google data`);
-          }
-        } else {
-          console.log(`⚠️ SYNC: No updates needed for ${sanitizeForLog(profile.dj_name)}`);
-        }
-      } catch (profileError) {
-        console.error(`❌ SYNC ERROR: Failed to process profile ${sanitizeForLog(profile.id)}:`, sanitizeForLog(profileError));
-      }
-    }
-    
-  } catch (error: any) {
-    console.error('❌ SYNC ERROR: General sync failure:', error);
-    throw new ApiError(`General sync failure: ${error.message}`, { isNetworkError: true });
-  }
+export const syncCurrentUserGoogleProfile = async (userId: string): Promise<void> => {
+  // Deprecated - no longer needed with Clerk
+  console.log('⚠️ SYNC: Skipped (Clerk handles profile sync)');
 };
 
 // Periodic sync function that runs every 30 minutes
@@ -451,59 +225,29 @@ export const startPeriodicProfileSync = (): (() => void) => {
   };
 };
 
-export const recordSwipe = async (profileId: string, direction: 'left' | 'right' | 'super'): Promise<SwipeResult> => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Not authenticated');
+export const recordSwipe = async (profileId: string, direction: 'left' | 'right' | 'super', userId: string): Promise<SwipeResult> => {
+  if (!userId) throw new Error('Not authenticated');
 
-  const { data: userProfile } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('user_id', user.id)
-    .single();
+  const profile = await sql`SELECT id FROM profiles WHERE user_id = ${userId}`;
+  if (!profile.rows[0]) throw new Error('Profile not found');
 
-  if (!userProfile) throw new Error('Profile not found');
+  const userProfileId = profile.rows[0].id;
 
   try {
-    // Record the swipe
-    await supabase
-      .from('swipes')
-      .insert({
-        swiper_id: userProfile.id,
-        swiped_id: profileId,
-        direction: direction
-      });
+    await sql`INSERT INTO swipes (swiper_id, swiped_id, direction) VALUES (${userProfileId}, ${profileId}, ${direction})`;
   } catch (error: any) {
-    // Ignore duplicate swipes
-    if (error.code !== '23505') {
-      console.error('Swipe error:', error);
-    }
+    if (error.code !== '23505') console.error('Swipe error:', error);
   }
 
-  // Check for match if it's a right swipe
   if (direction === 'right' || direction === 'super') {
     try {
-      const { data: reverseSwipe } = await supabase
-        .from('swipes')
-        .select('*')
-        .eq('swiper_id', profileId)
-        .eq('swiped_id', userProfile.id)
-        .eq('direction', 'right')
-        .single();
+      const reverseSwipe = await sql`SELECT * FROM swipes WHERE swiper_id = ${profileId} AND swiped_id = ${userProfileId} AND direction = 'right' LIMIT 1`;
 
-      if (reverseSwipe) {
-        // It's a match!
+      if (reverseSwipe.rows[0]) {
         try {
-          await supabase
-            .from('matches')
-            .insert({
-              profile1_id: userProfile.id,
-              profile2_id: profileId
-            });
+          await sql`INSERT INTO matches (profile1_id, profile2_id) VALUES (${userProfileId}, ${profileId})`;
         } catch (matchError: any) {
-          // Ignore duplicate matches
-          if (matchError.code !== '23505') {
-            console.error('Match error:', matchError);
-          }
+          if (matchError.code !== '23505') console.error('Match error:', matchError);
         }
         return { match: true };
       }
@@ -515,33 +259,31 @@ export const recordSwipe = async (profileId: string, direction: 'left' | 'right'
   return { match: false };
 };
 
-export const fetchMatches = async (): Promise<DJProfile[]> => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Not authenticated');
+export const fetchMatches = async (userId: string): Promise<DJProfile[]> => {
+  if (!userId) throw new Error('Not authenticated');
 
-  const { data: userProfile } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('user_id', user.id)
-    .single();
+  const profile = await sql`SELECT id FROM profiles WHERE user_id = ${userId}`;
+  if (!profile.rows[0]) return [];
 
-  if (!userProfile) return [];
+  const userProfileId = profile.rows[0].id;
 
   try {
-    const { data: matches } = await supabase
-      .from('matches')
-      .select(`
-        *,
-        profile1:profiles!matches_profile1_id_fkey(*),
-        profile2:profiles!matches_profile2_id_fkey(*)
-      `)
-      .or(`profile1_id.eq.${userProfile.id},profile2_id.eq.${userProfile.id}`);
+    const matches = await sql`
+      SELECT m.id as match_id, m.*, 
+             p1.*, p2.*
+      FROM matches m
+      LEFT JOIN profiles p1 ON m.profile1_id = p1.id
+      LEFT JOIN profiles p2 ON m.profile2_id = p2.id
+      WHERE m.profile1_id = ${userProfileId} OR m.profile2_id = ${userProfileId}
+    `;
 
-    return (matches || []).map(match => {
-      const otherProfile = match.profile1_id === userProfile.id ? match.profile2 : match.profile1;
+    return matches.rows.map(match => {
+      const otherProfile = match.profile1_id === userProfileId ? 
+        { id: match.profile2_id, dj_name: match.dj_name } : 
+        { id: match.profile1_id, dj_name: match.dj_name };
       return {
         ...otherProfile,
-        match_id: match.id
+        match_id: match.match_id
       };
     });
   } catch (error) {
@@ -550,86 +292,40 @@ export const fetchMatches = async (): Promise<DJProfile[]> => {
   }
 };
 
-export const undoSwipe = async (): Promise<void> => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Not authenticated');
+export const undoSwipe = async (userId: string): Promise<void> => {
+  if (!userId) throw new Error('Not authenticated');
 
-  const { data: userProfile } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('user_id', user.id)
-    .single();
+  const profile = await sql`SELECT id FROM profiles WHERE user_id = ${userId}`;
+  if (!profile.rows[0]) throw new Error('Profile not found');
 
-  if (!userProfile) throw new Error('Profile not found');
-
-  // Delete most recent swipe
-  const { error } = await supabase
-    .from('swipes')
-    .delete()
-    .eq('swiper_id', userProfile.id)
-    .order('created_at', { ascending: false })
-    .limit(1);
-
-  if (error) {
-    throw new ApiError(`Failed to undo swipe: ${error.message}`, { statusCode: error.code as any });
-  }
+  await sql`DELETE FROM swipes WHERE id = (SELECT id FROM swipes WHERE swiper_id = ${profile.rows[0].id} ORDER BY created_at DESC LIMIT 1)`;
 };
 
-export const deleteMatch = async (matchId: string): Promise<void> => {
-  if (!validateInput(matchId, 50)) {
-    throw new Error('Invalid match ID');
-  }
-  
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Not authenticated');
+export const deleteMatch = async (matchId: string, userId: string): Promise<void> => {
+  if (!validateInput(matchId, 50)) throw new Error('Invalid match ID');
+  if (!userId) throw new Error('Not authenticated');
 
-  const { data: userProfile } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('user_id', user.id)
-    .single();
+  const profile = await sql`SELECT id FROM profiles WHERE user_id = ${userId}`;
+  if (!profile.rows[0]) throw new Error('Profile not found');
 
-  if (!userProfile) throw new Error('Profile not found');
-
+  const userProfileId = profile.rows[0].id;
   console.log('🎯 HYBRID UNMATCH:', sanitizeForLog(matchId));
   
-  // Get match details first
-  const { data: match } = await supabase
-    .from('matches')
-    .select('profile1_id, profile2_id')
-    .eq('id', matchId)
-    .single();
+  const match = await sql`SELECT profile1_id, profile2_id FROM matches WHERE id = ${matchId} LIMIT 1`;
 
-  if (match) {
-    const otherProfileId = match.profile1_id === userProfile.id ? match.profile2_id : match.profile1_id;
+  if (match.rows[0]) {
+    const otherProfileId = match.rows[0].profile1_id === userProfileId ? match.rows[0].profile2_id : match.rows[0].profile1_id;
     
     try {
-      // Delete match (trigger should handle swipes)
-      const { error: matchError } = await supabase
-        .from('matches')
-        .delete()
-        .eq('id', matchId);
-        
-      if (matchError) throw matchError;
-      
-      // Manual cleanup as fallback
-      await supabase
-        .from('swipes')
-        .delete()
-        .eq('swiper_id', userProfile.id)
-        .eq('swiped_id', otherProfileId);
-        
-      await supabase
-        .from('swipes')
-        .delete()
-        .eq('swiper_id', otherProfileId)
-        .eq('swiped_id', userProfile.id);
+      await sql`DELETE FROM matches WHERE id = ${matchId}`;
+      await sql`DELETE FROM swipes WHERE swiper_id = ${userProfileId} AND swiped_id = ${otherProfileId}`;
+      await sql`DELETE FROM swipes WHERE swiper_id = ${otherProfileId} AND swiped_id = ${userProfileId}`;
     } catch (deleteError) {
       console.error('Delete match error:', sanitizeForLog(deleteError));
       throw new ApiError(`Failed to delete match: ${deleteError.message}`, { statusCode: (deleteError as any).code });
     }
       
-    console.log('✨ HYBRID UNMATCH COMPLETE: Trigger + manual cleanup!');
+    console.log('✨ HYBRID UNMATCH COMPLETE!');
   }
 };
 
@@ -637,27 +333,10 @@ export const subscribeToCareerAccelerator = async (email: string, firstName?: st
   console.log('Attempting Career Accelerator signup:', { email, firstName });
   
   try {
-    const { data, error } = await supabase
-      .from('career_accelerator_leads')
-      .insert({
-        email: email.trim(),
-        first_name: firstName?.trim() || null
-      })
-      .select();
+    await sql`INSERT INTO career_accelerator_leads (email, first_name) VALUES (${email.trim()}, ${firstName?.trim() || null})`;
+    console.log('Career Accelerator signup successful');
+    
 
-    console.log('Career Accelerator response:', { data, error });
-    
-    if (error) {
-      // Handle duplicate email gracefully
-      if (error.code === '23505') {
-        console.log('Email already signed up for Career Accelerator');
-        return;
-      }
-      console.error('Career Accelerator error details:', error);
-      throw new Error(`Career Accelerator signup failed: ${error.message}`);
-    }
-    
-    console.log('Career Accelerator signup successful:', data);
     
     // Send emails via secure Netlify function
     try {
@@ -683,6 +362,10 @@ export const subscribeToCareerAccelerator = async (email: string, firstName?: st
       // Don't throw - signup was successful even if emails failed
     }
   } catch (err: any) {
+    if (err.code === '23505') {
+      console.log('Email already signed up for Career Accelerator');
+      return;
+    }
     console.error('Career Accelerator signup error:', err);
     throw new ApiError(`Career Accelerator signup failed: ${err.message}`, { statusCode: err.code as any, isNetworkError: err instanceof TypeError });
   }
@@ -692,28 +375,13 @@ export const subscribeToNewsletter = async (email: string, firstName?: string): 
   console.log('Attempting to subscribe:', { email, firstName });
   
   try {
-    const { data, error } = await supabase
-      .from('newsletter_subscribers')
-      .insert({
-        email: email.trim(),
-        first_name: firstName?.trim() || null
-      })
-      .select();
-
-    console.log('Supabase response:', { data, error });
-    
-    if (error) {
-      // Handle duplicate email gracefully
-      if (error.code === '23505') {
-        console.log('Email already subscribed');
-        return;
-      }
-      console.error('Supabase error details:', error);
-      throw new Error(`Newsletter signup failed: ${error.message}`);
-    }
-    
-    console.log('Newsletter subscription successful:', data);
+    await sql`INSERT INTO newsletter_subscribers (email, first_name) VALUES (${email.trim()}, ${firstName?.trim() || null})`;
+    console.log('Newsletter subscription successful');
   } catch (err: any) {
+    if (err.code === '23505') {
+      console.log('Email already subscribed');
+      return;
+    }
     console.error('Newsletter subscription error:', err);
     throw new ApiError(`Newsletter subscription failed: ${err.message}`, { statusCode: err.code as any, isNetworkError: err instanceof TypeError });
   }

@@ -1,4 +1,4 @@
-import { supabase } from '../config/supabase';
+import { sql } from '../config/supabase';
 import type { DJProfile } from '../types/profile';
 
 interface MatchScore {
@@ -69,13 +69,8 @@ class MatchingEngine {
   }
 
   private async getCurrentUserProfile(userId: string): Promise<DJProfile | null> {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
-    
-    return data;
+    const result = await sql`SELECT * FROM profiles WHERE user_id = ${userId} LIMIT 1`;
+    return result.rows[0] || null;
   }
 
   private async getCandidateProfiles(
@@ -83,36 +78,8 @@ class MatchingEngine {
     preferences: MatchingPreferences
   ): Promise<DJProfile[]> {
     try {
-      // SIMPLIFIED QUERY: Basic filtering without complex joins
-      let query = supabase
-        .from('profiles')
-        .select('*')
-        .neq('user_id', currentUserId)
-        .limit(50);
-
-      // Apply preference filters if available
-      if (preferences.preferredGenres?.length) {
-        query = query.overlaps('genres', preferences.preferredGenres);
-      }
-
-      if (preferences.experienceLevel?.length) {
-        query = query.in('experience_level', preferences.experienceLevel);
-      }
-
-      const { data, error } = await query;
-      
-      if (error) {
-        console.warn('🔄 MATCHING ENGINE: Query error, using fallback', error);
-        // Fallback to simplest query
-        const { data: fallbackData } = await supabase
-          .from('profiles')
-          .select('*')
-          .neq('user_id', currentUserId)
-          .limit(20);
-        return fallbackData || [];
-      }
-      
-      return data || [];
+      const result = await sql`SELECT * FROM profiles WHERE user_id != ${currentUserId} LIMIT 50`;
+      return result.rows;
     } catch (error) {
       console.error('❌ MATCHING ENGINE: Database error', error);
       return [];
@@ -187,18 +154,11 @@ class MatchingEngine {
 
   private async calculateSocialCompatibility(profileId1: string, profileId2: string): Promise<number> {
     try {
-      // SIMPLIFIED: Basic mutual connection check
-      const { count: mutualConnections } = await supabase
-        .from('matches')
-        .select('*', { count: 'exact', head: true })
-        .or(`profile1_id.eq.${profileId1},profile2_id.eq.${profileId1}`)
-        .limit(10);
-
-      // Return basic social score
-      return Math.min((mutualConnections || 0) * 0.1, 0.5);
+      const result = await sql`SELECT COUNT(*) FROM matches WHERE profile1_id = ${profileId1} OR profile2_id = ${profileId1} LIMIT 10`;
+      const count = parseInt(result.rows[0]?.count || '0');
+      return Math.min(count * 0.1, 0.5);
     } catch (error) {
-      // Silent fallback - don't break matching
-      return 0.1; // Default small social score
+      return 0.1;
     }
   }
 
@@ -273,13 +233,9 @@ class MatchingEngine {
     
     if (profileIds.length === 0) return [];
     
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .in('id', profileIds);
+    const result = await sql`SELECT * FROM profiles WHERE id = ANY(${profileIds})`;
     
-    // Maintain order and add match reasons
-    return (data || [])
+    return result.rows
       .sort((a, b) => profileIds.indexOf(a.id) - profileIds.indexOf(b.id))
       .map(profile => {
         const matchData = cached.find(m => m.profileId === profile.id);
@@ -294,15 +250,8 @@ class MatchingEngine {
 
   private async getFallbackProfiles(currentUserId: string, limit: number): Promise<DJProfile[]> {
     console.log('🔄 MATCHING ENGINE: Using fallback profiles');
-    
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .neq('user_id', currentUserId)
-      .order('created_at', { ascending: false })
-      .limit(limit);
-    
-    return data || [];
+    const result = await sql`SELECT * FROM profiles WHERE user_id != ${currentUserId} ORDER BY created_at DESC LIMIT ${limit}`;
+    return result.rows;
   }
 
   // Clear cache when user preferences change

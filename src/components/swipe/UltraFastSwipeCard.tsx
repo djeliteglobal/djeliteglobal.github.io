@@ -44,6 +44,11 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
     if (!down && trigger) {
       const direction = dir > 0 ? 'right' : 'left';
       
+      // Validate opportunity data before swiping
+      if (!opportunity || !opportunity.id) {
+        return;
+      }
+      
       // Immediate swipe without waiting for API
       onSwipe(direction);
       api.start({ 
@@ -65,6 +70,11 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
         }).catch(() => {});
       }
     } else if (!down && my < -80) {
+      // Validate opportunity data before super like
+      if (!opportunity || !opportunity.id) {
+        return;
+      }
+      
       // Super like gesture (upward swipe)
       onSwipe('super');
       api.start({ 

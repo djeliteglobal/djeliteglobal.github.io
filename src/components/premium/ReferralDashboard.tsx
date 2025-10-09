@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../config/supabase';
+import { sql } from '../../config/supabase';
 import { referralService, ReferralStats } from '../../services/referralService';
 import { useAuth } from '../../contexts/ClerkAuthContext';
 
@@ -12,7 +12,7 @@ interface Referral {
 }
 
 const ReferralDashboard: React.FC = () => {
-  const { currentUser } = useAuth();
+  const { currentUser, loading: authLoading } = useAuth();
   const [stats, setStats] = useState<ReferralStats>({
     totalReferrals: 0,
     completedReferrals: 0,
@@ -29,23 +29,23 @@ const ReferralDashboard: React.FC = () => {
   console.log('🎯 ReferralDashboard mounted!', { currentUser, loading });
 
   useEffect(() => {
-    console.log('🔄 useEffect triggered with currentUser:', currentUser);
+    console.log('🔄 useEffect triggered with currentUser:', currentUser, 'authLoading:', authLoading);
+    if (authLoading) {
+      return;
+    }
     if (currentUser) {
       loadReferralData();
     } else {
       setLoading(false);
     }
-  }, [currentUser]);
+  }, [currentUser, authLoading]);
 
   const loadReferralData = async () => {
     try {
       setLoading(true);
       console.log('🔍 Starting to load referral data...');
 
-      // Get current user ID from Supabase auth
-      const { data: authUser } = await supabase.auth.getUser();
-      const userId = authUser.user?.id;
-
+      const userId = currentUser?.id;
       console.log('👤 Auth user ID:', userId);
 
       if (!userId) {
@@ -53,16 +53,14 @@ const ReferralDashboard: React.FC = () => {
         return;
       }
 
-      // Check if referral tables exist
       console.log('🔍 Checking if referral tables exist...');
-      const { data: tableCheck, error: tableError } = await supabase
-        .from('referrals')
-        .select('id')
-        .limit(1);
-      
-      if (tableError && tableError.code === '42P01') {
-        setError('Referral system not set up. Please run the database schema first.');
-        return;
+      try {
+        await sql`SELECT id FROM referrals LIMIT 1`;
+      } catch (tableError: any) {
+        if (tableError.code === '42P01') {
+          setError('Referral system not set up. Please run the database schema first.');
+          return;
+        }
       }
 
       // Get referral stats
@@ -77,17 +75,12 @@ const ReferralDashboard: React.FC = () => {
       console.log('✅ Referrals loaded:', referralsData.length, 'items');
       setReferrals(referralsData);
 
-      // Get referral code
       console.log('🔗 Loading referral code...');
-      const profile = await supabase
-        .from('profiles')
-        .select('referral_code')
-        .eq('user_id', userId)
-        .single();
+      const profile = await sql`SELECT referral_code FROM profiles WHERE user_id = ${userId} LIMIT 1`;
 
-      if (profile.data?.referral_code) {
-        console.log('✅ Referral code found:', profile.data.referral_code);
-        setReferralCode(profile.data.referral_code);
+      if (profile.rows[0]?.referral_code) {
+        console.log('✅ Referral code found:', profile.rows[0].referral_code);
+        setReferralCode(profile.rows[0].referral_code);
       } else {
         console.log('🔧 Generating referral code...');
         const code = await referralService.generateReferralCode(userId);
@@ -108,19 +101,11 @@ const ReferralDashboard: React.FC = () => {
   };
 
   const loadUserReferrals = async (): Promise<Referral[]> => {
-    const { data: authUser } = await supabase.auth.getUser();
-    const userId = authUser.user?.id;
-
+    const userId = currentUser?.id;
     if (!userId) return [];
 
-    const { data } = await supabase
-      .from('referrals')
-      .select('*')
-      .eq('referrer_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(20);
-
-    return data || [];
+    const result = await sql`SELECT * FROM referrals WHERE referrer_id = ${userId} ORDER BY created_at DESC LIMIT 20`;
+    return result.rows || [];
   };
 
   const handleCopyCode = () => {
@@ -192,7 +177,7 @@ const ReferralDashboard: React.FC = () => {
   }
 
   // Loading Screen
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="min-h-screen bg-[color:var(--bg)] text-[color:var(--text-primary)] flex items-center justify-center">
         <div className="text-center">

@@ -1,4 +1,4 @@
-import { supabase } from '../config/supabase';
+import { sql } from '../config/supabase';
 import { matchingEngine } from './matchingEngine';
 
 export interface TopPick {
@@ -10,29 +10,19 @@ export interface TopPick {
   expires_at: string;
 }
 
-export const generateTopPicks = async (): Promise<TopPick[]> => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return [];
+export const generateTopPicks = async (userId: string): Promise<TopPick[]> => {
+  if (!userId) return [];
 
   try {
-    // Get AI-powered matches
-    const matches = await matchingEngine.getOptimalMatches(user.id, {}, 50);
+    const matches = await matchingEngine.getOptimalMatches(userId, {}, 50);
     
     // Filter for top picks criteria
     const topCandidates = matches.filter(profile => 
       profile.matchScore && profile.matchScore > 80
     );
 
-    // Get trending profiles (most liked recently)
-    const { data: trendingProfiles } = await supabase
-      .from('profiles')
-      .select(`
-        *,
-        swipe_count:swipes!swipes_swiped_id_fkey(count)
-      `)
-      .gte('last_active_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
-      .order('created_at', { ascending: false })
-      .limit(10);
+    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const trendingProfiles = await sql`SELECT * FROM profiles WHERE last_active_at >= ${weekAgo} ORDER BY created_at DESC LIMIT 10`;
 
     // Combine and score
     const allPicks: TopPick[] = [];
@@ -49,15 +39,9 @@ export const generateTopPicks = async (): Promise<TopPick[]> => {
       });
     });
 
-    // Premium picks (boosted profiles)
-    const { data: boostedProfiles } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('is_boosted', true)
-      .gt('boost_expires_at', new Date().toISOString())
-      .limit(5);
+    const boostedProfiles = await sql`SELECT * FROM profiles WHERE is_boosted = true AND boost_expires_at > NOW() LIMIT 5`;
 
-    (boostedProfiles || []).forEach(profile => {
+    boostedProfiles.rows.forEach(profile => {
       allPicks.push({
         id: `premium-${profile.id}`,
         profile,
@@ -68,8 +52,7 @@ export const generateTopPicks = async (): Promise<TopPick[]> => {
       });
     });
 
-    // Trending picks
-    (trendingProfiles || []).slice(0, 2).forEach(profile => {
+    trendingProfiles.rows.slice(0, 2).forEach(profile => {
       allPicks.push({
         id: `trending-${profile.id}`,
         profile,
@@ -95,14 +78,13 @@ export const generateTopPicks = async (): Promise<TopPick[]> => {
   }
 };
 
-export const getTopPicks = async (): Promise<TopPick[]> => {
-  // Check cache first
+export const getTopPicks = async (userId: string): Promise<TopPick[]> => {
   const cacheKey = 'top_picks';
   const cached = localStorage.getItem(cacheKey);
   
   if (cached) {
     const { picks, timestamp } = JSON.parse(cached);
-    const isExpired = Date.now() - timestamp > 60 * 60 * 1000; // 1 hour
+    const isExpired = Date.now() - timestamp > 60 * 60 * 1000;
     
     if (!isExpired) {
       return picks.filter((pick: TopPick) => 
@@ -111,10 +93,8 @@ export const getTopPicks = async (): Promise<TopPick[]> => {
     }
   }
 
-  // Generate fresh picks
-  const picks = await generateTopPicks();
+  const picks = await generateTopPicks(userId);
   
-  // Cache results
   localStorage.setItem(cacheKey, JSON.stringify({
     picks,
     timestamp: Date.now()
@@ -125,28 +105,13 @@ export const getTopPicks = async (): Promise<TopPick[]> => {
 
 export const recordTopPickView = async (pickId: string): Promise<void> => {
   try {
-    await supabase
-      .from('top_pick_analytics')
-      .insert({
-        pick_id: pickId,
-        action: 'view',
-        created_at: new Date().toISOString()
-      });
-  } catch (error) {
-    // Silent fail for analytics
-  }
+    await sql`INSERT INTO top_pick_analytics (pick_id, action, created_at) VALUES (${pickId}, 'view', NOW())`;
+  } catch (error) {}
 };
 
 export const recordTopPickSwipe = async (pickId: string, direction: 'left' | 'right'): Promise<void> => {
   try {
-    await supabase
-      .from('top_pick_analytics')
-      .insert({
-        pick_id: pickId,
-        action: direction === 'right' ? 'like' : 'pass',
-        created_at: new Date().toISOString()
-      });
-  } catch (error) {
-    // Silent fail for analytics
-  }
+    const action = direction === 'right' ? 'like' : 'pass';
+    await sql`INSERT INTO top_pick_analytics (pick_id, action, created_at) VALUES (${pickId}, ${action}, NOW())`;
+  } catch (error) {}
 };

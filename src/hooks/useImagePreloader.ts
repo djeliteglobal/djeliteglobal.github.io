@@ -22,11 +22,15 @@ export const useImagePreloader = (images: PreloadConfig[], enabled = true) => {
       const batch = images.slice(start, end);
 
       await Promise.all(
-        batch.map(({ src, width = 400, height = 400, quality = 0.8 }) =>
-          preloadImage(src, width, height, quality).catch(() => {
+        batch.map(({ src, width = 400, height = 400, quality = 0.8 }) => {
+          // Block Google images immediately
+          if (src.includes('googleusercontent.com')) {
+            return Promise.resolve();
+          }
+          return preloadImage(src, width, height, quality).catch(() => {
             // Ignore errors, continue with other images
-          })
-        )
+          });
+        })
       );
 
       currentBatch++;

@@ -1,4 +1,4 @@
-import { supabase } from '../config/supabase';
+import { sql } from '../config/supabase';
 
 export interface SuperLike {
   id: string;
@@ -8,103 +8,50 @@ export interface SuperLike {
   is_mutual?: boolean;
 }
 
-export const sendSuperLike = async (profileId: string): Promise<{ success: boolean; isMatch: boolean }> => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Not authenticated');
+export const sendSuperLike = async (profileId: string, userId: string): Promise<{ success: boolean; isMatch: boolean }> => {
+  const profile = await sql`SELECT id FROM profiles WHERE user_id = ${userId}`;
+  if (!profile.rows[0]) throw new Error('Profile not found');
 
-  const { data: userProfile } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('user_id', user.id)
-    .single();
+  const profileIdVal = profile.rows[0].id;
+  const today = new Date().toISOString().split('T')[0];
+  const count = await sql`SELECT COUNT(*) FROM super_likes WHERE sender_id = ${profileIdVal} AND created_at >= ${today}`;
 
-  if (!userProfile) throw new Error('Profile not found');
-
-  // Check if user has super likes remaining
-  const { count: todayCount } = await supabase
-    .from('super_likes')
-    .select('*', { count: 'exact', head: true })
-    .eq('sender_id', userProfile.id)
-    .gte('created_at', new Date().toISOString().split('T')[0]);
-
-  if ((todayCount || 0) >= 1) {
+  if (parseInt(count.rows[0]?.count || '0') >= 1) {
     throw new Error('Daily super like limit reached');
   }
 
-  // Send super like
-  const { error } = await supabase
-    .from('super_likes')
-    .insert({
-      sender_id: userProfile.id,
-      receiver_id: profileId
-    });
+  await sql`INSERT INTO super_likes (sender_id, receiver_id) VALUES (${profileIdVal}, ${profileId})`;
 
-  if (error) throw error;
+  const mutual = await sql`SELECT * FROM super_likes WHERE sender_id = ${profileId} AND receiver_id = ${profileIdVal} LIMIT 1`;
 
-  // Check for mutual super like (instant match)
-  const { data: mutualSuperLike } = await supabase
-    .from('super_likes')
-    .select('*')
-    .eq('sender_id', profileId)
-    .eq('receiver_id', userProfile.id)
-    .single();
-
-  if (mutualSuperLike) {
-    // Create instant match
-    await supabase
-      .from('matches')
-      .insert({
-        profile1_id: userProfile.id,
-        profile2_id: profileId,
-        is_super_match: true
-      });
+  if (mutual.rows[0]) {
+    await sql`INSERT INTO matches (profile1_id, profile2_id, is_super_match) VALUES (${profileIdVal}, ${profileId}, true)`;
     return { success: true, isMatch: true };
   }
 
   return { success: true, isMatch: false };
 };
 
-export const getSuperLikesReceived = async (): Promise<SuperLike[]> => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return [];
+export const getSuperLikesReceived = async (userId: string): Promise<SuperLike[]> => {
+  const profile = await sql`SELECT id FROM profiles WHERE user_id = ${userId}`;
+  if (!profile.rows[0]) return [];
 
-  const { data: userProfile } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('user_id', user.id)
-    .single();
-
-  if (!userProfile) return [];
-
-  const { data } = await supabase
-    .from('super_likes')
-    .select(`
-      *,
-      sender:profiles!super_likes_sender_id_fkey(*)
-    `)
-    .eq('receiver_id', userProfile.id)
-    .order('created_at', { ascending: false });
-
-  return data || [];
+  const result = await sql`
+    SELECT sl.*, p.* FROM super_likes sl
+    LEFT JOIN profiles p ON sl.sender_id = p.id
+    WHERE sl.receiver_id = ${profile.rows[0].id}
+    ORDER BY sl.created_at DESC
+  `;
+  return result.rows;
 };
 
-export const getSuperLikeCount = async (): Promise<number> => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return 0;
+export const getSuperLikeCount = async (userId: string): Promise<number> => {
+  const profile = await sql`SELECT id FROM profiles WHERE user_id = ${userId}`;
+  if (!profile.rows[0]) return 0;
 
-  const { data: userProfile } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('user_id', user.id)
-    .single();
+  const today = new Date().toISOString().split('T')[0];
+  const result = await sql`SELECT COUNT(*) FROM super_likes WHERE sender_id = ${profile.rows[0].id} AND created_at >= ${today}`;
+  const count = parseInt(result.rows[0]?.count || '0');
 
-  if (!userProfile) return 0;
-
-  const { count } = await supabase
-    .from('super_likes')
-    .select('*', { count: 'exact', head: true })
-    .eq('sender_id', userProfile.id)
-    .gte('created_at', new Date().toISOString().split('T')[0]);
-
-  return 1 - (count || 0); // 1 free super like per day
+  return 1 - count;
 };

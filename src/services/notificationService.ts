@@ -1,4 +1,4 @@
-import { supabase } from '../config/supabase';
+import { sql } from '../config/supabase';
 
 export interface Notification {
   id: string;
@@ -30,15 +30,8 @@ class NotificationService {
 
   async getNotifications(userId: string, limit: number = 20): Promise<Notification[]> {
     try {
-      const { data, error } = await supabase
-        .from('notifications')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-        .limit(limit);
-
-      if (error) throw error;
-      return data || [];
+      const result = await sql`SELECT * FROM notifications WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${limit}`;
+      return result.rows;
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
       return [];
@@ -47,12 +40,7 @@ class NotificationService {
 
   async markAsRead(notificationId: string): Promise<void> {
     try {
-      const { error } = await supabase
-        .from('notifications')
-        .update({ read: true })
-        .eq('id', notificationId);
-
-      if (error) throw error;
+      await sql`UPDATE notifications SET read = true WHERE id = ${notificationId}`;
     } catch (error) {
       console.error('Failed to mark notification as read:', error);
     }
@@ -60,13 +48,7 @@ class NotificationService {
 
   async markAllAsRead(userId: string): Promise<void> {
     try {
-      const { error } = await supabase
-        .from('notifications')
-        .update({ read: true })
-        .eq('user_id', userId)
-        .eq('read', false);
-
-      if (error) throw error;
+      await sql`UPDATE notifications SET read = true WHERE user_id = ${userId} AND read = false`;
     } catch (error) {
       console.error('Failed to mark all notifications as read:', error);
     }
@@ -74,14 +56,8 @@ class NotificationService {
 
   async getUnreadCount(userId: string): Promise<number> {
     try {
-      const { count, error } = await supabase
-        .from('notifications')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', userId)
-        .eq('read', false);
-
-      if (error) throw error;
-      return count || 0;
+      const result = await sql`SELECT COUNT(*) FROM notifications WHERE user_id = ${userId} AND read = false`;
+      return parseInt(result.rows[0]?.count || '0');
     } catch (error) {
       console.error('Failed to get unread count:', error);
       return 0;
@@ -124,33 +100,18 @@ class NotificationService {
     }
   }
 
-  // Subscribe to real-time notifications
   subscribeToNotifications(userId: string, callback: (notification: Notification) => void): () => void {
-    const channel = supabase
-      .channel(`notifications:${userId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notifications',
-          filter: `user_id=eq.${userId}`
-        },
-        (payload) => {
-          const notification = payload.new as Notification;
-          callback(notification);
-          
-          // Show browser notification for referral success
-          if (notification.type === 'referral_success') {
-            this.showReferralNotification(notification.title, notification.message);
-          }
+    const interval = setInterval(async () => {
+      const notifications = await this.getNotifications(userId, 1);
+      if (notifications[0]) {
+        callback(notifications[0]);
+        if (notifications[0].type === 'referral_success') {
+          this.showReferralNotification(notifications[0].title, notifications[0].message);
         }
-      )
-      .subscribe();
+      }
+    }, 5000);
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => clearInterval(interval);
   }
 
   // Create notification (for testing purposes)
@@ -162,17 +123,7 @@ class NotificationService {
     data?: any
   ): Promise<void> {
     try {
-      const { error } = await supabase
-        .from('notifications')
-        .insert({
-          user_id: userId,
-          type,
-          title,
-          message,
-          data
-        });
-
-      if (error) throw error;
+      await sql`INSERT INTO notifications (user_id, type, title, message, data) VALUES (${userId}, ${type}, ${title}, ${message}, ${JSON.stringify(data)})`;
     } catch (error) {
       console.error('Failed to create notification:', error);
     }

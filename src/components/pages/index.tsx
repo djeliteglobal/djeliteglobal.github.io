@@ -389,40 +389,7 @@ export const CoursesPage: React.FC = () => {
         const loadCoursesWithProgress = async () => {
             try {
                 const coursesData = await loadCourses();
-                
-                // Load progress for DJ Bookings Blueprint course (ID 1)
-                if (currentUser) {
-                    const { supabase } = await import('../../services/profileService');
-                    const { data: profile } = await supabase
-                        .from('profiles')
-                        .select('id')
-                        .eq('user_id', currentUser.email)
-                        .single();
-                    
-                    if (profile) {
-                        const { data: progress } = await supabase
-                            .from('course_progress')
-                            .select('*')
-                            .eq('user_id', profile.id);
-                        
-                        // Calculate progress for course ID 1 (DJ Bookings Blueprint)
-                        const totalModules = 12; // Total modules in FreeCourseAccess
-                        const completedModules = progress?.length || 0;
-                        const progressPercentage = Math.round((completedModules / totalModules) * 100);
-                        
-                        // Update course progress
-                        const updatedCourses = coursesData.map(course => 
-                            course.id === 1 
-                                ? { ...course, progress: progressPercentage }
-                                : course
-                        );
-                        setCourses(updatedCourses);
-                    } else {
-                        setCourses(coursesData);
-                    }
-                } else {
-                    setCourses(coursesData);
-                }
+                setCourses(coursesData);
             } catch (err) {
                 console.error('Courses error:', err);
                 setError('Failed to load courses');
@@ -682,11 +649,6 @@ export const CommunityPage: React.FC = () => {
     useEffect(() => {
         const loadEvents = async () => {
             try {
-                // Test Supabase connection first
-                const { testSupabaseConnection } = await import('../../services/profileService');
-                const isConnected = await testSupabaseConnection();
-                console.log('🔍 SUPABASE CONNECTION:', isConnected ? 'WORKING' : 'FAILED');
-                
                 const { fetchEvents } = await import('../../services/eventService');
                 const eventData = await fetchEvents();
                 console.log('🎪 EVENTS LOADED:', eventData.length, 'events');
@@ -855,19 +817,26 @@ const DJ_LOADING_COMMENTS = [
 
 // Discover Page (Tinder-like DJ matching)
 export const OpportunitiesPage: React.FC = () => {
+    const { currentUser } = useAuth();
     const [view, setView] = useState<'swipe' | 'list'>('swipe');
     const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
     const [loading, setLoading] = useState(true);
     const [loadingComment, setLoadingComment] = useState(DJ_LOADING_COMMENTS[0]);
     const [matchResult, setMatchResult] = useState<{show: boolean, isMatch: boolean}>({show: false, isMatch: false});
     const [lastSwipedProfile, setLastSwipedProfile] = useState<Opportunity | null>(null);
+    const [isSwipeInProgress, setIsSwipeInProgress] = useState(false);
 
     // ULTRA-FAST LOADING: Instant access with aggressive caching
     const loadProfiles = useCallback(async () => {
         try {
-            // Skip profile creation - just fetch immediately
+            if (!currentUser?.id) {
+                setOpportunities([]);
+                setLoading(false);
+                return;
+            }
+            
             const { fetchSwipeProfiles } = await import('../../services/profileService');
-            const profiles = await fetchSwipeProfiles();
+            const profiles = await fetchSwipeProfiles(currentUser.id);
             setOpportunities(profiles);
             setLoading(false);
             
@@ -897,31 +866,54 @@ export const OpportunitiesPage: React.FC = () => {
         // Preload next batch in background
         const preloadTimer = setTimeout(() => {
             requestIdleCallback(async () => {
-                const { fetchSwipeProfiles } = await import('../../services/profileService');
-                fetchSwipeProfiles().then(profiles => {
-                    // Cache next batch for instant access
-                    if (profiles.length > opportunities.length) {
-                        setOpportunities(prev => [...prev, ...profiles.slice(prev.length)]);
-                    }
-                }).catch(() => {});
+                try {
+                    if (!currentUser?.id) return;
+                    const { fetchSwipeProfiles } = await import('../../services/profileService');
+                    const profiles = await fetchSwipeProfiles(currentUser.id);
+                    
+                    setOpportunities(prev => {
+                        if (!Array.isArray(prev)) return Array.isArray(profiles) ? profiles : [];
+                        if (!Array.isArray(profiles)) return prev;
+                        if (profiles.length > prev.length) {
+                            return [...prev, ...profiles.slice(prev.length)];
+                        }
+                        return prev;
+                    });
+                } catch (error) {
+                    // Silent fail for background preload
+                }
             });
         }, 2000);
         
         return () => clearTimeout(preloadTimer);
     }, []);
 
-    // GENNADY OPTIMIZATION: Optimistic updates
+    // GENNADY OPTIMIZATION: Optimistic updates with debouncing + validation + loading protection
     const handleSwipe = useCallback(async (direction?: 'left' | 'right' | 'super') => {
-        if (opportunities.length === 0 || !direction) return;
+        // Comprehensive validation to prevent undefined access
+        if (!direction || !currentUser?.id || isSwipeInProgress || loading) return;
+        if (!Array.isArray(opportunities) || opportunities.length === 0) return;
         
         const currentProfile = opportunities[0];
-        setLastSwipedProfile(currentProfile);
+        if (!currentProfile || !currentProfile.id || typeof currentProfile.id !== 'string') return;
+        
+        setIsSwipeInProgress(true);
+        
+        // Store references before modifying state
+        const profileToSwipe = { ...currentProfile };
+        setLastSwipedProfile(profileToSwipe);
         setOpportunities(prev => prev.slice(1));
         
-        requestIdleCallback(async () => {
+        // Use Promise-wrapped setTimeout instead of requestIdleCallback
+        Promise.resolve().then(async () => {
             try {
+                // Final validation before database call
+                if (!profileToSwipe?.id || !currentUser?.id || !direction) {
+                    return;
+                }
+                
                 const { recordSwipe } = await import('../../services/profileService');
-                const result = await recordSwipe(currentProfile.id, direction);
+                const result = await recordSwipe(profileToSwipe.id, direction, currentUser.id);
                 if (result?.match) {
                     setMatchResult({show: true, isMatch: true});
                     setTimeout(() => setMatchResult({show: false, isMatch: false}), 3000);
@@ -935,22 +927,28 @@ export const OpportunitiesPage: React.FC = () => {
                     error?.message?.includes('already exists') ||
                     error?.message?.includes('duplicate');
                 
-                if (!isExpectedError) {
-                    console.warn('⚠️ SWIPE WARNING:', error?.message || 'Unknown swipe error');
+                if (!isExpectedError && error) {
+                    const errorMsg = typeof error.message === 'string' ? error.message : 
+                                   Array.isArray(error.message) ? error.message.join(', ') :
+                                   typeof error.toString === 'function' ? error.toString() : 'Unknown swipe error';
+                    console.warn('⚠️ SWIPE WARNING:', errorMsg);
                 }
                 // Always continue - don't break user flow
             }
+        }).finally(() => {
+            // Reset debounce after 500ms
+            setTimeout(() => setIsSwipeInProgress(false), 500);
         });
-    }, [opportunities]);
+    }, [opportunities, currentUser?.id, isSwipeInProgress]);
     
     const handleUndo = async () => {
-        if (lastSwipedProfile) {
+        if (lastSwipedProfile && currentUser?.id) {
             setOpportunities(prev => [lastSwipedProfile, ...prev]);
             setLastSwipedProfile(null);
             
             try {
                 const { undoSwipe } = await import('../../services/profileService');
-                await undoSwipe();
+                await undoSwipe(currentUser.id);
             } catch (error) {
                 console.error('Failed to undo swipe:', error);
             }
@@ -998,7 +996,7 @@ export const OpportunitiesPage: React.FC = () => {
                             </svg>
                         </div>
                         <h2 className="text-2xl font-bold mb-2">It's a Match!</h2>
-                        <p className="text-white/90">You and {opportunities[0]?.title} liked each other</p>
+                        <p className="text-white/90">You and {lastSwipedProfile?.dj_name || lastSwipedProfile?.title || 'another DJ'} liked each other</p>
                         <Button className="mt-6 bg-white text-purple-600 hover:bg-gray-100">
                             Send Message
                         </Button>
@@ -1046,13 +1044,43 @@ export const OpportunitiesPage: React.FC = () => {
                         </div>
                         {opportunities.length > 0 && (
                             <div className="mt-8 flex items-center gap-4">
-                                <button onClick={() => triggerSwipe('left')} className="flex items-center justify-center w-14 h-14 rounded-full bg-[color:var(--surface)] text-[#EF4444] shadow-soft hover:scale-105 transition-transform">
+                                <button 
+                                    onClick={() => {
+                                        try {
+                                            if (opportunities.length > 0) triggerSwipe('left');
+                                        } catch (error) {
+                                            console.warn('⚠️ SWIPE ERROR:', error);
+                                        }
+                                    }} 
+                                    className="flex items-center justify-center w-14 h-14 rounded-full bg-[color:var(--surface)] text-[#EF4444] shadow-soft hover:scale-105 transition-transform"
+                                    disabled={loading || isSwipeInProgress}
+                                >
                                     <XIcon className="w-6 h-6" />
                                 </button>
-                                <button onClick={() => triggerSwipe('super')} className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500 text-white shadow-soft hover:scale-105 transition-transform">
+                                <button 
+                                    onClick={() => {
+                                        try {
+                                            if (opportunities.length > 0) triggerSwipe('super');
+                                        } catch (error) {
+                                            console.warn('⚠️ SWIPE ERROR:', error);
+                                        }
+                                    }} 
+                                    className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500 text-white shadow-soft hover:scale-105 transition-transform"
+                                    disabled={loading || isSwipeInProgress}
+                                >
                                     <StarIcon className="w-5 h-5" fill="currentColor" />
                                 </button>
-                                <button onClick={() => triggerSwipe('right')} className="flex items-center justify-center w-16 h-16 rounded-full bg-[color:var(--accent)] text-black shadow-elev hover:scale-105 transition-transform">
+                                <button 
+                                    onClick={() => {
+                                        try {
+                                            if (opportunities.length > 0) triggerSwipe('right');
+                                        } catch (error) {
+                                            console.warn('⚠️ SWIPE ERROR:', error);
+                                        }
+                                    }} 
+                                    className="flex items-center justify-center w-16 h-16 rounded-full bg-[color:var(--accent)] text-black shadow-elev hover:scale-105 transition-transform"
+                                    disabled={loading || isSwipeInProgress}
+                                >
                                     <HeartIcon className="w-8 h-8" fill="currentColor" />
                                 </button>
                             </div>

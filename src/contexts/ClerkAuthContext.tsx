@@ -1,6 +1,7 @@
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 import { useUser, useClerk } from '@clerk/clerk-react';
 import type { User } from '../types/platform';
+import { setMatchStoreUserId } from '../stores/matchStore';
 
 interface AuthContextType {
   currentUser: User | null;
@@ -25,9 +26,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { user, isLoaded } = useUser();
   const { signOut, openSignIn } = useClerk();
 
-
+  useEffect(() => {
+    if (user?.id) {
+      setMatchStoreUserId(user.id);
+    }
+  }, [user?.id]);
 
   const currentUser: User | null = user ? {
+    id: user.id,
     name: user.fullName || user.username || 'User',
     email: user.primaryEmailAddress?.emailAddress || '',
     avatarUrl: user.imageUrl,

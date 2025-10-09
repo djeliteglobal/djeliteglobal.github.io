@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
-import { deleteMatch, fetchMatches, supabase } from '../services/profileService';
+import { deleteMatch, fetchMatches } from '../services/profileService';
 
 export const useMatches = () => {
   const queryClient = useQueryClient();
@@ -14,23 +13,7 @@ export const useMatches = () => {
     refetchOnWindowFocus: true,
   });
 
-  // Real-time subscription for instant unmatch updates
-  useEffect(() => {
-    const channel = supabase
-      .channel('matches-realtime')
-      .on('postgres_changes', 
-        { event: 'DELETE', schema: 'public', table: 'matches' },
-        () => {
-          console.log('🔄 REALTIME: Match deleted, refreshing...');
-          queryClient.invalidateQueries({ queryKey: ['matches'] });
-        }
-      )
-      .subscribe();
-      
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
+
 
   const unmatchMutation = useMutation({
     mutationFn: deleteMatch,
