@@ -934,9 +934,9 @@ export const OpportunitiesPage: React.FC = () => {
                     error?.message?.includes('duplicate');
                 
                 if (!isExpectedError && error) {
-                    const errorMsg = typeof error.message === 'string' ? error.message : 
-                                   Array.isArray(error.message) ? error.message.join(', ') :
-                                   typeof error.toString === 'function' ? error.toString() : 'Unknown swipe error';
+                    const errorMsg = error?.message && typeof error.message === 'string' ? error.message : 
+                                   error?.message && Array.isArray(error.message) && error.message.length > 0 ? error.message.join(', ') :
+                                   error && typeof error.toString === 'function' ? error.toString() : 'Unknown swipe error';
                     console.warn('⚠️ SWIPE WARNING:', errorMsg);
                 }
                 // Always continue - don't break user flow
