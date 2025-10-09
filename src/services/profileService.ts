@@ -38,7 +38,7 @@ export const fetchSwipeProfiles = async (userId?: string): Promise<DJProfile[]> 
     
     console.log('🚀 NEON FETCH: Loaded', data?.length || 0, 'profiles');
 
-    // Transform and cache
+    // Transform and cache - Neon returns array directly
     const profiles = (data || []).map((profile: any) => {
       const profileImage = profile.profile_image_url || profile.images?.[0] || DEFAULT_PROFILE_IMAGE;
       return {
