@@ -23,6 +23,13 @@ export interface DJProfile {
   equipment?: string[];
   achievements?: string[];
   portfolio_tracks?: string[];
+  spotify_songs?: Array<{
+    id: string;
+    name: string;
+    artists: string[];
+    album: string;
+    image: string;
+  }>;
   contact_info?: {
     email?: string;
     phone?: string;

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect } from 'react';
-import { useUser, useClerk } from '@clerk/clerk-react';
+import { useUser, useClerk, SignIn, SignUp } from '@clerk/clerk-react';
 import type { User } from '../types/platform';
 import { setMatchStoreUserId } from '../stores/matchStore';
 
@@ -10,6 +10,7 @@ interface AuthContextType {
   loginWithOAuth: (provider: 'google' | 'facebook' | 'spotify' | 'discord') => Promise<void>;
   logout: () => Promise<void>;
   loading: boolean;
+  openSignIn: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -49,7 +50,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const loginWithOAuth = async (provider: 'google' | 'facebook' | 'spotify' | 'discord') => {
-    openSignIn({ redirectUrl: '/' });
+    openSignIn();
   };
 
   const logout = async () => {
@@ -62,7 +63,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signup,
     loginWithOAuth,
     logout,
-    loading: !isLoaded
+    loading: !isLoaded,
+    openSignIn
   };
 
   return (

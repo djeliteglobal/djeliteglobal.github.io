@@ -7,7 +7,6 @@ import { LandingPage, Dashboard, CoursesPage, CourseDetailPage, CommunityPage, O
 import AudioServicesPage from '../components/pages/AudioServicesPage';
 import { FreeCourseAccess } from '../components/FreeCourseAccess';
 import { useAuth } from '../contexts/ClerkAuthContext';
-import { AuthModal } from '../components/auth/AuthModal';
 import { SwipeTour } from '../components/platform/SwipeTour';
 import { Toaster } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -293,7 +292,6 @@ const HomePageContent: React.FC = () => {
                     </div>
                 </>
             )}
-            <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
             <SwipeTour />
             <Toaster
                 position="top-right"

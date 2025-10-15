@@ -199,6 +199,30 @@ export const UltraFastSwipeCard: React.FC<UltraFastSwipeCardProps> = ({
                 </span>
               </div>
               
+              {/* Spotify Songs - Always visible */}
+              {opportunity.spotify_songs && opportunity.spotify_songs.length > 0 && (
+                <div className="mt-4 p-3 bg-black/40 rounded-lg backdrop-blur-sm">
+                  <div className="flex items-center gap-2 mb-2">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-green-500">
+                      <circle cx="12" cy="12" r="10" fill="currentColor"/>
+                      <path d="M8 10c2 0 4-1 6-1s4 1 6 1M8 14c2 0 4-1 6-1s4 1 6 1M8 18c2 0 4-1 6-1s4 1 6 1" stroke="white" strokeWidth="1.5" fill="none"/>
+                    </svg>
+                    <span className="text-xs font-semibold text-white/90">Top Tracks</span>
+                  </div>
+                  <div className="space-y-2">
+                    {opportunity.spotify_songs.slice(0, 3).map(song => (
+                      <div key={song.id} className="flex items-center gap-2 bg-black/20 rounded p-1.5">
+                        <img src={song.image} alt={song.album} className="w-8 h-8 rounded" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium text-white truncate">{song.name}</p>
+                          <p className="text-[10px] text-white/60 truncate">{song.artists.join(', ')}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* More Info Section */}
               {showMoreInfo && (
                 <div className="mt-4 p-4 bg-black/30 rounded-lg backdrop-blur-sm">

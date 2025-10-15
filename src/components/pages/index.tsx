@@ -45,6 +45,8 @@ import { useMatches } from '../../hooks/useMatches';
 import { useProfileImagePreloader } from '../../hooks/useImagePreloader';
 import type { Course, Opportunity } from '../../types/platform';
 import { DJMatchingPage } from './DJMatchingPage';
+import { spotifyService, SpotifyTrack } from '../../services/spotifyService';
+import { useUser } from '@clerk/clerk-react';
 
 // Add swipe animation styles
 const swipeStyles = `
@@ -68,6 +70,7 @@ if (typeof document !== 'undefined') {
 // Landing Page
 export const LandingPage: React.FC = () => {
     const { navigate } = useContext(AppContext)!;
+    const { openSignIn } = useAuth();
     
     return (
         <div className="bg-[color:var(--bg)] text-[color:var(--text-primary)]">
@@ -76,7 +79,7 @@ export const LandingPage: React.FC = () => {
                 <div className="container mx-auto flex h-20 items-center justify-between px-4">
                     <div className="text-2xl font-bold font-display">DJ Elite</div>
                     <div>
-                        <Button onClick={() => navigate('dashboard')}>Log In</Button>
+                        <Button onClick={openSignIn}>Log In</Button>
                     </div>
                 </div>
             </header>
@@ -105,7 +108,7 @@ export const LandingPage: React.FC = () => {
                             Connect with DJs worldwide, find your perfect gig match, and build your music community.
                         </p>
                         <div className="mt-10 flex justify-center">
-                            <Button className="px-8 py-4 text-lg" onClick={() => navigate('dashboard')}>Get Started</Button>
+                            <Button className="px-8 py-4 text-lg" onClick={openSignIn}>Get Started</Button>
                         </div>
                     </div>
                 </section>
@@ -198,7 +201,7 @@ export const LandingPage: React.FC = () => {
                         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
                             <Button 
                                 className="px-8 py-4 text-lg font-semibold" 
-                                onClick={() => navigate('dashboard')}
+                                onClick={openSignIn}
                             >
                                 Start Matching (Free)
                             </Button>
@@ -1659,6 +1662,10 @@ const InlineProfileEditor: React.FC = () => {
     const [additionalImages, setAdditionalImages] = useState<string[]>(['', '', '']);
     const [hasAdvanced, setHasAdvanced] = useState(false);
     const [hasContact, setHasContact] = useState(false);
+    const [spotifyTracks, setSpotifyTracks] = useState<SpotifyTrack[]>([]);
+    const [selectedSongs, setSelectedSongs] = useState<SpotifyTrack[]>([]);
+    const [loadingSpotify, setLoadingSpotify] = useState(false);
+    const { user } = useUser();
 
     useEffect(() => {
         // Load data in parallel for maximum speed
@@ -1667,6 +1674,12 @@ const InlineProfileEditor: React.FC = () => {
             checkPremiumFeatures()
         ]).finally(() => setInitialLoading(false));
     }, []);
+
+    useEffect(() => {
+        if (profile.spotify_songs) {
+            setSelectedSongs(profile.spotify_songs);
+        }
+    }, [profile.spotify_songs]);
     
     const checkPremiumFeatures = async () => {
         try {
@@ -1721,11 +1734,66 @@ const InlineProfileEditor: React.FC = () => {
                 if (currentProfile.images) {
                     setAdditionalImages(currentProfile.images.slice(1, 4).concat(['', '', '']).slice(0, 3));
                 }
+                if (currentProfile.spotify_songs) {
+                    setSelectedSongs(currentProfile.spotify_songs);
+                }
             }
         } catch (error) {
             console.error('Failed to load profile:', error);
             setInitialLoading(false);
         }
+    };
+
+    const handleConnectSpotify = async () => {
+        setLoadingSpotify(true);
+        try {
+            const spotifyAccount = user?.externalAccounts?.find(acc => acc.provider === 'spotify');
+            if (!spotifyAccount) {
+                alert('Please connect Spotify in your account settings first');
+                return;
+            }
+            
+            console.log('Spotify account:', spotifyAccount);
+            
+            // Try to get token from verification
+            const verification = (spotifyAccount as any).verification;
+            const token = verification?.externalVerificationRedirectURL?.includes('access_token') 
+                ? new URLSearchParams(verification.externalVerificationRedirectURL.split('#')[1]).get('access_token')
+                : (spotifyAccount as any).publicMetadata?.accessToken || (spotifyAccount as any).accessToken;
+            
+            if (!token) {
+                // Fallback: use mock data for testing
+                alert('Using demo tracks. Full Spotify integration requires backend token refresh.');
+                setSpotifyTracks([
+                    { id: '1', name: 'Demo Track 1', artists: ['Artist 1'], album: 'Album 1', image: 'https://via.placeholder.com/64' },
+                    { id: '2', name: 'Demo Track 2', artists: ['Artist 2'], album: 'Album 2', image: 'https://via.placeholder.com/64' },
+                    { id: '3', name: 'Demo Track 3', artists: ['Artist 3'], album: 'Album 3', image: 'https://via.placeholder.com/64' }
+                ]);
+                return;
+            }
+            
+            const tracks = await spotifyService.getUserTracks(token);
+            setSpotifyTracks(tracks);
+        } catch (error: any) {
+            console.error('Spotify error:', error);
+            alert(`Failed to load Spotify tracks: ${error.message || 'Connection error'}`);
+        } finally {
+            setLoadingSpotify(false);
+        }
+    };
+
+    const toggleSongSelection = (track: SpotifyTrack) => {
+        setSelectedSongs(prev => {
+            const exists = prev.find(s => s.id === track.id);
+            if (exists) {
+                return prev.filter(s => s.id !== track.id);
+            }
+            if (prev.length >= 5) {
+                alert('You can select up to 5 songs');
+                return prev;
+            }
+            return [...prev, track];
+        });
     };
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number = 0) => {
@@ -1759,6 +1827,11 @@ const InlineProfileEditor: React.FC = () => {
     const handleSave = async () => {
         setLoading(true);
         try {
+            if (!user?.id) {
+                alert('Not authenticated. Please log in again.');
+                return;
+            }
+
             const updatedProfile = {
                 dj_name: profile.dj_name,
                 age: profile.age,
@@ -1773,6 +1846,7 @@ const InlineProfileEditor: React.FC = () => {
                 website: profile.website,
                 social_links: profile.social_links,
                 contact_info: profile.contact_info,
+                spotify_songs: selectedSongs.map(s => ({ id: s.id, name: s.name, artists: s.artists, album: s.album, image: s.image })),
                 premium_badge: hasAdvanced
             };
 
@@ -1781,7 +1855,7 @@ const InlineProfileEditor: React.FC = () => {
             cacheTimestamp = Date.now();
 
             const { updateProfile } = await import('../../services/profileService');
-            await updateProfile(updatedProfile);
+            await updateProfile(updatedProfile, user.id);
             alert('Profile updated successfully!');
         } catch (error: any) {
             alert(`Failed to update profile: ${error.message}`);
@@ -2002,6 +2076,83 @@ const InlineProfileEditor: React.FC = () => {
                         />
                     </div>
                 </div>
+            </div>
+
+            {/* Spotify Songs */}
+            <div className="bg-[color:var(--surface)] rounded-xl p-6 border border-[color:var(--border)]">
+                <div className="flex items-center gap-2 mb-4">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-green-500">
+                        <circle cx="12" cy="12" r="10" fill="currentColor"/>
+                        <path d="M8 10c2 0 4-1 6-1s4 1 6 1M8 14c2 0 4-1 6-1s4 1 6 1M8 18c2 0 4-1 6-1s4 1 6 1" stroke="white" strokeWidth="1.5" fill="none"/>
+                    </svg>
+                    <h3 className="text-lg font-semibold">Spotify Songs</h3>
+                </div>
+                <p className="text-sm text-[color:var(--text-secondary)] mb-4">Showcase your favorite tracks on your profile (up to 5 songs)</p>
+                
+                {selectedSongs.length > 0 && (
+                    <div className="mb-4">
+                        <h4 className="text-sm font-medium mb-2">Selected Songs ({selectedSongs.length}/5)</h4>
+                        <div className="space-y-2">
+                            {selectedSongs.map(song => (
+                                <div key={song.id} className="flex items-center gap-3 p-2 bg-[color:var(--surface-alt)] rounded-lg">
+                                    <img src={song.image} alt={song.album} className="w-10 h-10 rounded" />
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-medium truncate">{song.name}</p>
+                                        <p className="text-xs text-[color:var(--text-secondary)] truncate">{song.artists.join(', ')}</p>
+                                    </div>
+                                    <button
+                                        onClick={() => toggleSongSelection(song)}
+                                        className="text-red-400 hover:text-red-500"
+                                    >
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                            <path d="M18 6L6 18M6 6l12 12"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {spotifyTracks.length === 0 ? (
+                    <Button onClick={handleConnectSpotify} disabled={loadingSpotify} variant="secondary">
+                        {loadingSpotify ? 'Loading...' : '🎵 Import from Spotify'}
+                    </Button>
+                ) : (
+                    <div>
+                        <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-sm font-medium">Your Spotify Library</h4>
+                            <button onClick={() => setSpotifyTracks([])} className="text-xs text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]">
+                                Close
+                            </button>
+                        </div>
+                        <div className="max-h-64 overflow-y-auto space-y-2">
+                            {spotifyTracks.map(track => {
+                                const isSelected = selectedSongs.find(s => s.id === track.id);
+                                return (
+                                    <div
+                                        key={track.id}
+                                        onClick={() => toggleSongSelection(track)}
+                                        className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${
+                                            isSelected ? 'bg-green-500/20 border border-green-500' : 'bg-[color:var(--surface-alt)] hover:bg-[color:var(--elevated)]'
+                                        }`}
+                                    >
+                                        <img src={track.image} alt={track.album} className="w-10 h-10 rounded" />
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-medium truncate">{track.name}</p>
+                                            <p className="text-xs text-[color:var(--text-secondary)] truncate">{track.artists.join(', ')}</p>
+                                        </div>
+                                        {isSelected && (
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-green-500">
+                                                <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2" fill="none"/>
+                                            </svg>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Premium Features */}

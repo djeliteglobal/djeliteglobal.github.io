@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Button } from '../platform';
 import { useAuth } from '../../contexts/ClerkAuthContext';
-import { AuthModal } from '../auth/AuthModal';
+import { useClerk } from '@clerk/clerk-react';
 import toast from 'react-hot-toast';
 
 const AgencySignupPage: React.FC = () => {
   const { currentUser: user, loading: authLoading } = useAuth();
-  
+  const { openSignIn } = useClerk();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -23,12 +23,11 @@ const AgencySignupPage: React.FC = () => {
   });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!authLoading && !user) {
-      setShowLoginModal(true);
+      openSignIn();
       return;
     }
     if (authLoading) return;
@@ -62,13 +61,13 @@ const AgencySignupPage: React.FC = () => {
 
   const handleInputFocus = () => {
     if (!authLoading && !user) {
-      setShowLoginModal(true);
+      openSignIn();
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     if (!authLoading && !user) {
-      setShowLoginModal(true);
+      openSignIn();
       return;
     }
     if (authLoading) return;
@@ -286,12 +285,6 @@ const AgencySignupPage: React.FC = () => {
             {loading ? 'Submitting...' : 'Submit Application'}
           </Button>
         </form>
-
-        {/* Auth Modal */}
-        <AuthModal 
-          isOpen={showLoginModal} 
-          onClose={() => setShowLoginModal(false)} 
-        />
       </div>
     </div>
   );

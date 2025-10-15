@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { ClerkProvider } from '@clerk/clerk-react';
+import { clerkAppearance } from './config/clerkTheme';
 import './index.css';
 import App from './App';
 
@@ -18,7 +19,10 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
-    <ClerkProvider publishableKey={clerkPubKey}>
+    <ClerkProvider 
+      publishableKey={clerkPubKey} 
+      appearance={clerkAppearance}
+    >
       <App />
     </ClerkProvider>
   </React.StrictMode>

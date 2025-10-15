@@ -20,7 +20,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 export const Button: React.FC<ButtonProps> = ({ variant = 'primary', children, className = '', ...props }) => {
   const baseClasses = 'px-6 py-3 rounded-md font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[color:var(--bg)] focus:ring-[color:var(--accent)] disabled:opacity-50 disabled:cursor-not-allowed';
   const variantClasses = {
-    primary: 'bg-[color:var(--accent)] text-black hover:bg-[color:var(--accent-muted)]',
+    primary: 'bg-green-500 text-white hover:bg-green-600',
     secondary: 'bg-[color:var(--surface-alt)] text-[color:var(--text-primary)] hover:bg-[color:var(--surface)] border border-[color:var(--border)]',
     ghost: 'bg-transparent text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-alt)] hover:text-[color:var(--text-primary)]',
   };
